@@ -591,7 +591,7 @@ function onEdit(e) {
     
     // If edit is in rows 2+ and columns 1-10
     if (row &gt; 1 && col &gt;= 1 && col &lt;= 10) {
-      sheet.getRange(row, 11).setValue(new Date());
+      sheet.getRange(row, 11).setValue(new Date().toISOString());
     }
   } catch(err) {
     // Fail silently on restricted sheet operations
@@ -1022,13 +1022,41 @@ function onEdit(e) {
         if (!res.ok) return;
         const sheetData = await res.json();
         if (sheetData && Array.isArray(sheetData)) {
-          // If local roster is empty, directly load the sheet data
-          if (roster.length === 0) {
+          if (!isUnlocked) {
+            // Public viewers should simply mirror the Google Sheet state to guarantee no ghost records on sheet edits/deletions
             roster = sheetData;
           } else {
-            // Reconcile and merge sheet data based on ID and timestamps
+            // Reconcile and merge sheet data based on ID and timestamps for Admin Session
+            // Calculate the latest timestamp present on the spreadsheet
+            let maxSheetTime = 0;
+            sheetData.forEach(p => {
+              if (p.timestamp) {
+                const t = new Date(p.timestamp).getTime();
+                if (!isNaN(t) && t > maxSheetTime) {
+                  maxSheetTime = t;
+                }
+              }
+            });
+
             const localMap = new Map();
-            roster.forEach(p => { if (p.id) localMap.set(String(p.id).trim(), p); });
+            const sheetPlayerIds = new Set(sheetData.map(p => String(p.id).trim()));
+
+            // Propagate Deletions from Spreadsheet to Local State on Load:
+            // Check if local players should be kept or removed
+            roster.forEach(localPlayer => {
+              if (!localPlayer.id) return;
+              const localId = String(localPlayer.id).trim();
+              const localTime = new Date(localPlayer.timestamp || 0).getTime();
+
+              if (!sheetPlayerIds.has(localId)) {
+                // If a local player is missing on the sheet, keep them only if they are newly added local edits
+                if (localTime > maxSheetTime) {
+                  localMap.set(localId, localPlayer);
+                }
+              } else {
+                localMap.set(localId, localPlayer);
+              }
+            });
             
             sheetData.forEach(sheetPlayer => {
               if (!sheetPlayer.id) return;
@@ -1428,6 +1456,7 @@ function onEdit(e) {
     }
 
     // CSV Roster Download
+    // Generates a downloadable spreadsheet file for spreadsheet administration imports
     function downloadCSV() {
       if (roster.length === 0) {
         triggerToast('error', 'Database is empty. No files to extract.');
@@ -1565,6 +1594,7 @@ function onEdit(e) {
     // Bidirectional Sync Database Action
     // Smart merge: pulls first, reconciles based on both player ID and timestamps.
     // Overwrites older local records with sheet edits, while keeping and pushing newer website edits.
+    // Automatically handles spreadsheet-side deletions securely by comparing local timestamps to the latest sheet timestamp.
     async function syncDatabase() {
       const endpoint = document.getElementById('sheets-endpoint').value.trim();
       if (!endpoint) {
@@ -1601,7 +1631,7 @@ function onEdit(e) {
         return;
       }
 
-      // Authorized Officer Mode: Executes the full Bidirectional Merge (Pull -> Reconcile -> Push back to cloud)
+      // Authorized Officer Mode: Executes the full Bidirectional Merge (Pull -> Reconcile Deletions/Edits -> Push back to cloud)
       triggerToast('success', 'Establishing secure connection with Google Sheets...');
 
       try {
@@ -1613,24 +1643,52 @@ function onEdit(e) {
         const sheetData = await res.json();
         
         if (sheetData && Array.isArray(sheetData)) {
-          // Step 2: Bidirectional Reconciliation using "ID Code" (Player ID) and Timestamps
-          const mergedMap = new Map();
-          
-          // Map existing local records first
-          roster.forEach(p => {
-            if (p.id) {
-              mergedMap.set(String(p.id).trim(), p);
+          // Calculate the latest timestamp present on the spreadsheet
+          let maxSheetTime = 0;
+          sheetData.forEach(p => {
+            if (p.timestamp) {
+              const t = new Date(p.timestamp).getTime();
+              if (!isNaN(t) && t > maxSheetTime) {
+                maxSheetTime = t;
+              }
             }
           });
 
-          // Reconcile with sheet data. Sheet changes overwrite corresponding local values ONLY if sheet timestamp is newer.
+          // Step 2: Bidirectional Reconciliation using "ID Code" (Player ID) and Timestamps
+          const mergedMap = new Map();
+          const sheetPlayerIds = new Set(sheetData.map(p => String(p.id).trim()));
+          
+          // Map existing local records first, handling potential sheet-side deletions
+          roster.forEach(localPlayer => {
+            if (!localPlayer.id) return;
+            const localId = String(localPlayer.id).trim();
+            const localTime = new Date(localPlayer.timestamp || 0).getTime();
+
+            // Reconcile Deletions:
+            // If the player is missing on the sheet, they were either deleted directly on the sheet, OR added locally on the website.
+            // If their local timestamp is older than or equal to maxSheetTime, they were present in a previous sync but deleted from the sheet.
+            // If their local timestamp is newer than maxSheetTime, they are a fresh local addition or edit that hasn't made it to the sheet yet.
+            if (!sheetPlayerIds.has(localId)) {
+              if (localTime > maxSheetTime) {
+                // Keep fresh local additions
+                mergedMap.set(localId, localPlayer);
+              } else {
+                // Was already synced previously, but deleted on the sheet -> delete locally on the website
+                console.log(`Player ${localPlayer.name} (ID: ${localId}) was deleted on Sheet. Sync propagating deletion locally.`);
+              }
+            } else {
+              // Exists on both, start with local version (might be overridden by newer sheet version below)
+              mergedMap.set(localId, localPlayer);
+            }
+          });
+
+          // Reconcile with sheet data. Sheet changes overwrite corresponding local values ONLY if sheet timestamp is newer or equal.
           sheetData.forEach(sheetPlayer => {
             if (!sheetPlayer.id) return;
             const sheetId = String(sheetPlayer.id).trim();
 
             if (mergedMap.has(sheetId)) {
               const localPlayer = mergedMap.get(sheetId);
-              
               const localTime = new Date(localPlayer.timestamp || 0).getTime();
               const sheetTime = new Date(sheetPlayer.timestamp || 0).getTime();
 
