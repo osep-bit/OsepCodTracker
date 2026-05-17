@@ -876,13 +876,13 @@ function doPost(e) {
       nextItem.status = 'processing';
       renderQueueList();
 
-      // Configure explicit CDN Worker files to help run Tesseract on local pages
+      // Configure Tesseract.js to automatically fetch and resolve CORS-safe workers.
+      // Do NOT manually configure CDN paths (workerPath, corePath) under HTTPS deployment 
+      // as modern browsers will trigger cross-origin worker script restrictions.
       Tesseract.recognize(
         nextItem.imgSrc,
         'eng',
         {
-          workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
-          corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js',
           logger: m => {
             if (m.status === 'recognizing text') {
               nextItem.progress = Math.round(m.progress * 100);
@@ -912,11 +912,11 @@ function doPost(e) {
         nextItem.parsedData = { name: "Manual Required", id: "", power: 0, merits: 0, kills: 0 };
         isOcrActive = false;
 
-        // Custom Error Notification explaining the browser local restriction block
+        // Custom Error Notification explaining the browser local restriction block if applicable
         if (window.location.protocol === 'file:') {
           triggerToast('error', 'CORS / Web-Worker Block! Run this page using an editor local server extension to scan images.');
         } else {
-          triggerToast('error', 'Scan failed. Please adjust values manually.');
+          triggerToast('error', 'Scan failed or was blocked by browser. Please adjust values manually.');
         }
 
         renderQueueList();
