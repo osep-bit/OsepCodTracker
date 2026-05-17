@@ -11,6 +11,13 @@
     tailwind.config = {
       darkMode: 'class',
       theme: {
+        screens: {
+          'xs': '400px',
+          'sm': '640px',
+          'md': '768px',
+          'lg': '1024px',
+          'xl': '1280px',
+        },
         extend: {
           colors: {
             codDark: '#08090c',
@@ -61,20 +68,29 @@
 <body class="bg-codDark text-gray-200 font-sans h-full overflow-hidden flex flex-col">
 
   <!-- ==================== MAIN LAYOUT WRAPPER ==================== -->
-  <div class="flex h-full w-full overflow-hidden">
+  <div class="flex h-full w-full overflow-hidden relative">
     
+    <!-- BACKDROP: Dark blurred overlay for mobile sidebar drawer -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-20 md:hidden transition-all duration-300"></div>
+
     <!-- LEFT SIDEBAR: Premium Game Hub Control -->
-    <aside class="w-64 bg-codCard border-r border-codBorder flex flex-col justify-between shrink-0 z-20">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-codCard border-r border-codBorder flex flex-col justify-between shrink-0 z-30 transform -translate-x-full transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:h-full">
       <div>
         <!-- Logo / Title -->
-        <div class="p-6 border-b border-codBorder flex items-center space-x-3 bg-codDark/30">
-          <div class="p-2.5 bg-codAccent/10 text-codAccent rounded-xl border border-codAccent/25">
-            <i data-lucide="shield" class="w-6 h-6"></i>
+        <div class="p-6 border-b border-codBorder flex items-center justify-between bg-codDark/30">
+          <div class="flex items-center space-x-3">
+            <div class="p-2.5 bg-codAccent/10 text-codAccent rounded-xl border border-codAccent/25 shrink-0">
+              <i data-lucide="shield" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h1 class="font-extrabold text-sm tracking-wider text-white">WRATH OF GOD 949</h1>
+              <p class="text-[10px] text-codAccent font-bold uppercase tracking-widest">Roster Management</p>
+            </div>
           </div>
-          <div>
-            <h1 class="font-extrabold text-md tracking-wider text-white">WRATH OF GOD 949</h1>
-            <p class="text-[10px] text-codAccent font-bold uppercase tracking-widest">Roster Management</p>
-          </div>
+          <!-- Close button for mobile -->
+          <button onclick="toggleSidebar(false)" class="md:hidden p-2 text-gray-400 hover:text-white hover:bg-codBorder rounded-lg transition shrink-0">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
         </div>
 
         <!-- Navigation Menu -->
@@ -120,85 +136,90 @@
     <main class="flex-1 flex flex-col overflow-y-auto bg-codDark relative">
       
       <!-- Top Sticky Bar -->
-      <header class="h-16 border-b border-codBorder flex items-center justify-between px-8 bg-codCard/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
-        <div class="flex items-center space-x-3">
-          <h2 id="tab-title" class="text-lg font-bold text-white tracking-wide">Alliance Overview</h2>
-          <span class="text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Active Workspace</span>
+      <header class="h-16 border-b border-codBorder flex items-center justify-between px-4 md:px-8 bg-codCard/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
+        <div class="flex items-center space-x-2 md:space-x-3">
+          <!-- Hamburger Menu button for mobile screens -->
+          <button onclick="toggleSidebar(true)" class="md:hidden p-2 text-gray-400 hover:text-white hover:bg-codBorder rounded-lg transition mr-1 shrink-0">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+          <h2 id="tab-title" class="text-sm md:text-lg font-bold text-white tracking-wide truncate max-w-[120px] xs:max-w-none">Alliance Overview</h2>
+          <span class="text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold px-1.5 md:px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">Active</span>
         </div>
         
-        <div class="flex items-center space-x-4">
-          <div class="text-right">
+        <div class="flex items-center space-x-2 md:space-x-4">
+          <div class="text-right hidden sm:block">
             <span class="block text-[10px] text-codTextMuted uppercase font-bold tracking-wider">Alliance Roster</span>
-            <span id="header-member-count" class="text-sm font-extrabold text-white">0 / 150</span>
+            <span id="header-member-count" class="text-xs md:text-sm font-extrabold text-white">0 / 150</span>
           </div>
-          <div class="h-8 w-[1px] bg-codBorder"></div>
+          <div class="h-8 w-[1px] bg-codBorder hidden sm:block"></div>
           
           <!-- Sync Database Button (Bidirectional Merge) -->
-          <button onclick="syncDatabase()" class="btn-sync-hover flex items-center space-x-1.5 px-3 py-1.5 border border-codAccent/20 hover:border-codAccent/50 bg-codAccent/5 text-codAccent rounded-lg text-xs font-semibold transition">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-            <span>Sync Database</span>
+          <button onclick="syncDatabase()" class="btn-sync-hover flex items-center space-x-1 px-2.5 py-1.5 border border-codAccent/20 hover:border-codAccent/50 bg-codAccent/5 text-codAccent rounded-lg text-xs font-semibold transition shrink-0">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5 shrink-0"></i>
+            <span class="hidden xs:inline">Sync Database</span>
+            <span class="xs:hidden">Sync</span>
           </button>
         </div>
       </header>
 
       <!-- Context Window -->
-      <div class="p-8 space-y-8 max-w-7xl w-full mx-auto flex-1">
+      <div class="p-4 md:p-8 space-y-6 md:space-y-8 max-w-7xl w-full mx-auto flex-1">
 
         <!-- ==================== TAB: OVERVIEW DASHBOARD ==================== -->
-        <section id="tab-dashboard" class="space-y-8">
+        <section id="tab-dashboard" class="space-y-6 md:space-y-8">
           
           <!-- Quick Stat Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="bg-codCard border border-codBorder rounded-2xl p-6 relative overflow-hidden">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
               <div class="absolute right-0 bottom-0 text-codAccent/5 translate-x-4 translate-y-4">
-                <i data-lucide="users" class="w-28 h-28"></i>
+                <i data-lucide="users" class="w-20 md:w-28 h-20 md:h-28"></i>
               </div>
-              <p class="text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Members</p>
-              <h3 id="stat-members" class="text-3xl font-extrabold text-white mt-2">0</h3>
-              <p class="text-xs text-codTextMuted mt-1">Maximum recommended: 150</p>
+              <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Members</p>
+              <h3 id="stat-members" class="text-2xl md:text-3xl font-extrabold text-white mt-1 md:mt-2">0</h3>
+              <p class="text-[10px] text-codTextMuted mt-1">Maximum recommended: 150</p>
             </div>
 
-            <div class="bg-codCard border border-codBorder rounded-2xl p-6 relative overflow-hidden">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
               <div class="absolute right-0 bottom-0 text-emerald-500/5 translate-x-4 translate-y-4">
-                <i data-lucide="swords" class="w-28 h-28"></i>
+                <i data-lucide="swords" class="w-20 md:w-28 h-20 md:h-28"></i>
               </div>
-              <p class="text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Power</p>
-              <h3 id="stat-power" class="text-3xl font-extrabold text-emerald-400 mt-2">0.0M</h3>
-              <p class="text-xs text-codTextMuted mt-1">Aggregated roster power</p>
+              <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Power</p>
+              <h3 id="stat-power" class="text-2xl md:text-3xl font-extrabold text-emerald-400 mt-1 md:mt-2">0.0M</h3>
+              <p class="text-[10px] text-codTextMuted mt-1">Aggregated roster power</p>
             </div>
 
-            <div class="bg-codCard border border-codBorder rounded-2xl p-6 relative overflow-hidden">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
               <div class="absolute right-0 bottom-0 text-amber-500/5 translate-x-4 translate-y-4">
-                <i data-lucide="sparkles" class="w-28 h-28"></i>
+                <i data-lucide="sparkles" class="w-20 md:w-28 h-20 md:h-28"></i>
               </div>
-              <p class="text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Merits</p>
-              <h3 id="stat-merits" class="text-3xl font-extrabold text-amber-400 mt-2">0</h3>
-              <p class="text-xs text-codTextMuted mt-1">Combat performance rating</p>
+              <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Merits</p>
+              <h3 id="stat-merits" class="text-2xl md:text-3xl font-extrabold text-amber-400 mt-1 md:mt-2">0</h3>
+              <p class="text-[10px] text-codTextMuted mt-1">Combat performance rating</p>
             </div>
 
-            <div class="bg-codCard border border-codBorder rounded-2xl p-6 relative overflow-hidden">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
               <div class="absolute right-0 bottom-0 text-rose-500/5 translate-x-4 translate-y-4">
-                <i data-lucide="activity" class="w-28 h-28"></i>
+                <i data-lucide="activity" class="w-20 md:w-28 h-20 md:h-28"></i>
               </div>
-              <p class="text-xs font-bold text-codTextMuted uppercase tracking-wider">Active Kill Points</p>
-              <h3 id="stat-kills" class="text-3xl font-extrabold text-rose-500 mt-2">0</h3>
-              <p class="text-xs text-codTextMuted mt-1">Total defeated enemies</p>
+              <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Active Kill Points</p>
+              <h3 id="stat-kills" class="text-2xl md:text-3xl font-extrabold text-rose-500 mt-1 md:mt-2">0</h3>
+              <p class="text-[10px] text-codTextMuted mt-1">Total defeated enemies</p>
             </div>
           </div>
 
           <!-- Charts and Analytics -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="bg-codCard border border-codBorder rounded-2xl p-6 lg:col-span-2">
-              <div class="flex items-center justify-between mb-6">
-                <h4 class="font-extrabold text-md text-white flex items-center space-x-2">
-                  <i data-lucide="bar-chart-3" class="w-5 h-5 text-codAccent"></i>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 lg:col-span-2">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-2">
+                <h4 class="font-extrabold text-sm md:text-md text-white flex items-center space-x-2">
+                  <i data-lucide="bar-chart-3" class="w-4 h-4 md:w-5 md:h-5 text-codAccent"></i>
                   <span>Top 10 Roster Overall Performance (Score 1-100)</span>
                 </h4>
-                <span class="text-[10px] bg-codAccent/10 text-codAccent px-2 py-0.5 rounded font-bold uppercase">Dynamic Ranking</span>
+                <span class="self-start sm:self-auto text-[9px] bg-codAccent/10 text-codAccent px-2 py-0.5 rounded font-bold uppercase shrink-0">Dynamic Ranking</span>
               </div>
-              <div class="h-85 w-full relative flex items-center justify-center">
+              <div class="h-64 sm:h-80 md:h-85 w-full relative flex items-center justify-center">
                 <canvas id="overviewChart"></canvas>
-                <div id="no-chart-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-codCard text-center">
+                <div id="no-chart-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-codCard text-center p-4">
                   <i data-lucide="bar-chart-2" class="w-10 h-10 text-codBorder mb-3"></i>
                   <p class="text-sm font-semibold text-gray-500">Input members inside the Manual Entry portal to generate analytical graphs.</p>
                 </div>
@@ -206,10 +227,10 @@
             </div>
 
             <!-- Leaderboard panel -->
-            <div class="bg-codCard border border-codBorder rounded-2xl p-6 flex flex-col justify-between">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 flex flex-col justify-between">
               <div>
-                <h4 class="font-extrabold text-md text-white flex items-center space-x-2 mb-4">
-                  <i data-lucide="trophy" class="w-5 h-5 text-yellow-500"></i>
+                <h4 class="font-extrabold text-sm md:text-md text-white flex items-center space-x-2 mb-4">
+                  <i data-lucide="trophy" class="w-4 h-4 md:w-5 md:h-5 text-yellow-500"></i>
                   <span>Top Contributors (Support Score)</span>
                 </h4>
                 <div id="mini-leaderboard" class="space-y-3">
@@ -224,21 +245,21 @@
         </section>
 
         <!-- ==================== TAB: DATA ENTRY (Streamlined & Spaced) ==================== -->
-        <section id="tab-data-entry" class="hidden space-y-8">
-          <div class="bg-codCard border border-codBorder rounded-2xl p-8 max-w-4xl mx-auto shadow-xl">
+        <section id="tab-data-entry" class="hidden space-y-6 md:space-y-8">
+          <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 md:p-8 max-w-4xl mx-auto shadow-xl">
             <!-- Header inside Card -->
             <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-codBorder">
-              <div class="p-2 bg-codAccent/10 text-codAccent rounded-lg">
+              <div class="p-2 bg-codAccent/10 text-codAccent rounded-lg shrink-0">
                 <i data-lucide="user-plus" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="font-extrabold text-lg text-white">Alliance Member Profile Registration</h3>
-                <p class="text-xs text-codTextMuted mt-0.5">Quickly key in or update a player's combat, baseline, and support metrics.</p>
+                <h3 class="font-extrabold text-base md:text-lg text-white">Alliance Member Profile Registration</h3>
+                <p class="text-[11px] md:text-xs text-codTextMuted mt-0.5">Quickly key in or update a player's combat, baseline, and support metrics.</p>
               </div>
             </div>
             
             <form id="quick-add-form" class="space-y-6" onsubmit="handleManualAdd(event)">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 
                 <!-- LEFT COLUMN: Identity & Core Power Metrics -->
                 <div class="space-y-5">
@@ -338,15 +359,15 @@
               <input type="text" id="search-input" oninput="renderRoster()" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white pl-10 pr-4 py-2.5 text-xs rounded-xl outline-none transition" placeholder="Search by Player Name or ID...">
             </div>
 
-            <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
-              <select id="sort-select" onchange="renderRoster()" class="bg-codDark border border-codBorder text-gray-300 text-xs rounded-xl p-2.5 focus:outline-none focus:border-codAccent">
+            <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full md:w-auto justify-end">
+              <select id="sort-select" onchange="renderRoster()" class="w-full sm:w-auto bg-codDark border border-codBorder text-gray-300 text-xs rounded-xl p-2.5 focus:outline-none focus:border-codAccent">
                 <option value="merits-desc">Sort: Highest Merits</option>
                 <option value="power-desc">Sort: Highest Power</option>
                 <option value="kills-desc">Sort: Highest Kills</option>
                 <option value="name-asc">Sort: Name (A-Z)</option>
               </select>
 
-              <button onclick="downloadCSV()" class="flex items-center space-x-1.5 px-4 py-2.5 border border-codBorder hover:border-codAccent bg-codDark hover:text-codAccent rounded-xl text-xs font-semibold transition">
+              <button onclick="downloadCSV()" class="w-full sm:w-auto flex items-center justify-center space-x-1.5 px-4 py-2.5 border border-codBorder hover:border-codAccent bg-codDark hover:text-codAccent rounded-xl text-xs font-semibold transition">
                 <i data-lucide="download" class="w-4 h-4"></i>
                 <span>Download CSV</span>
               </button>
@@ -393,17 +414,17 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
             <!-- Integration Configuration -->
-            <div class="bg-codCard border border-codBorder rounded-2xl p-6 flex flex-col justify-between">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 flex flex-col justify-between">
               <div class="space-y-6">
                 <div>
-                  <h3 class="font-extrabold text-lg text-white mb-2">Sync to Google Sheets</h3>
+                  <h3 class="font-extrabold text-base md:text-lg text-white mb-2">Sync to Google Sheets</h3>
                   <p class="text-xs text-codTextMuted leading-relaxed">Instantly synchronize your player stats bidirectionally. You can load statistics entered on your spreadsheet directly into this client dashboard, or export any manual changes back to Google Sheets instantly.</p>
                 </div>
 
                 <div class="space-y-3">
                   <label class="block text-[10px] font-bold text-codTextMuted uppercase tracking-wider">Google Sheets Web App API Endpoint URL</label>
                   <input type="text" id="sheets-endpoint" oninput="saveEndpointLocally()" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-xl p-3.5 outline-none transition font-semibold" placeholder="https://script.google.com/macros/s/xxxx/exec">
-                  <span class="block text-[10px] text-amber-500 font-medium">⚠️ Hint: Find this link inside Apps Script under Deploy > New deployment (Web app, Execute as: Me, Who has access: Anyone).</span>
+                  <span class="block text-[10px] text-amber-500 font-medium leading-relaxed">⚠️ Hint: Find this link inside Apps Script under Deploy > New deployment (Web app, Execute as: Me, Who has access: Anyone).</span>
                 </div>
 
                 <!-- Sync Controls Box -->
@@ -422,7 +443,7 @@
                 <!-- Step-by-step -->
                 <div class="space-y-2 pt-4 border-t border-codBorder">
                   <h4 class="text-xs font-bold text-white">How to connect:</h4>
-                  <ol class="list-decimal list-inside text-xs text-codTextMuted space-y-2 leading-relaxed">
+                  <ol class="list-decimal list-inside text-[11px] md:text-xs text-codTextMuted space-y-2 leading-relaxed">
                     <li>In your Google Sheet, open <span class="text-codAccent font-semibold">Extensions > Apps Script</span>.</li>
                     <li>Copy the code shown in the panel on the right.</li>
                     <li>In Google Apps Script, delete default code, paste the code, and click <span class="text-white font-semibold">Deploy > New Deployment</span>.</li>
@@ -434,7 +455,7 @@
             </div>
 
             <!-- Interactive Script Copy Card -->
-            <div class="bg-codCard border border-codBorder rounded-2xl p-6 flex flex-col">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 flex flex-col">
               <div class="flex justify-between items-center mb-4">
                 <h4 class="font-bold text-xs uppercase text-codTextMuted tracking-wider">Apps Script Webhook Snippet</h4>
                 <button onclick="copySheetsSnippet()" class="flex items-center space-x-1.5 text-xs text-codAccent hover:text-codAccentHover bg-codDark/80 border border-codBorder hover:border-codAccent px-3 py-1.5 rounded-lg transition font-semibold">
@@ -572,7 +593,7 @@ function onEdit(e) {
   
   <!-- Custom Password Lock Verification Modal -->
   <div id="password-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
-    <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all">
+    <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all mx-4">
       <div class="w-12 h-12 bg-codAccent/10 text-codAccent rounded-xl flex items-center justify-center mb-4 border border-codAccent/20">
         <i data-lucide="lock" class="w-6 h-6"></i>
       </div>
@@ -596,7 +617,7 @@ function onEdit(e) {
 
   <!-- Custom Confirmation Dialog (No-Alert Constraint) -->
   <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all">
+    <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all mx-4">
       <div class="w-12 h-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-4">
         <i data-lucide="alert-triangle" class="w-6 h-6"></i>
       </div>
@@ -616,7 +637,7 @@ function onEdit(e) {
 
   <!-- Custom Edit Modal Dialog -->
   <div id="edit-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-codCard border border-codBorder rounded-2xl max-w-md w-full p-6 shadow-2xl scale-95 transition-all max-h-[90vh] overflow-y-auto">
+    <div class="bg-codCard border border-codBorder rounded-2xl max-w-md w-full p-6 shadow-2xl scale-95 transition-all max-h-[90vh] overflow-y-auto mx-4">
       <div class="flex justify-between items-center mb-4 pb-2 border-b border-codBorder">
         <h3 class="text-md font-bold text-white">Modify Player Profile</h3>
         <button onclick="closeEditModal()" class="text-gray-400 hover:text-white transition">
@@ -712,6 +733,21 @@ function onEdit(e) {
       updateUI();
       autoPullOnLoad();
     };
+
+    // Responsive Mobile Sidebar Toggle Control
+    function toggleSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar && backdrop) {
+        if (open) {
+          sidebar.classList.remove('-translate-x-full');
+          backdrop.classList.remove('hidden');
+        } else {
+          sidebar.classList.add('-translate-x-full');
+          backdrop.classList.add('hidden');
+        }
+      }
+    }
 
     // Load persisted local storage stats inside safe blocks
     function loadDataFromDisk() {
@@ -823,37 +859,11 @@ function onEdit(e) {
       });
     }
 
-    // Toast alerts helper
-    function triggerToast(type, text) {
-      const toastBox = document.getElementById('toast-box');
-      const toast = document.createElement('div');
-      toast.className = `p-4 rounded-xl flex items-center space-x-3 shadow-2xl transition duration-300 transform translate-y-4 opacity-0 pointer-events-auto ${
-        type === 'success' ? 'bg-emerald-600 text-white border border-emerald-500/20' : 'bg-red-600 text-white border border-red-500/20'
-      }`;
-      
-      const icon = type === 'success' ? 'check-circle' : 'alert-circle';
-      toast.innerHTML = `
-        <i data-lucide="${icon}" class="w-5 h-5 shrink-0"></i>
-        <span class="text-xs font-semibold">${text}</span>
-      `;
-      
-      toastBox.appendChild(toast);
-      lucide.createIcons();
-
-      // Trigger animation
-      setTimeout(() => {
-        toast.classList.remove('translate-y-4', 'opacity-0');
-      }, 50);
-
-      // Dismiss timer
-      setTimeout(() => {
-        toast.classList.add('translate-y-4', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
-      }, 4000);
-    }
-
-    // Tab view router (Updated with Security passcode lock controls)
+    // Tab view router (Updated with Security passcode lock controls & Auto sidebar close for Mobile)
     function switchTab(tabId) {
+      // Close mobile drawer seamlessly
+      toggleSidebar(false);
+
       // If the target tab is restricted and the user hasn't authenticated yet, open password modal
       if ((tabId === 'data-entry' || tabId === 'sheets') && !isUnlocked) {
         pendingTabId = tabId;
