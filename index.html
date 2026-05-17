@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dragon Ledger Elite - Call of Dragons Alliance OCR Suite</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            codDark: '#0a0b0e',
+            codCard: '#12141c',
+            codCardHover: '#181b26',
+            codAccent: '#dfa13b', // Call of Dragons Gold/Orange
+            codAccentHover: '#b87f28',
+            codBorder: '#1e2330',
+            codTextMuted: '#8a93a6'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Tesseract.js for fast in-browser OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Premium custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0b0e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e2330;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #dfa13b;
+    }
+  </style>
+</head>
+<body class="bg-codDark text-gray-200 font-sans h-full overflow-hidden flex flex-col">
+
+  <!-- ==================== MAIN LAYOUT WRAPPER ==================== -->
+  <div class="flex h-full w-full overflow-hidden">
+    
+    <!-- LEFT SIDEBAR: Premium Game Hub Control -->
+    <aside class="w-64 bg-codCard border-r border-codBorder flex flex-col justify-between shrink-0 z-20">
+      <div>
+        <!-- Logo / Title -->
+        <div class="p-6 border-b border-codBorder flex items-center space-x-3 bg-codDark/30">
+          <div class="p-2.5 bg-codAccent/10 text-codAccent rounded-xl border border-codAccent/25">
+            <i data-lucide="sparkles" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="font-extrabold text-md tracking-wider text-white">DRAGON LEDGER</h1>
+            <p class="text-[10px] text-codAccent font-bold uppercase tracking-widest">Elite Roster OS</p>
+          </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="p-4 space-y-1">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-codAccent text-black">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            <span>Alliance Overview</span>
+          </button>
+          
+          <button onclick="switchTab('ocr-queue')" id="nav-ocr-queue" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition text-gray-400 hover:text-white hover:bg-codBorder">
+            <div class="flex items-center space-x-3">
+              <i data-lucide="scan-eye" class="w-5 h-5"></i>
+              <span>Bulk OCR Queue</span>
+            </div>
+            <span id="queue-badge" class="hidden text-[10px] bg-codAccent text-black font-extrabold px-1.5 py-0.5 rounded-full">0</span>
+          </button>
+          
+          <button onclick="switchTab('roster')" id="nav-roster" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition text-gray-400 hover:text-white hover:bg-codBorder">
+            <i data-lucide="users" class="w-5 h-5"></i>
+            <span>Active Roster</span>
+          </button>
+
+          <button onclick="switchTab('delta')" id="nav-delta" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition text-gray-400 hover:text-white hover:bg-codBorder">
+            <i data-lucide="trending-up" class="w-5 h-5"></i>
+            <span>Weekly Delta Engine</span>
+          </button>
+
+          <button onclick="switchTab('sheets')" id="nav-sheets" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition text-gray-400 hover:text-white hover:bg-codBorder">
+            <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+            <span>Sheets Sync Hub</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Footer Widget -->
+      <div class="p-4 border-t border-codBorder">
+        <div class="bg-codDark/70 rounded-xl p-3 border border-codBorder/80">
+          <div class="flex items-center space-x-2 mb-1.5">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+            <span class="text-[11px] font-bold text-gray-300">OCR Engine Core</span>
+          </div>
+          <p class="text-[10px] text-codTextMuted leading-relaxed">Runs in sandbox. All profile scans remain secure and local on your PC.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT CONTENT AREA -->
+    <main class="flex-1 flex flex-col overflow-y-auto bg-codDark relative">
+      
+      <!-- Top Sticky Bar -->
+      <header class="h-16 border-b border-codBorder flex items-center justify-between px-8 bg-codCard/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
+        <div class="flex items-center space-x-3">
+          <h2 id="tab-title" class="text-lg font-bold text-white tracking-wide">Alliance Overview</h2>
+          <span class="text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">SECURE CLIENT</span>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <div class="text-right">
+            <span class="block text-[10px] text-codTextMuted uppercase font-bold tracking-wider">Alliance Roster</span>
+            <span id="header-member-count" class="text-sm font-extrabold text-white">0 / 150</span>
+          </div>
+          <div class="h-8 w-[1px] bg-codBorder"></div>
+          <button onclick="showClearConfirmModal()" class="flex items-center space-x-1.5 px-3 py-1.5 border border-red-500/20 hover:border-red-500/50 bg-red-500/5 text-red-400 rounded-lg text-xs font-semibold transition">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Reset Database</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Protocol Environment Safety Warning Banner -->
+      <div id="protocol-warning-banner" class="hidden bg-amber-500/10 border-b border-amber-500/20 px-8 py-4 flex items-start justify-between text-xs text-amber-400 shrink-0">
+        <div class="flex items-start space-x-3">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5"></i>
+          <div>
+            <strong class="block text-amber-300 mb-0.5">Browser Restriction Detected (Local File Protocol)</strong>
+            <span>Your browser blocks running Web Workers on <span class="font-mono bg-black/40 px-1.5 py-0.5 rounded">file:///</span> (opening the saved file directly). The automatic OCR engine will stall. To enable automatic scans, run this page through a local server (e.g., using VS Code's **Live Server** extension, or running <code class="bg-amber-950/50 px-1 py-0.5 rounded font-mono">python -m http.server</code> in your terminal) or host it on free web space. You can still input data manually or test the Demo Generator!</span>
+          </div>
+        </div>
+        <button onclick="document.getElementById('protocol-warning-banner').remove()" class="text-amber-500/70 hover:text-amber-400 font-bold ml-4 shrink-0">
+          Dismiss
+        </button>
+      </div>
+
+      <!-- Context Window -->
+      <div class="p-8 space-y-8 max-w-7xl w-full mx-auto flex-1">
+
+        <!-- ==================== TAB: OVERVIEW DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="space-y-8">
+          
+          <!-- Quick Stat Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-6 relative overflow-hidden">
+              <div class="absolute right-0 bottom-0 text-codAccent/5 translate-x-4 translate-y-4">
+                <i data-lucide="users" class="w-28 h-28"></i>
+              </div>
+              <p class="text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Members</p>
+              <h3 id="stat-members" class="text-3xl font-extrabold text-white mt-2">0</h3>
+              <p class="text-xs text-codTextMuted mt-1">Maximum tracked limits: 150</p>
+            </div>
+
+            <div class="bg-codCard border border-codBorder rounded-2xl p-6 relative overflow-hidden">
+              <div class="absolute right-0 bottom-0 text-emerald-500/5 translate-x-4 translate-y-4">
+                <i data-lucide="swords" class="w-28 h-28"></i>
+              </div>
+              <p class="text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Power</p>
+              <h3 id="stat-power" class="text-3xl font-extrabold text-emerald-400 mt-2">0.0M</h3>
+              <p class="text-xs text-codTextMuted mt-1">Aggregated roster power</p>
+            </div>
+
+            <div class="bg-codCard border border-codBorder rounded-2xl p-6 relative overflow-hidden">
+              <div class="absolute right-0 bottom-0 text-amber-500/5 translate-x-4 translate-y-4">
+                <i data-lucide="sparkles" class="w-28 h-28"></i>
+              </div>
+              <p class="text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Merits</p>
+              <h3 id="stat-merits" class="text-3xl font-extrabold text-amber-400 mt-2">0</h3>
+              <p class="text-xs text-codTextMuted mt-1">Combat performance rating</p>
+            </div>
+
+            <div class="bg-codCard border border-codBorder rounded-2xl p-6 relative overflow-hidden">
+              <div class="absolute right-0 bottom-0 text-rose-500/5 translate-x-4 translate-y-4">
+                <i data-lucide="activity" class="w-28 h-28"></i>
+              </div>
+              <p class="text-xs font-bold text-codTextMuted uppercase tracking-wider">Active Kill Points</p>
+              <h3 id="stat-kills" class="text-3xl font-extrabold text-rose-500 mt-2">0</h3>
+              <p class="text-xs text-codTextMuted mt-1">Total defeated enemies</p>
+            </div>
+          </div>
+
+          <!-- Charts and Analytics -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-6 lg:col-span-2">
+              <div class="flex items-center justify-between mb-6">
+                <h4 class="font-extrabold text-md text-white flex items-center space-x-2">
+                  <i data-lucide="bar-chart-3" class="w-5 h-5 text-codAccent"></i>
+                  <span>Top 10 Roster Merits Analysis</span>
+                </h4>
+                <span class="text-[10px] bg-codAccent/10 text-codAccent px-2 py-0.5 rounded font-bold uppercase">Dynamic Ranking</span>
+              </div>
+              <div class="h-80 w-full relative flex items-center justify-center">
+                <canvas id="overviewChart"></canvas>
+                <div id="no-chart-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-codCard text-center">
+                  <i data-lucide="bar-chart-2" class="w-10 h-10 text-codBorder mb-3"></i>
+                  <p class="text-sm font-semibold text-gray-500">Scan or upload screenshots in the OCR Queue to generate analytical graphs.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Leaderboard panel -->
+            <div class="bg-codCard border border-codBorder rounded-2xl p-6 flex flex-col justify-between">
+              <div>
+                <h4 class="font-extrabold text-md text-white flex items-center space-x-2 mb-4">
+                  <i data-lucide="trophy" class="w-5 h-5 text-yellow-500"></i>
+                  <span>Top Contributors</span>
+                </h4>
+                <div id="mini-leaderboard" class="space-y-3">
+                  <!-- Injected via Javascript -->
+                </div>
+              </div>
+              <button onclick="switchTab('roster')" class="w-full py-2.5 border border-codBorder hover:border-codAccent hover:text-codAccent rounded-xl text-xs font-bold text-gray-300 transition mt-6">
+                Open Full Roster Directory
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB: BULK OCR QUEUE ==================== -->
+        <section id="tab-ocr-queue" class="hidden space-y-8">
+          
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Upload / Queue Container (7 cols) -->
+            <div class="lg:col-span-7 space-y-6">
+              
+              <!-- Bulk Drag Zone -->
+              <div class="bg-codCard border border-codBorder rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="font-extrabold text-md text-white">1. Add Screenshots to Queue</h3>
+                  <!-- Demo Generator Trigger -->
+                  <button onclick="simulateScreenshotUpload()" class="flex items-center space-x-1 px-2.5 py-1 bg-codAccent/10 border border-codAccent/30 hover:bg-codAccent/20 text-codAccent rounded-lg text-xs font-semibold transition">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span>Generate Demo Screenshot</span>
+                  </button>
+                </div>
+                <p class="text-xs text-codTextMuted mb-6 leading-relaxed">Drag and drop up to 50 profile screenshots from your computer explorer (or PC emulator directory). The engine will process and queue them simultaneously.</p>
+                
+                <div id="dragzone" class="border-2 border-dashed border-codBorder hover:border-codAccent/50 bg-codDark/40 transition rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer min-h-[220px]">
+                  <input type="file" id="bulk-file-input" class="hidden" accept="image/*" multiple>
+                  <div class="p-4 bg-codBorder/60 rounded-full mb-3 text-codAccent">
+                    <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                  </div>
+                  <h4 class="font-bold text-white text-sm">Select files or drop them here</h4>
+                  <p class="text-[11px] text-codTextMuted mt-1">PNG, JPG, JPEG, BMP accepted • Multi-selection active</p>
+                </div>
+              </div>
+
+              <!-- Active Processing Queue List -->
+              <div class="bg-codCard border border-codBorder rounded-2xl overflow-hidden">
+                <div class="p-5 border-b border-codBorder flex justify-between items-center bg-codDark/20">
+                  <h4 class="font-extrabold text-xs uppercase text-codTextMuted tracking-wider">Batch Scan Progress</h4>
+                  <button onclick="clearCompletedQueue()" class="text-[10px] text-gray-400 hover:text-white border border-codBorder px-2.5 py-1 rounded-md transition">
+                    Clear Completed
+                  </button>
+                </div>
+                <div id="queue-list-container" class="divide-y divide-codBorder max-h-[380px] overflow-y-auto">
+                  <!-- Empty indicator -->
+                  <div id="queue-empty-state" class="text-center py-12">
+                    <i data-lucide="scan" class="w-8 h-8 text-codBorder mx-auto mb-2"></i>
+                    <p class="text-xs text-codTextMuted">Your scanning queue is currently empty.</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Verification Dashboard / Edit Panel (5 cols) -->
+            <div class="lg:col-span-5">
+              <div class="bg-codCard border border-codBorder rounded-2xl p-6 sticky top-24">
+                <div class="flex justify-between items-center mb-6">
+                  <h3 class="font-extrabold text-md text-white">2. Verification Dashboard</h3>
+                  <span class="text-[9px] bg-codAccent/10 text-codAccent border border-codAccent/20 font-extrabold px-2 py-0.5 rounded uppercase">Verify Results</span>
+                </div>
+
+                <!-- Side-by-Side Panel -->
+                <div class="space-y-6">
+                  <!-- Crop View Preview -->
+                  <div class="bg-codDark rounded-xl border border-codBorder p-2 h-48 flex items-center justify-center overflow-hidden">
+                    <img id="verify-preview-img" src="" alt="OCR Target Preview" class="hidden max-h-full max-w-full object-contain rounded">
+                    <div id="verify-preview-placeholder" class="text-center">
+                      <i data-lucide="image" class="w-8 h-8 text-codBorder mx-auto mb-2"></i>
+                      <p class="text-xs text-codTextMuted">Select an item from the queue list to edit/verify stats.</p>
+                    </div>
+                  </div>
+
+                  <!-- Verification Form -->
+                  <form id="verify-form" class="space-y-4" onsubmit="event.preventDefault();">
+                    <!-- Hidden reference ID -->
+                    <input type="hidden" id="verify-queue-id">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Player Name</label>
+                        <input type="text" id="v-name" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-2.5 outline-none transition font-semibold">
+                      </div>
+                      <div>
+                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Character ID</label>
+                        <input type="text" id="v-id" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-2.5 outline-none font-mono transition">
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                      <div>
+                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Power</label>
+                        <input type="number" id="v-power" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-2.5 outline-none transition">
+                      </div>
+                      <div>
+                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Merits</label>
+                        <input type="number" id="v-merits" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-2.5 outline-none transition">
+                      </div>
+                      <div>
+                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Kills (KP)</label>
+                        <input type="number" id="v-kills" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-2.5 outline-none transition">
+                      </div>
+                    </div>
+
+                    <button type="button" onclick="commitVerifiedItem()" class="w-full py-3 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-xl text-xs tracking-wide transition shadow-lg shadow-codAccent/15 flex items-center justify-center space-x-2">
+                      <i data-lucide="check-circle" class="w-4 h-4"></i>
+                      <span>Save Player Data to Roster</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==================== TAB: ACTIVE ROSTER ==================== -->
+        <section id="tab-roster" class="hidden space-y-6">
+          
+          <!-- Roster controls -->
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-codCard border border-codBorder rounded-2xl p-4">
+            <div class="relative w-full md:w-80">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-codTextMuted">
+                <i data-lucide="search" class="w-4 h-4"></i>
+              </span>
+              <input type="text" id="search-input" oninput="renderRoster()" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white pl-10 pr-4 py-2.5 text-xs rounded-xl outline-none transition" placeholder="Search by Player Name or ID...">
+            </div>
+
+            <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+              <select id="sort-select" onchange="renderRoster()" class="bg-codDark border border-codBorder text-gray-300 text-xs rounded-xl p-2.5 focus:outline-none focus:border-codAccent">
+                <option value="merits-desc">Sort: Highest Merits</option>
+                <option value="power-desc">Sort: Highest Power</option>
+                <option value="kills-desc">Sort: Highest Kills</option>
+                <option value="name-asc">Sort: Name (A-Z)</option>
+              </select>
+
+              <button onclick="downloadCSV()" class="flex items-center space-x-1.5 px-4 py-2.5 border border-codBorder hover:border-codAccent bg-codDark hover:text-codAccent rounded-xl text-xs font-semibold transition">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span>Download CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Roster Table Panel -->
+          <div class="bg-codCard border border-codBorder rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-codBorder bg-codDark/30 text-[10px] font-bold uppercase tracking-wider text-codTextMuted">
+                    <th class="py-4 px-6">Player Identity</th>
+                    <th class="py-4 px-6">ID Code</th>
+                    <th class="py-4 px-6">Power Rating</th>
+                    <th class="py-4 px-6">Merit Count</th>
+                    <th class="py-4 px-6">Kill Points</th>
+                    <th class="py-4 px-6">PvP Efficiency</th>
+                    <th class="py-4 px-6 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="roster-table-body" class="divide-y divide-codBorder text-xs text-gray-300">
+                  <!-- Injected via Javascript -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Empty table state -->
+            <div id="roster-empty" class="hidden text-center py-20">
+              <i data-lucide="shield-question" class="w-12 h-12 text-codBorder mx-auto mb-3"></i>
+              <h4 class="text-sm font-bold text-white">Roster Database Empty</h4>
+              <p class="text-xs text-codTextMuted mt-1">Populate records inside the OCR scanning pipeline to visualize members.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB: WEEKLY DELTA ENGINE ==================== -->
+        <section id="tab-delta" class="hidden space-y-8">
+          
+          <div class="bg-codCard border border-codBorder rounded-2xl p-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h3 class="font-extrabold text-lg text-white mb-1">Growth Differential Performance</h3>
+                <p class="text-xs text-codTextMuted">Take a snapshot baseline from a past date, then run new scans to measure weekly player contributions, power losses, and merit gains.</p>
+              </div>
+              <button onclick="saveRosterSnapshot()" class="flex items-center space-x-1.5 px-4 py-2.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-xl text-xs transition shadow-lg shadow-codAccent/15">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Record Current Baseline Snapshot</span>
+              </button>
+            </div>
+
+            <!-- Stored Snapshot Summary Banner -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-codBorder/60 pt-6">
+              <div class="bg-codDark/60 rounded-xl p-4 border border-codBorder">
+                <span class="text-[9px] font-extrabold uppercase text-codTextMuted tracking-wider">Saved State Status</span>
+                <p id="delta-status-banner" class="text-xs font-bold text-white mt-1">No Snapshot Saved</p>
+              </div>
+              <div class="bg-codDark/60 rounded-xl p-4 border border-codBorder">
+                <span class="text-[9px] font-extrabold uppercase text-codTextMuted tracking-wider">Tracked Players in Baseline</span>
+                <p id="delta-players-banner" class="text-xs font-bold text-white mt-1">0 Users Recorded</p>
+              </div>
+              <div class="bg-codDark/60 rounded-xl p-4 border border-codBorder">
+                <span class="text-[9px] font-extrabold uppercase text-codTextMuted tracking-wider">Automatic Engine Formula</span>
+                <p class="text-xs font-semibold text-codAccent mt-1">Live Statistics - Baseline Snapshot = Gains</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delta table -->
+          <div class="bg-codCard border border-codBorder rounded-2xl overflow-hidden">
+            <div class="p-6 border-b border-codBorder flex justify-between items-center bg-codDark/10">
+              <h4 class="font-bold text-xs uppercase text-codTextMuted tracking-wider">Weekly Performance Differentials</h4>
+              <span class="text-[9px] bg-emerald-500/10 text-emerald-400 font-extrabold px-2.5 py-1 rounded border border-emerald-500/20 uppercase tracking-widest">Real-time Calculation</span>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-codBorder bg-codDark/30 text-[10px] font-bold uppercase tracking-wider text-codTextMuted">
+                    <th class="py-4 px-6">Player Name</th>
+                    <th class="py-4 px-6">Current Power</th>
+                    <th class="py-4 px-6">Power Growth</th>
+                    <th class="py-4 px-6">Current Merits</th>
+                    <th class="py-4 px-6">Weekly Merits Gained</th>
+                    <th class="py-4 px-6">Status Warning</th>
+                  </tr>
+                </thead>
+                <tbody id="delta-table-body" class="divide-y divide-codBorder text-xs text-gray-300">
+                  <!-- Injected via Javascript -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Empty delta state -->
+            <div id="delta-empty" class="text-center py-20">
+              <i data-lucide="line-chart" class="w-12 h-12 text-codBorder mx-auto mb-3"></i>
+              <h4 class="text-sm font-bold text-white">No Snapshot Recorded</h4>
+              <p class="text-xs text-codTextMuted mt-1">Click the "Record Current Baseline Snapshot" button above first to enable differential calculations.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB: SHEETS SYNC HUB ==================== -->
+        <section id="tab-sheets" class="hidden space-y-8">
+          
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Integration Configuration -->
+            <div class="bg-codCard border border-codBorder rounded-2xl p-6 flex flex-col justify-between">
+              <div class="space-y-6">
+                <div>
+                  <h3 class="font-extrabold text-lg text-white mb-2">Sync to Google Sheets</h3>
+                  <p class="text-xs text-codTextMuted leading-relaxed">Instantly synchronize your player stats from this desktop dashboard to your private Google Spreadsheet. This uses a direct Web App tunnel to append player rows immediately without complex setups.</p>
+                </div>
+
+                <div class="space-y-3">
+                  <label class="block text-[10px] font-bold text-codTextMuted uppercase tracking-wider">Google Sheets Web App API Endpoint URL</label>
+                  <input type="text" id="sheets-endpoint" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-xl p-3.5 outline-none transition font-semibold" placeholder="https://script.google.com/macros/s/xxxx/exec">
+                </div>
+
+                <!-- Step-by-step -->
+                <div class="space-y-2">
+                  <h4 class="text-xs font-bold text-white">How to connect:</h4>
+                  <ol class="list-decimal list-inside text-xs text-codTextMuted space-y-2 leading-relaxed">
+                    <li>In your Google Sheet, open <span class="text-codAccent font-semibold">Extensions > Apps Script</span>.</li>
+                    <li>Copy the code shown in the panel on the right.</li>
+                    <li>In Google Apps Script, delete default code, paste the code, and click <span class="text-white font-semibold">Deploy > New Deployment</span>.</li>
+                    <li>Select <span class="text-white font-semibold">Web App</span>, execute as <span class="text-white font-semibold">Me</span>, set access to <span class="text-white font-semibold">Anyone</span>.</li>
+                    <li>Deploy, authorize permissions, copy the resulting URL, and paste it above!</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div class="pt-6 border-t border-codBorder mt-8">
+                <button onclick="pushToGoogleSheets()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl text-xs tracking-wide transition shadow-lg shadow-emerald-600/10 flex items-center justify-center space-x-2">
+                  <i data-lucide="cloud-lightning" class="w-4.5 h-4.5"></i>
+                  <span>Push Roster to Google Spreadsheet</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Interactive Script Copy Card -->
+            <div class="bg-codCard border border-codBorder rounded-2xl p-6 flex flex-col">
+              <div class="flex justify-between items-center mb-4">
+                <h4 class="font-bold text-xs uppercase text-codTextMuted tracking-wider">Apps Script Webhook Snippet</h4>
+                <button onclick="copySheetsSnippet()" class="flex items-center space-x-1.5 text-xs text-codAccent hover:text-codAccentHover bg-codDark/80 border border-codBorder hover:border-codAccent px-3 py-1.5 rounded-lg transition font-semibold">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  <span>Copy Snippet</span>
+                </button>
+              </div>
+
+              <!-- Monospace snippet container -->
+              <pre class="flex-1 bg-codDark border border-codBorder rounded-xl p-4 text-[10px] font-mono text-gray-400 overflow-y-auto max-h-[420px] leading-relaxed select-all">
+function doPost(e) {
+  try {
+    var rawData = e.postData.contents;
+    var parsedData = JSON.parse(rawData);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getActiveSheet();
+    
+    // Create header row if sheet is brand new and empty
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(["Player Name", "Player ID", "Power", "Merits", "Kills", "Sync Timestamp"]);
+    }
+    
+    // Clean and clear current database rows prior to syncing fresh
+    if (sheet.getLastRow() > 1) {
+      sheet.getRange(2, 1, sheet.getLastRow() - 1, 6).clearContent();
+    }
+    
+    // Append scanned players
+    parsedData.forEach(function(member) {
+      sheet.appendRow([
+        member.name,
+        member.id,
+        Number(member.power),
+        Number(member.merits),
+        Number(member.kills),
+        new Date()
+      ]);
+    });
+    
+    return ContentService.createTextOutput(JSON.stringify({"status": "success", "rows": parsedData.length}))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}</pre>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== PREMIUM UI POPUPS & DIALOGS ==================== -->
+  
+  <!-- Custom Confirmation Dialog (No-Alert Constraint) -->
+  <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all">
+      <div class="w-12 h-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-4">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      </div>
+      <h3 id="confirm-modal-title" class="text-md font-bold text-white">Reset Database?</h3>
+      <p id="confirm-modal-description" class="text-xs text-codTextMuted mt-2 leading-relaxed">Are you absolutely sure you want to delete all players inside your local Roster? This action cannot be undone.</p>
+      
+      <div class="flex space-x-3 mt-6">
+        <button onclick="closeConfirmModal()" class="w-1/2 py-2 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition">
+          Cancel
+        </button>
+        <button id="confirm-modal-btn" class="w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Toast Notification Box -->
+  <div id="toast-box" class="fixed bottom-6 right-6 z-50 pointer-events-none flex flex-col space-y-3">
+    <!-- Success Toast example template (rendered via JS) -->
+  </div>
+
+  <!-- Hidden canvas for generating the simulated Call of Dragons screenshot -->
+  <canvas id="mock-canvas" class="hidden"></canvas>
+
+  <!-- ==================== JAVASCRIPT MASTER APPLICATION ==================== -->
+  <script>
+    // Application States
+    let roster = [];
+    let baselineSnapshot = null;
+    let ocrQueue = [];
+    let isOcrActive = false;
+    let overviewChartInstance = null;
+
+    // Load data upon DOM initialization
+    window.onload = function() {
+      lucide.createIcons();
+      loadDataFromDisk();
+      renderDashboard();
+      initDragzoneListeners();
+
+      // Check protocol to show file:/// warning safely
+      if (window.location.protocol === 'file:') {
+        document.getElementById('protocol-warning-banner').classList.remove('hidden');
+      }
+    };
+
+    // Load persisted local storage stats inside safe blocks
+    function loadDataFromDisk() {
+      try {
+        const storedRoster = localStorage.getItem('cod_el_roster');
+        if (storedRoster) {
+          roster = JSON.parse(storedRoster);
+        }
+        const storedSnapshot = localStorage.getItem('cod_el_snapshot');
+        if (storedSnapshot) {
+          baselineSnapshot = JSON.parse(storedSnapshot);
+        }
+        const storedEndpoint = localStorage.getItem('cod_el_endpoint');
+        if (storedEndpoint) {
+          document.getElementById('sheets-endpoint').value = storedEndpoint;
+        }
+      } catch (err) {
+        console.warn("localStorage read blocked/failed:", err);
+      }
+      updateGlobalHeader();
+    }
+
+    // Save states safely
+    function saveDataToDisk() {
+      try {
+        localStorage.setItem('cod_el_roster', JSON.stringify(roster));
+        localStorage.setItem('cod_el_snapshot', JSON.stringify(baselineSnapshot));
+        localStorage.setItem('cod_el_endpoint', document.getElementById('sheets-endpoint').value.trim());
+      } catch (err) {
+        console.warn("localStorage write blocked/failed:", err);
+      }
+      updateGlobalHeader();
+    }
+
+    function updateGlobalHeader() {
+      document.getElementById('header-member-count').textContent = `${roster.length} / 150`;
+    }
+
+    // Tab view router
+    function switchTab(tabId) {
+      document.querySelectorAll('main > div > section').forEach(tab => {
+        tab.classList.add('hidden');
+      });
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+      const headerTitle = {
+        'dashboard': 'Alliance Overview',
+        'ocr-queue': 'Bulk OCR Queue Manager',
+        'roster': 'Active Roster Directory',
+        'delta': 'Weekly Growth Delta Calculator',
+        'sheets': 'Sheets Sync Hub'
+      };
+      document.getElementById('tab-title').textContent = headerTitle[tabId];
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-codAccent', 'text-black');
+        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
+      });
+
+      const activeBtn = document.getElementById('nav-' + tabId);
+      activeBtn.classList.add('bg-codAccent', 'text-black');
+      activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
+
+      // Refresh dynamic values inside requested view
+      if (tabId === 'dashboard') renderDashboard();
+      if (tabId === 'roster') renderRoster();
+      if (tabId === 'delta') renderDelta();
+    }
+
+    // Toast alerts helper
+    function triggerToast(type, text) {
+      const toastBox = document.getElementById('toast-box');
+      const toast = document.createElement('div');
+      toast.className = `p-4 rounded-xl flex items-center space-x-3 shadow-2xl transition duration-300 transform translate-y-4 opacity-0 pointer-events-auto ${
+        type === 'success' ? 'bg-emerald-600 text-white border border-emerald-500/20' : 'bg-red-600 text-white border border-red-500/20'
+      }`;
+      
+      const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+      toast.innerHTML = `
+        <i data-lucide="${icon}" class="w-5 h-5 shrink-0"></i>
+        <span class="text-xs font-semibold">${text}</span>
+      `;
+      
+      toastBox.appendChild(toast);
+      lucide.createIcons();
+
+      // Trigger animation
+      setTimeout(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+      }, 50);
+
+      // Dismiss timer
+      setTimeout(() => {
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+    }
+
+    // Modal Manager
+    let modalActionCallback = null;
+    function showClearConfirmModal() {
+      document.getElementById('confirm-modal-title').textContent = "Reset Local Database?";
+      document.getElementById('confirm-modal-description').textContent = "Are you absolutely sure you want to delete all members and reset your local Roster? This action cannot be undone.";
+      document.getElementById('confirm-modal-btn').className = "w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition";
+      
+      modalActionCallback = function() {
+        roster = [];
+        baselineSnapshot = null;
+        try {
+          localStorage.removeItem('cod_el_roster');
+          localStorage.removeItem('cod_el_snapshot');
+        } catch (e) {}
+        saveDataToDisk();
+        switchTab('dashboard');
+        triggerToast('success', 'Roster database successfully wiped.');
+      };
+
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function showDeletePlayerModal(playerId, playerName) {
+      document.getElementById('confirm-modal-title').textContent = `Remove ${playerName}?`;
+      document.getElementById('confirm-modal-description').textContent = `Are you sure you want to remove this player profile (ID: ${playerId}) from your active alliance roster?`;
+      document.getElementById('confirm-modal-btn').className = "w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition";
+
+      modalActionCallback = function() {
+        roster = roster.filter(p => p.id !== playerId);
+        saveDataToDisk();
+        renderRoster();
+        triggerToast('success', `${playerName} removed from Roster.`);
+      };
+
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+      modalActionCallback = null;
+    }
+
+    document.getElementById('confirm-modal-btn').addEventListener('click', () => {
+      if (modalActionCallback) {
+        modalActionCallback();
+        closeConfirmModal();
+      }
+    });
+
+    // ==================== drag and drop logic ====================
+    function initDragzoneListeners() {
+      const dragzone = document.getElementById('dragzone');
+      const input = document.getElementById('bulk-file-input');
+
+      dragzone.addEventListener('click', () => input.click());
+      dragzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dragzone.classList.add('border-codAccent');
+      });
+      dragzone.addEventListener('dragleave', () => {
+        dragzone.classList.remove('border-codAccent');
+      });
+      dragzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dragzone.classList.remove('border-codAccent');
+        if (e.dataTransfer.files.length) {
+          queueImages(e.dataTransfer.files);
+        }
+      });
+      input.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+          queueImages(e.target.files);
+        }
+      });
+    }
+
+    // Image queue pipeline
+    function queueImages(files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          const item = {
+            id: 'item_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+            name: file.name,
+            imgSrc: e.target.result,
+            status: 'pending',
+            progress: 0,
+            parsedData: null,
+            rawOcrText: ''
+          };
+          ocrQueue.push(item);
+          renderQueueList();
+          processNextInQueue();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Render visual items in the list queue
+    function renderQueueList() {
+      const container = document.getElementById('queue-list-container');
+      const emptyState = document.getElementById('queue-empty-state');
+      const badge = document.getElementById('queue-badge');
+
+      const pendingCount = ocrQueue.filter(i => i.status !== 'completed' && i.status !== 'committed').length;
+      if (pendingCount > 0) {
+        badge.textContent = pendingCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      if (ocrQueue.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      container.innerHTML = ocrQueue.map(item => {
+        let statusBadge = '';
+        if (item.status === 'pending') statusBadge = `<span class="text-[9px] bg-gray-500/10 text-gray-400 px-2 py-0.5 rounded border border-gray-500/15 font-bold uppercase">Pending</span>`;
+        if (item.status === 'processing') statusBadge = `<span class="text-[9px] bg-codAccent/10 text-codAccent px-2 py-0.5 rounded border border-codAccent/20 font-bold uppercase animate-pulse">Scanning (${item.progress}%)</span>`;
+        if (item.status === 'completed') statusBadge = `<span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold uppercase animate-pulse">Ready to Verify</span>`;
+        if (item.status === 'committed') statusBadge = `<span class="text-[9px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 font-bold uppercase">Committed</span>`;
+
+        return `
+          <div onclick="selectQueueItem('${item.id}')" class="flex items-center justify-between p-4 hover:bg-codCardHover transition cursor-pointer border-l-2 ${
+            item.status === 'processing' ? 'border-codAccent bg-codAccent/5' : 'border-transparent'
+          }">
+            <div class="flex items-center space-x-3 overflow-hidden font-sans">
+              <div class="w-10 h-10 bg-codDark border border-codBorder rounded-lg flex items-center justify-center overflow-hidden shrink-0">
+                <img src="${item.imgSrc}" class="object-cover h-full w-full">
+              </div>
+              <div class="overflow-hidden text-left">
+                <span class="block text-xs font-semibold text-white truncate max-w-[180px]">${item.name}</span>
+                <span class="block text-[10px] text-codTextMuted mt-0.5">Size: ${Math.round(item.imgSrc.length / 1024)} KB</span>
+              </div>
+            </div>
+            <div>
+              ${statusBadge}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Process OCR list loop
+    function processNextInQueue() {
+      if (isOcrActive) return;
+
+      const nextItem = ocrQueue.find(item => item.status === 'pending');
+      if (!nextItem) {
+        isOcrActive = false;
+        return;
+      }
+
+      isOcrActive = true;
+      nextItem.status = 'processing';
+      renderQueueList();
+
+      // Configure explicit CDN Worker files to help run Tesseract on local pages
+      Tesseract.recognize(
+        nextItem.imgSrc,
+        'eng',
+        {
+          workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
+          corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js',
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              nextItem.progress = Math.round(m.progress * 100);
+              renderQueueList();
+            }
+          }
+        }
+      ).then(({ data: { text } }) => {
+        nextItem.status = 'completed';
+        nextItem.progress = 100;
+        nextItem.rawOcrText = text;
+        nextItem.parsedData = parseCallOfDragonsLayout(text);
+
+        // Auto-select first completed scan to verification side panel if empty
+        const activeSelectId = document.getElementById('verify-queue-id').value;
+        if (!activeSelectId) {
+          selectQueueItem(nextItem.id);
+        }
+
+        isOcrActive = false;
+        renderQueueList();
+        processNextInQueue();
+      }).catch(err => {
+        console.error("OCR Failure Details: ", err);
+        nextItem.status = 'completed';
+        nextItem.progress = 100;
+        nextItem.parsedData = { name: "Manual Required", id: "", power: 0, merits: 0, kills: 0 };
+        isOcrActive = false;
+
+        // Custom Error Notification explaining the browser local restriction block
+        if (window.location.protocol === 'file:') {
+          triggerToast('error', 'CORS / Web-Worker Block! Run this page using an editor local server extension to scan images.');
+        } else {
+          triggerToast('error', 'Scan failed. Please adjust values manually.');
+        }
+
+        renderQueueList();
+        processNextInQueue();
+      });
+    }
+
+    // OCR parser heuristic engine
+    function parseCallOfDragonsLayout(text) {
+      const parsed = { name: "Unknown", id: "", power: 0, merits: 0, kills: 0 };
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const invalidWords = ['power', 'id', 'merits', 'kills', 'rank', 'vip', 'alliance', 'member', 'level', 'defeat'];
+
+      // Guess name based on structure
+      for (let l of lines) {
+        const lower = l.toLowerCase();
+        const hasBanned = invalidWords.some(w => lower.includes(w));
+        if (!hasBanned && l.length > 2 && l.length < 24) {
+          parsed.name = l.replace(/[^a-zA-Z0-9\[\]_\-\s]/g, '').trim();
+          break;
+        }
+      }
+
+      // Flat scan for stats using regex
+      const flat = text.replace(/\n/g, ' ');
+
+      const idMatch = flat.match(/(?:id|i\s*d)[:\s-]*(\d+)/i);
+      const powerMatch = flat.match(/(?:power|pwr)[:\s-]*([\d.,\s]+)/i);
+      const meritsMatch = flat.match(/(?:merits?|pvp)[:\s-]*([\d.,\s]+)/i);
+      const killsMatch = flat.match(/(?:kills?|defeated|defeat)[:\s-]*([\d.,\s]+)/i);
+
+      if (idMatch) parsed.id = idMatch[1].trim();
+      if (powerMatch) parsed.power = parseInt(powerMatch[1].replace(/[^0-9]/g, '')) || 0;
+      if (meritsMatch) parsed.merits = parseInt(meritsMatch[1].replace(/[^0-9]/g, '')) || 0;
+      if (killsMatch) parsed.kills = parseInt(killsMatch[1].replace(/[^0-9]/g, '')) || 0;
+
+      return parsed;
+    }
+
+    // Select queue item for side-panel verification
+    function selectQueueItem(itemId) {
+      const item = ocrQueue.find(i => i.id === itemId);
+      if (!item || item.status === 'pending' || item.status === 'processing') return;
+
+      document.getElementById('verify-queue-id').value = item.id;
+      
+      const imgPreview = document.getElementById('verify-preview-img');
+      imgPreview.src = item.imgSrc;
+      imgPreview.classList.remove('hidden');
+      document.getElementById('verify-preview-placeholder').classList.add('hidden');
+
+      // Populate input forms
+      document.getElementById('v-name').value = item.parsedData.name;
+      document.getElementById('v-id').value = item.parsedData.id;
+      document.getElementById('v-power').value = item.parsedData.power;
+      document.getElementById('v-merits').value = item.parsedData.merits;
+      document.getElementById('v-kills').value = item.parsedData.kills;
+    }
+
+    // Commit verified statistics to master roster database
+    function commitVerifiedItem() {
+      const queueId = document.getElementById('verify-queue-id').value;
+      if (!queueId) {
+        triggerToast('error', 'Select a scanned profile from the progress list first.');
+        return;
+      }
+
+      const item = ocrQueue.find(i => i.id === queueId);
+      if (!item) return;
+
+      const name = document.getElementById('v-name').value.trim();
+      const id = document.getElementById('v-id').value.trim();
+      const power = parseInt(document.getElementById('v-power').value) || 0;
+      const merits = parseInt(document.getElementById('v-merits').value) || 0;
+      const kills = parseInt(document.getElementById('v-kills').value) || 0;
+
+      if (!name || !id) {
+        triggerToast('error', 'Player Name and Character ID are required fields.');
+        return;
+      }
+
+      // Write over existing character details if duplicate
+      const duplicateIndex = roster.findIndex(p => p.id === id);
+      const playerData = { name, id, power, merits, kills, timestamp: new Date().toISOString() };
+
+      if (duplicateIndex !== -1) {
+        roster[duplicateIndex] = playerData;
+      } else {
+        roster.push(playerData);
+      }
+
+      item.status = 'committed';
+      saveDataToDisk();
+      renderQueueList();
+
+      // Reset Verification panel
+      document.getElementById('verify-form').reset();
+      document.getElementById('verify-queue-id').value = '';
+      document.getElementById('verify-preview-img').classList.add('hidden');
+      document.getElementById('verify-preview-placeholder').classList.remove('hidden');
+
+      triggerToast('success', `${name} successfully added to Roster!`);
+    }
+
+    function clearCompletedQueue() {
+      ocrQueue = ocrQueue.filter(i => i.status !== 'completed' && i.status !== 'committed');
+      renderQueueList();
+    }
+
+    // ==================== TAB: ALLIANCE OVERVIEW GRAPHICS ====================
+    function renderDashboard() {
+      document.getElementById('stat-members').textContent = roster.length;
+      
+      const totalPower = roster.reduce((sum, p) => sum + p.power, 0);
+      const totalMerits = roster.reduce((sum, p) => sum + p.merits, 0);
+      const totalKills = roster.reduce((sum, p) => sum + p.kills, 0);
+
+      document.getElementById('stat-power').textContent = (totalPower / 1000000).toFixed(1) + 'M';
+      document.getElementById('stat-merits').textContent = totalMerits.toLocaleString();
+      document.getElementById('stat-kills').textContent = (totalKills / 1000000).toFixed(1) + 'M';
+
+      const sortedByMerits = [...roster].sort((a, b) => b.merits - a.merits).slice(0, 5);
+      const miniLeaderboard = document.getElementById('mini-leaderboard');
+
+      if (sortedByMerits.length === 0) {
+        miniLeaderboard.innerHTML = `
+          <div class="text-center py-12">
+            <i data-lucide="shield-alert" class="w-8 h-8 text-codBorder mx-auto mb-2"></i>
+            <p class="text-xs text-codTextMuted">Roster database empty.</p>
+          </div>
+        `;
+      } else {
+        const medals = ["🥇", "🥈", "🥉", "🏅", "🏅"];
+        miniLeaderboard.innerHTML = sortedByMerits.map((p, idx) => `
+          <div class="flex items-center justify-between p-3 bg-codDark/40 rounded-xl border border-codBorder/60 hover:border-codAccent/20 transition">
+            <div class="flex items-center space-x-3 overflow-hidden">
+              <span class="text-sm shrink-0">${medals[idx]}</span>
+              <div class="overflow-hidden">
+                <span class="block text-xs font-bold text-white truncate">${p.name}</span>
+                <span class="block text-[10px] text-codTextMuted">ID: ${p.id}</span>
+              </div>
+            </div>
+            <span class="text-xs font-extrabold text-amber-400 shrink-0">${p.merits.toLocaleString()}</span>
+          </div>
+        `).join('');
+      }
+
+      renderAnalyticsChart(sortedByMerits);
+    }
+
+    function renderAnalyticsChart(topPlayers) {
+      const canvas = document.getElementById('overviewChart');
+      const placeholder = document.getElementById('no-chart-placeholder');
+
+      if (topPlayers.length === 0) {
+        canvas.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        return;
+      }
+
+      canvas.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+
+      const ctx = canvas.getContext('2d');
+      if (overviewChartInstance) {
+        overviewChartInstance.destroy();
+      }
+
+      const labels = topPlayers.map(p => p.name);
+      const data = topPlayers.map(p => p.merits);
+
+      overviewChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Player Merits',
+            data: data,
+            backgroundColor: 'rgba(223, 161, 59, 0.15)',
+            borderColor: '#dfa13b',
+            borderWidth: 2,
+            borderRadius: 8,
+            barThickness: 32
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#1c2130' }, ticks: { color: '#8a93a6', font: { size: 10 } } },
+            x: { grid: { display: false }, ticks: { color: '#8a93a6', font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    // ==================== TAB: DIRECTORY ROSTER ====================
+    function renderRoster() {
+      const searchVal = document.getElementById('search-input').value.toLowerCase();
+      const sortVal = document.getElementById('sort-select').value;
+      const tbody = document.getElementById('roster-table-body');
+      const emptyState = document.getElementById('roster-empty');
+
+      let filtered = roster.filter(p => 
+        p.name.toLowerCase().includes(searchVal) || p.id.includes(searchVal)
+      );
+
+      if (sortVal === 'merits-desc') filtered.sort((a, b) => b.merits - a.merits);
+      else if (sortVal === 'power-desc') filtered.sort((a, b) => b.power - a.power);
+      else if (sortVal === 'kills-desc') filtered.sort((a, b) => b.kills - a.kills);
+      else if (sortVal === 'name-asc') filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      tbody.innerHTML = filtered.map(player => {
+        const efficiency = player.power > 0 ? ((player.merits / player.power) * 100).toFixed(2) : 0;
+        return `
+          <tr class="hover:bg-codCard/40 transition border-b border-codBorder/40">
+            <td class="py-4 px-6 font-semibold text-white">${player.name}</td>
+            <td class="py-4 px-6 text-codTextMuted font-mono">${player.id}</td>
+            <td class="py-4 px-6 font-semibold">${player.power.toLocaleString()}</td>
+            <td class="py-4 px-6 text-amber-400 font-extrabold">${player.merits.toLocaleString()}</td>
+            <td class="py-4 px-6 text-emerald-400 font-semibold">${player.kills.toLocaleString()}</td>
+            <td class="py-4 px-6">
+              <div class="flex items-center space-x-2">
+                <div class="w-12 bg-codDark rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-codAccent h-full" style="width: ${Math.min(efficiency * 5, 100)}%"></div>
+                </div>
+                <span class="text-[10px] text-codTextMuted font-semibold">${efficiency}%</span>
+              </div>
+            </td>
+            <td class="py-4 px-6 text-right">
+              <button onclick="showDeletePlayerModal('${player.id}', '${player.name}')" class="text-red-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition">
+                <i data-lucide="trash-2" class="w-4.5 h-4.5"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // CSV Roster Download
+    function downloadCSV() {
+      if (roster.length === 0) {
+        triggerToast('error', 'Database is empty. No files to extract.');
+        return;
+      }
+
+      let csv = "Player Name,Character ID,Power,Merits,Kills\n";
+      roster.forEach(p => {
+        csv += `"${p.name}","${p.id}",${p.power},${p.merits},${p.kills}\n`;
+      });
+
+      const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csv);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `cod_alliance_roster_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      triggerToast('success', 'CSV generation completed successfully.');
+    }
+
+    // ==================== TAB: WEEKLY SNAPSHOT ENGINE ====================
+    function saveRosterSnapshot() {
+      if (roster.length === 0) {
+        triggerToast('error', 'Cannot capture snapshot of empty roster records.');
+        return;
+      }
+      baselineSnapshot = JSON.parse(JSON.stringify(roster));
+      saveDataToDisk();
+      renderDelta();
+      triggerToast('success', 'Baseline snapshot captured. Delta differentials computed.');
+    }
+
+    function renderDelta() {
+      const tbody = document.getElementById('delta-table-body');
+      const emptyState = document.getElementById('delta-empty');
+
+      if (!baselineSnapshot) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        document.getElementById('delta-status-banner').textContent = 'No Snapshot Saved';
+        document.getElementById('delta-players-banner').textContent = '0 Users Recorded';
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      document.getElementById('delta-status-banner').textContent = 'Snapshot Registered';
+      document.getElementById('delta-players-banner').textContent = `${baselineSnapshot.length} Active Records`;
+
+      tbody.innerHTML = roster.map(curr => {
+        const base = baselineSnapshot.find(b => b.id === curr.id) || { power: curr.power, merits: curr.merits };
+        const powerDiff = curr.power - base.power;
+        const meritsDiff = curr.merits - base.merits;
+        const isLowActivity = meritsDiff <= 0;
+
+        return `
+          <tr class="hover:bg-codCard/40 transition border-b border-codBorder/40">
+            <td class="py-4 px-6 font-semibold text-white">${curr.name}</td>
+            <td class="py-4 px-6">${curr.power.toLocaleString()}</td>
+            <td class="py-4 px-6 font-semibold ${powerDiff >= 0 ? 'text-emerald-400' : 'text-red-400'}">
+              ${powerDiff >= 0 ? '+' : ''}${powerDiff.toLocaleString()}
+            </td>
+            <td class="py-4 px-6">${curr.merits.toLocaleString()}</td>
+            <td class="py-4 px-6 font-extrabold text-amber-400">
+              ${meritsDiff >= 0 ? '+' : ''}${meritsDiff.toLocaleString()}
+            </td>
+            <td class="py-4 px-6">
+              ${isLowActivity 
+                ? `<span class="text-[9px] bg-red-500/10 text-red-400 border border-red-500/20 font-bold uppercase px-2 py-0.5 rounded">Low Performance</span>`
+                : `<span class="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase px-2 py-0.5 rounded">Active Contribution</span>`
+              }
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ==================== TAB: GOOGLE SHEETS SYNC HUB ====================
+    function pushToGoogleSheets() {
+      const endpoint = document.getElementById('sheets-endpoint').value.trim();
+      if (!endpoint) {
+        triggerToast('error', 'Google Web App endpoint URL is missing.');
+        return;
+      }
+
+      if (roster.length === 0) {
+        triggerToast('error', 'Your local Roster has no player data to transmit.');
+        return;
+      }
+
+      saveDataToDisk();
+
+      fetch(endpoint, {
+        method: "POST",
+        mode: "no-cors", // Bypasses cross-origin redirect errors natively on Apps Script
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(roster)
+      })
+      .then(() => {
+        triggerToast('success', 'Roster synced successfully with Google Sheets!');
+      })
+      .catch(err => {
+        console.error(err);
+        triggerToast('error', 'Web App communication error. Check your API URL.');
+      });
+    }
+
+    function copySheetsSnippet() {
+      const pre = document.querySelector('pre');
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = pre.innerText;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempTextArea);
+      triggerToast('success', 'Snippet copied to clipboard.');
+    }
+
+    // Direct memory base64 parser helper to bypass CORS file:// restrictions
+    function dataURLtoFile(dataurl, filename) {
+      const arr = dataurl.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while(n--){
+          u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, {type:mime});
+    }
+
+    // ==================== INTERACTIVE PROFILE GENERATOR ====================
+    // Draws a pseudo-screenshot containing random stats so users can test immediately
+    function simulateScreenshotUpload() {
+      const canvas = document.getElementById('mock-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 1200;
+      canvas.height = 700;
+
+      // Random generator
+      const randomId = Math.floor(10000000 + Math.random() * 90000000);
+      const randomPower = Math.floor(10000000 + Math.random() * 80000000);
+      const randomMerits = Math.floor(50000 + Math.random() * 950000);
+      const randomKills = Math.floor(100000 + Math.random() * 9000000);
+      
+      const dragonNames = [
+        "Vaelastrasz", "Rhaegal", "Viserion", "Alexstrasza", "Deathwing", 
+        "Syrax", "Caraxes", "Vermithor", "Seasmoke", "Sheepstealer"
+      ];
+      const selectedName = `[DRGN] ${dragonNames[Math.floor(Math.random() * dragonNames.length)]}`;
+
+      // Draw dark gaming interface mockup
+      ctx.fillStyle = '#161922';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Card header
+      ctx.fillStyle = '#1f2430';
+      ctx.fillRect(50, 50, 1100, 120);
+
+      // Draw labels and stats in readable Arial font
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 36px Arial';
+      ctx.fillText(selectedName, 100, 125);
+
+      ctx.fillStyle = '#dfa13b';
+      ctx.font = 'bold 24px Arial';
+      ctx.fillText(`ID: ${randomId}`, 800, 120);
+
+      // Power Box
+      ctx.fillStyle = '#1b2a22';
+      ctx.fillRect(100, 220, 1000, 100);
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 24px Arial';
+      ctx.fillText(`POWER: ${randomPower.toLocaleString()}`, 150, 280);
+
+      // Merits Box
+      ctx.fillStyle = '#2b2418';
+      ctx.fillRect(100, 360, 1000, 100);
+      ctx.fillStyle = '#dfa13b';
+      ctx.font = 'bold 24px Arial';
+      ctx.fillText(`MERITS: ${randomMerits.toLocaleString()}`, 150, 420);
+
+      // Kills Box
+      ctx.fillStyle = '#2d1c1c';
+      ctx.fillRect(100, 500, 1000, 100);
+      ctx.fillStyle = '#ef4444';
+      ctx.font = 'bold 24px Arial';
+      ctx.fillText(`KILLS: ${randomKills.toLocaleString()}`, 150, 560);
+
+      try {
+        const generatedUrl = canvas.toDataURL('image/png');
+        // Standard non-network base64 conversion is 100% reliable locally on file://
+        const file = dataURLtoFile(generatedUrl, `screenshot_${selectedName.replace(/\s+/g, '')}.png`);
+        queueImages([file]);
+        triggerToast('success', 'Mock profile screenshot compiled and added to scanning queue.');
+      } catch (err) {
+        console.error("Mock screenshot generation failed:", err);
+        triggerToast('error', 'Failed to generate mock screenshot locally.');
+      }
+    }
+  </script>
+</body>
+</html>
