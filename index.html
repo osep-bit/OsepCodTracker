@@ -192,7 +192,7 @@
               <div class="flex items-center justify-between mb-6">
                 <h4 class="font-extrabold text-md text-white flex items-center space-x-2">
                   <i data-lucide="bar-chart-3" class="w-5 h-5 text-codAccent"></i>
-                  <span>Top 10 Roster Merits Analysis</span>
+                  <span>Top 10 Roster Overall Performance (Score 1-100)</span>
                 </h4>
                 <span class="text-[10px] bg-codAccent/10 text-codAccent px-2 py-0.5 rounded font-bold uppercase">Dynamic Ranking</span>
               </div>
@@ -210,7 +210,7 @@
               <div>
                 <h4 class="font-extrabold text-md text-white flex items-center space-x-2 mb-4">
                   <i data-lucide="trophy" class="w-5 h-5 text-yellow-500"></i>
-                  <span>Top Contributors</span>
+                  <span>Top Contributors (Support Score)</span>
                 </h4>
                 <div id="mini-leaderboard" class="space-y-3">
                   <!-- Injected via Javascript -->
@@ -402,7 +402,7 @@
 
                 <div class="space-y-3">
                   <label class="block text-[10px] font-bold text-codTextMuted uppercase tracking-wider">Google Sheets Web App API Endpoint URL</label>
-                  <input type="text" id="sheets-endpoint" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-xl p-3.5 outline-none transition font-semibold" placeholder="https://script.google.com/macros/s/xxxx/exec">
+                  <input type="text" id="sheets-endpoint" oninput="saveEndpointLocally()" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-xl p-3.5 outline-none transition font-semibold" placeholder="https://script.google.com/macros/s/xxxx/exec">
                   <span class="block text-[10px] text-amber-500 font-medium">⚠️ Hint: Find this link inside Apps Script under Deploy > New deployment (Web app, Execute as: Me, Who has access: Anyone).</span>
                 </div>
 
@@ -570,6 +570,30 @@ function onEdit(e) {
 
   <!-- ==================== PREMIUM UI POPUPS & DIALOGS ==================== -->
   
+  <!-- Custom Password Lock Verification Modal -->
+  <div id="password-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all">
+      <div class="w-12 h-12 bg-codAccent/10 text-codAccent rounded-xl flex items-center justify-center mb-4 border border-codAccent/20">
+        <i data-lucide="lock" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-md font-bold text-white tracking-wide">Security Verification Required</h3>
+      <p class="text-xs text-codTextMuted mt-2 leading-relaxed">Access to manual registry entries, sync dashboards, and database configurations is restricted. Enter your alliance access code to proceed.</p>
+      
+      <div class="mt-4">
+        <input type="password" id="password-input" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-sm rounded-lg p-3 outline-none transition font-sans" placeholder="••••••••" onkeydown="if(event.key === 'Enter') submitPassword()">
+      </div>
+      
+      <div class="flex space-x-3 mt-6">
+        <button onclick="closePasswordModal()" class="w-1/2 py-2.5 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition">
+          Cancel
+        </button>
+        <button onclick="submitPassword()" class="w-1/2 py-2.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-lg text-xs transition">
+          Unlock Workspace
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Custom Confirmation Dialog (No-Alert Constraint) -->
   <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all">
@@ -675,6 +699,11 @@ function onEdit(e) {
     // Application States
     let roster = [];
     let overviewChartInstance = null;
+    let isUnlocked = false; // Security credentials unlock state
+    let pendingTabId = null; // Caches target tab if authorization was required
+    let pendingPlayerId = null; // Caches edit player ID if authorization was required
+    let pendingDeletePlayerId = null; // Caches delete player ID if authorization was required
+    let pendingDeletePlayerName = null; // Caches delete player Name if authorization was required
 
     // Load data upon DOM initialization
     window.onload = function() {
@@ -694,6 +723,8 @@ function onEdit(e) {
         if (storedEndpoint) {
           document.getElementById('sheets-endpoint').value = storedEndpoint;
         }
+        // Load active security unlock credentials from the session storage
+        isUnlocked = sessionStorage.getItem('cod_el_unlocked') === 'true';
       } catch (err) {
         console.warn("localStorage read blocked/failed:", err);
       }
@@ -709,8 +740,21 @@ function onEdit(e) {
       }
     }
 
+    // Instantly persist the Google Sheets Web App Endpoint URL locally on any manual input/changes
+    function saveEndpointLocally() {
+      const url = document.getElementById('sheets-endpoint').value.trim();
+      try {
+        localStorage.setItem('cod_el_endpoint_manual', url);
+      } catch (err) {
+        console.warn("Endpoint write to localStorage failed:", err);
+      }
+    }
+
     // Master UI Refresh Function to guarantee sync across all active views
     function updateUI() {
+      // Calculate performance metrics dynamic formulas
+      calculateMetricsScores();
+      
       renderDashboard();
       renderRoster();
       
@@ -719,33 +763,63 @@ function onEdit(e) {
       document.getElementById('roster-badge').textContent = roster.length;
     }
 
-    // Tab view router
-    function switchTab(tabId) {
-      document.querySelectorAll('main > div > section').forEach(tab => {
-        tab.classList.add('hidden');
-      });
-      document.getElementById('tab-' + tabId).classList.remove('hidden');
+    // Dynamic Multi-Parameter Proportional Performance Scoring Engine
+    function calculateMetricsScores() {
+      if (roster.length === 0) return;
 
-      const headerTitle = {
-        'dashboard': 'Alliance Overview',
-        'roster-manager': 'Roster & Directory',
-        'data-entry': 'Manual Entry Workspace',
-        'sheets': 'Sheets Sync Hub'
+      // Find highest values recorded in the roster dynamically (with a fallback baseline of 1 to prevent division by zero)
+      const maxVals = {
+        power: Math.max(...roster.map(p => Number(p.power) || 0), 1),
+        merits: Math.max(...roster.map(p => Number(p.merits) || 0), 1),
+        kills: Math.max(...roster.map(p => Number(p.kills) || 0), 1),
+        donation: Math.max(...roster.map(p => Number(p.donation) || 0), 1),
+        buildTime: Math.max(...roster.map(p => Number(p.buildTime) || 0), 1),
+        destructionTime: Math.max(...roster.map(p => Number(p.destructionTime) || 0), 1),
+        help: Math.max(...roster.map(p => Number(p.help) || 0), 1),
+        assistance: Math.max(...roster.map(p => Number(p.assistance) || 0), 1)
       };
-      document.getElementById('tab-title').textContent = headerTitle[tabId];
 
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-codAccent', 'text-black', 'font-bold');
-        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
+      // Calculate relative raw contribution scores for each player
+      roster.forEach(p => {
+        const normPower = (Number(p.power) || 0) / maxVals.power;
+        const normMerits = (Number(p.merits) || 0) / maxVals.merits;
+        const normKills = (Number(p.kills) || 0) / maxVals.kills;
+        const normDonation = (Number(p.donation) || 0) / maxVals.donation;
+        const normBuild = (Number(p.buildTime) || 0) / maxVals.buildTime;
+        const normDestruction = (Number(p.destructionTime) || 0) / maxVals.destructionTime;
+        const normHelp = (Number(p.help) || 0) / maxVals.help;
+        const normAssistance = (Number(p.assistance) || 0) / maxVals.assistance;
+
+        // Overall Performance Score Formulas (All Parameters)
+        // Weights: Merits: 25% | Kills: 20% | Donation: 15% | Power: 10% | Build: 10% | Destruction: 10% | Help: 5% | Assistance: 5%
+        p.rawOverall = (normMerits * 0.25) + 
+                       (normKills * 0.20) + 
+                       (normDonation * 0.15) + 
+                       (normPower * 0.10) + 
+                       (normBuild * 0.10) + 
+                       (normDestruction * 0.10) + 
+                       (normHelp * 0.05) + 
+                       (normAssistance * 0.05);
+
+        // Support & Activity Score Formulas (Exclude Merit and Power)
+        // Weights: Kills: 30% | Donation: 25% | Build: 15% | Destruction: 15% | Help: 10% | Assistance: 5%
+        p.rawSupport = (normKills * 0.30) + 
+                       (normDonation * 0.25) + 
+                       (normBuild * 0.15) + 
+                       (normDestruction * 0.15) + 
+                       (normHelp * 0.10) + 
+                       (normAssistance * 0.05);
       });
 
-      const activeBtn = document.getElementById('nav-' + tabId);
-      activeBtn.classList.add('bg-codAccent', 'text-black', 'font-bold');
-      activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
+      // Find the absolute maximum raw scores in the roster to use as a 100-point benchmark scaling factor
+      const maxRawOverall = Math.max(...roster.map(p => p.rawOverall || 0), 0.001);
+      const maxRawSupport = Math.max(...roster.map(p => p.rawSupport || 0), 0.001);
 
-      // Refresh dynamic values inside requested view
-      if (tabId === 'dashboard') renderDashboard();
-      if (tabId === 'roster-manager') renderRoster();
+      // Perform proportional scaling relative to the highest performer (Top 1 player is set to exactly 100 points)
+      roster.forEach(p => {
+        p.overallScore = Math.round((p.rawOverall / maxRawOverall) * 100);
+        p.supportScore = Math.round((p.rawSupport / maxRawSupport) * 100);
+      });
     }
 
     // Toast alerts helper
@@ -777,9 +851,105 @@ function onEdit(e) {
       }, 4000);
     }
 
+    // Tab view router (Updated with Security passcode lock controls)
+    function switchTab(tabId) {
+      // If the target tab is restricted and the user hasn't authenticated yet, open password modal
+      if ((tabId === 'data-entry' || tabId === 'sheets') && !isUnlocked) {
+        pendingTabId = tabId;
+        openPasswordModal();
+        return;
+      }
+
+      document.querySelectorAll('main > div > section').forEach(tab => {
+        tab.classList.add('hidden');
+      });
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+      const headerTitle = {
+        'dashboard': 'Alliance Overview',
+        'roster-manager': 'Roster & Directory',
+        'data-entry': 'Manual Entry Workspace',
+        'sheets': 'Sheets Sync Hub'
+      };
+      document.getElementById('tab-title').textContent = headerTitle[tabId];
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-codAccent', 'text-black', 'font-bold');
+        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
+      });
+
+      const activeBtn = document.getElementById('nav-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-codAccent', 'text-black', 'font-bold');
+        activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
+      }
+
+      // Refresh dynamic values inside requested view
+      if (tabId === 'dashboard') renderDashboard();
+      if (tabId === 'roster-manager') renderRoster();
+    }
+
+    // Password Lock Modal actions
+    function openPasswordModal() {
+      document.getElementById('password-input').value = '';
+      document.getElementById('password-modal').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('password-input').focus();
+      }, 100);
+    }
+
+    function closePasswordModal() {
+      document.getElementById('password-modal').classList.add('hidden');
+      pendingTabId = null;
+      pendingPlayerId = null;
+      pendingDeletePlayerId = null;
+      pendingDeletePlayerName = null;
+    }
+
+    // Passcode validation check
+    function submitPassword() {
+      const code = document.getElementById('password-input').value;
+      if (code === '9492026') {
+        isUnlocked = true;
+        try {
+          sessionStorage.setItem('cod_el_unlocked', 'true');
+        } catch (e) {}
+        document.getElementById('password-modal').classList.add('hidden');
+        triggerToast('success', 'Workspace unlocked! Access granted.');
+        
+        if (pendingTabId) {
+          switchTab(pendingTabId);
+          pendingTabId = null;
+        }
+        if (pendingPlayerId) {
+          openEditModal(pendingPlayerId);
+          pendingPlayerId = null;
+        }
+        if (pendingDeletePlayerId && pendingDeletePlayerName) {
+          showDeletePlayerModal(pendingDeletePlayerId, pendingDeletePlayerName);
+          pendingDeletePlayerId = null;
+          pendingDeletePlayerName = null;
+        }
+      } else {
+        triggerToast('error', 'Access Denied: Incorrect alliance pass code.');
+        document.getElementById('password-input').value = '';
+        document.getElementById('password-input').focus();
+      }
+    }
+
     // Modal Manager
     let modalActionCallback = null;
     function showDeletePlayerModal(playerId, playerName) {
+      // Require security check to delete members
+      if (!isUnlocked) {
+        triggerToast('error', 'Authentication required to remove alliance members.');
+        pendingTabId = 'roster-manager';
+        pendingDeletePlayerId = playerId;
+        pendingDeletePlayerName = playerName;
+        openPasswordModal();
+        return;
+      }
+
       document.getElementById('confirm-modal-title').textContent = `Remove ${playerName}?`;
       document.getElementById('confirm-modal-description').textContent = `Are you sure you want to remove this player profile (ID: ${playerId}) from your active alliance roster?`;
       document.getElementById('confirm-modal-btn').className = "w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition";
@@ -853,6 +1023,15 @@ function onEdit(e) {
 
     // ==================== EDIT MODAL SYSTEM ====================
     function openEditModal(id) {
+      // Require unlock credentials to open inline editor
+      if (!isUnlocked) {
+        triggerToast('error', 'Authentication required to modify player statistics.');
+        pendingTabId = 'roster-manager';
+        pendingPlayerId = id;
+        openPasswordModal();
+        return;
+      }
+
       const player = roster.find(p => p.id === id);
       if (!player) return;
 
@@ -873,6 +1052,7 @@ function onEdit(e) {
       document.getElementById('edit-modal').classList.remove('hidden');
     }
 
+    // Close Inline Edit Modal
     function closeEditModal() {
       document.getElementById('edit-modal').classList.add('hidden');
       document.getElementById('edit-form').reset();
@@ -928,10 +1108,11 @@ function onEdit(e) {
       document.getElementById('stat-merits').textContent = totalMerits.toLocaleString();
       document.getElementById('stat-kills').textContent = (totalKills / 1000000).toFixed(1) + 'M';
 
-      const sortedByMerits = [...roster].sort((a, b) => b.merits - a.merits).slice(0, 5);
+      // Top Contributors Leaderboard (Sorted by proportional activity/support Score)
+      const sortedBySupport = [...roster].sort((a, b) => (b.supportScore || 0) - (a.supportScore || 0)).slice(0, 5);
       const miniLeaderboard = document.getElementById('mini-leaderboard');
 
-      if (sortedByMerits.length === 0) {
+      if (sortedBySupport.length === 0) {
         miniLeaderboard.innerHTML = `
           <div class="text-center py-12">
             <i data-lucide="shield-alert" class="w-8 h-8 text-codBorder mx-auto mb-2"></i>
@@ -940,21 +1121,23 @@ function onEdit(e) {
         `;
       } else {
         const medals = ["🥇", "🥈", "🥉", "🏅", "🏅"];
-        miniLeaderboard.innerHTML = sortedByMerits.map((p, idx) => `
+        miniLeaderboard.innerHTML = sortedBySupport.map((p, idx) => `
           <div class="flex items-center justify-between p-3 bg-codDark/40 rounded-xl border border-codBorder/60 hover:border-codAccent/20 transition">
-            <div class="flex items-center space-x-3 overflow-hidden">
+            <div class="flex items-center space-x-3 overflow-hidden font-sans">
               <span class="text-sm shrink-0">${medals[idx]}</span>
               <div class="overflow-hidden text-left">
                 <span class="block text-xs font-bold text-white truncate">${p.name}</span>
                 <span class="block text-[10px] text-codTextMuted">ID: ${p.id}</span>
               </div>
             </div>
-            <span class="text-xs font-extrabold text-amber-400 shrink-0">${p.merits.toLocaleString()}</span>
+            <span class="text-xs font-extrabold text-amber-400 shrink-0">Score: ${p.supportScore || 0}</span>
           </div>
         `).join('');
       }
 
-      renderAnalyticsChart(sortedByMerits);
+      // Render chart with top 10 sorted by Overall Score
+      const sortedByOverall = [...roster].sort((a, b) => (b.overallScore || 0) - (a.overallScore || 0)).slice(0, 10);
+      renderAnalyticsChart(sortedByOverall);
     }
 
     function renderAnalyticsChart(topPlayers) {
@@ -976,14 +1159,14 @@ function onEdit(e) {
       }
 
       const labels = topPlayers.map(p => p.name);
-      const data = topPlayers.map(p => p.merits);
+      const data = topPlayers.map(p => p.overallScore || 0);
 
       overviewChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: labels,
           datasets: [{
-            label: 'Player Merits',
+            label: 'Overall Performance Score (1-100)',
             data: data,
             backgroundColor: 'rgba(223, 161, 59, 0.15)',
             borderColor: '#dfa13b',
@@ -997,7 +1180,12 @@ function onEdit(e) {
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { grid: { color: '#1c2130' }, ticks: { color: '#8a93a6', font: { size: 10 } } },
+            y: { 
+              min: 0,
+              max: 100, // Lock scores between 1 and 100
+              grid: { color: '#1c2130' }, 
+              ticks: { color: '#8a93a6', font: { size: 10 } } 
+            },
             x: { grid: { display: false }, ticks: { color: '#8a93a6', font: { size: 10 } } }
           }
         }
@@ -1083,6 +1271,14 @@ function onEdit(e) {
 
     // ==================== TAB: GOOGLE SHEETS SYNC HUB ====================
     function pushToGoogleSheets() {
+      // Require unlock credentials first
+      if (!isUnlocked) {
+        pendingTabId = 'sheets';
+        triggerToast('error', 'Authentication required to push database changes.');
+        openPasswordModal();
+        return;
+      }
+
       const endpoint = document.getElementById('sheets-endpoint').value.trim();
       if (!endpoint) {
         triggerToast('error', 'Google Web App endpoint URL is missing.');
@@ -1110,7 +1306,16 @@ function onEdit(e) {
       });
     }
 
+    // Bidirectional Pull from Google Sheets Function
     function pullFromGoogleSheets() {
+      // Require unlock credentials first
+      if (!isUnlocked) {
+        pendingTabId = 'sheets';
+        triggerToast('error', 'Authentication required to pull database changes.');
+        openPasswordModal();
+        return;
+      }
+
       const endpoint = document.getElementById('sheets-endpoint').value.trim();
       if (!endpoint) {
         triggerToast('error', 'Google Web App endpoint URL is missing.');
@@ -1159,6 +1364,14 @@ function onEdit(e) {
     // Smart merge: pulls first, reconciles based on both player ID and timestamps.
     // Overwrites older local records with sheet edits, while keeping and pushing newer website edits.
     async function syncDatabase() {
+      // Require unlock credentials to execute complete bidirectional sync
+      if (!isUnlocked) {
+        pendingTabId = 'dashboard';
+        triggerToast('error', 'Authentication required to synchronize database.');
+        openPasswordModal();
+        return;
+      }
+
       const endpoint = document.getElementById('sheets-endpoint').value.trim();
       if (!endpoint) {
         triggerToast('error', 'Google Web App API URL is missing! Please configure it in the Sheets Sync Hub tab first.');
