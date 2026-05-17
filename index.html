@@ -710,6 +710,7 @@ function onEdit(e) {
       lucide.createIcons();
       loadDataFromDisk();
       updateUI();
+      autoPullOnLoad();
     };
 
     // Load persisted local storage stats inside safe blocks
@@ -896,6 +897,71 @@ function onEdit(e) {
       setTimeout(() => {
         document.getElementById('password-input').focus();
       }, 100);
+    }
+
+    // Silently pulls spreadsheet data on page load so viewers see stats instantly without manual password requirements
+    async function autoPullOnLoad() {
+      const endpoint = document.getElementById('sheets-endpoint').value.trim();
+      if (!endpoint) return;
+      try {
+        const res = await fetch(endpoint);
+        if (!res.ok) return;
+        const sheetData = await res.json();
+        if (sheetData && Array.isArray(sheetData)) {
+          // If local roster is empty, directly load the sheet data
+          if (roster.length === 0) {
+            roster = sheetData;
+          } else {
+            // Reconcile and merge sheet data based on ID and timestamps
+            const localMap = new Map();
+            roster.forEach(p => { if (p.id) localMap.set(String(p.id).trim(), p); });
+            
+            sheetData.forEach(sheetPlayer => {
+              if (!sheetPlayer.id) return;
+              const sheetId = String(sheetPlayer.id).trim();
+              if (localMap.has(sheetId)) {
+                const localPlayer = localMap.get(sheetId);
+                const localTime = new Date(localPlayer.timestamp || 0).getTime();
+                const sheetTime = new Date(sheetPlayer.timestamp || 0).getTime();
+                if (sheetTime >= localTime) {
+                  localMap.set(sheetId, {
+                    name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
+                    id: sheetId,
+                    power: Number(sheetPlayer.power) || 0,
+                    merits: Number(sheetPlayer.merits) || 0,
+                    kills: Number(sheetPlayer.kills) || 0,
+                    donation: Number(sheetPlayer.donation) || 0,
+                    buildTime: Number(sheetPlayer.buildTime) || 0,
+                    destructionTime: Number(sheetPlayer.destructionTime) || 0,
+                    help: Number(sheetPlayer.help) || 0,
+                    assistance: Number(sheetPlayer.assistance) || 0,
+                    timestamp: sheetPlayer.timestamp || new Date().toISOString()
+                  });
+                }
+              } else {
+                localMap.set(sheetId, {
+                  name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
+                  id: sheetId,
+                  power: Number(sheetPlayer.power) || 0,
+                  merits: Number(sheetPlayer.merits) || 0,
+                  kills: Number(sheetPlayer.kills) || 0,
+                  donation: Number(sheetPlayer.donation) || 0,
+                  buildTime: Number(sheetPlayer.buildTime) || 0,
+                  destructionTime: Number(sheetPlayer.destructionTime) || 0,
+                  help: Number(sheetPlayer.help) || 0,
+                  assistance: Number(sheetPlayer.assistance) || 0,
+                  timestamp: sheetPlayer.timestamp || new Date().toISOString()
+                });
+              }
+            });
+            roster = Array.from(localMap.values());
+          }
+          saveDataToDisk();
+          updateUI();
+        }
+      } catch (err) {
+        console.warn("Background auto-pull on page load failed:", err);
+      }
     }
 
     function closePasswordModal() {
@@ -1364,22 +1430,43 @@ function onEdit(e) {
     // Smart merge: pulls first, reconciles based on both player ID and timestamps.
     // Overwrites older local records with sheet edits, while keeping and pushing newer website edits.
     async function syncDatabase() {
-      // Require unlock credentials to execute complete bidirectional sync
-      if (!isUnlocked) {
-        pendingTabId = 'dashboard';
-        triggerToast('error', 'Authentication required to synchronize database.');
-        openPasswordModal();
-        return;
-      }
-
       const endpoint = document.getElementById('sheets-endpoint').value.trim();
       if (!endpoint) {
         triggerToast('error', 'Google Web App API URL is missing! Please configure it in the Sheets Sync Hub tab first.');
-        switchTab('sheets');
+        if (isUnlocked) {
+          switchTab('sheets');
+        } else {
+          openPasswordModal();
+        }
         return;
       }
 
-      triggerToast('success', 'Establishing connection with Google Sheets...');
+      if (!isUnlocked) {
+        // Public Viewer Mode: Bypasses security passcode blocks and conducts a quick, read-only download pull from sheets
+        triggerToast('success', 'Establishing connection with Google Sheets...');
+        try {
+          triggerToast('success', 'Downloading latest spreadsheet rows...');
+          const res = await fetch(endpoint);
+          if (!res.ok) throw new Error('Failed to fetch from sheet');
+          
+          const sheetData = await res.json();
+          if (sheetData && Array.isArray(sheetData)) {
+            roster = sheetData;
+            saveDataToDisk();
+            updateUI();
+            triggerToast('success', `Database updated! Loaded ${roster.length} active alliance records.`);
+          } else {
+            triggerToast('error', 'Sheets endpoint returned invalid or empty data structure.');
+          }
+        } catch (err) {
+          console.error("Fetch pull error:", err);
+          triggerToast('error', 'Failed to pull updated stats from Google Sheets.');
+        }
+        return;
+      }
+
+      // Authorized Officer Mode: Executes the full Bidirectional Merge (Pull -> Reconcile -> Push back to cloud)
+      triggerToast('success', 'Establishing secure connection with Google Sheets...');
 
       try {
         // Step 1: ALWAYS pull first from the spreadsheet to get external edits
