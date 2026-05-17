@@ -447,7 +447,17 @@
                   </button>
                 </div>
 
-                <!-- Step-by-step -->
+                <!-- Shareable viewer generator box -->
+                <div class="mt-4 p-4 bg-codDark/40 rounded-xl border border-codBorder/60">
+                  <span class="block text-xs font-bold text-white mb-1">Public Shareable Viewer Link</span>
+                  <p class="text-[11px] text-codTextMuted mb-3 leading-relaxed">Generate a customized link to share with your alliance members. Anyone who opens this link will instantly see the roster and live sync updates without needing a password.</p>
+                  <button onclick="copyShareableLink()" class="w-full py-2 bg-codAccent/15 hover:bg-codAccent/25 text-codAccent border border-codAccent/30 font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                    <span>Copy Shareable Viewer Link</span>
+                  </button>
+                </div>
+
+                <!-- Step-by-step instructions -->
                 <div class="space-y-2 pt-4 border-t border-codBorder">
                   <h4 class="text-xs font-bold text-white">How to connect:</h4>
                   <ol class="list-decimal list-inside text-[11px] md:text-xs text-codTextMuted space-y-2 leading-relaxed">
@@ -736,6 +746,7 @@ function onEdit(e) {
     // Load data upon DOM initialization
     window.onload = function() {
       lucide.createIcons();
+      checkUrlParams(); // Check for shareable link parameter before loading
       loadDataFromDisk();
       updateUI();
       autoPullOnLoad();
@@ -753,6 +764,31 @@ function onEdit(e) {
           sidebar.classList.add('-translate-x-full');
           backdrop.classList.add('hidden');
         }
+      }
+    }
+
+    // Inspects URL parameters for the ?api=... query parameter, configures the site, and sanitizes the address bar.
+    function checkUrlParams() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const apiParam = urlParams.get('api');
+        if (apiParam) {
+          const decodedApi = decodeURIComponent(apiParam);
+          if (decodedApi.startsWith('https://script.google.com/')) {
+            localStorage.setItem('cod_el_endpoint_manual', decodedApi);
+            // Instantly sync form field if rendered
+            const field = document.getElementById('sheets-endpoint');
+            if (field) field.value = decodedApi;
+            
+            // Clean up address bar query string silently for premium look
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+            
+            triggerToast('success', 'Successfully linked to Alliance Sheet Database!');
+          }
+        }
+      } catch (e) {
+        console.warn("URL Parameters parsing failed:", e);
       }
     }
 
@@ -806,7 +842,7 @@ function onEdit(e) {
       document.getElementById('header-member-count').textContent = `${roster.length} / ${limit}`;
       document.getElementById('roster-badge').textContent = roster.length;
       
-      // Compute and update the 'Last Admin Sync' UI timestamp indicator
+      // Compute and update the 'Last Sync (Admin)' UI timestamp indicator
       updateLastSyncDisplay();
     }
 
@@ -1096,7 +1132,7 @@ function onEdit(e) {
 
       document.getElementById('confirm-modal-title').textContent = `Remove ${playerName}?`;
       document.getElementById('confirm-modal-description').textContent = `Are you sure you want to remove this player profile (ID: ${playerId}) from your active alliance roster?`;
-      document.getElementById('confirm-modal-btn').className = "w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition";
+      document.getElementById('confirm-modal-btn').className = "w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition border-none";
 
       modalActionCallback = function() {
         roster = roster.filter(p => p.id !== playerId);
@@ -1502,6 +1538,28 @@ function onEdit(e) {
       .catch(err => {
         console.warn("Background synchronization with Google Sheets failed:", err);
       });
+    }
+
+    // Generates a public shareable viewer link by appending the encoded sheets-endpoint as a query string param.
+    function copyShareableLink() {
+      const endpoint = document.getElementById('sheets-endpoint').value.trim();
+      if (!endpoint) {
+        triggerToast('error', 'Please configure and save your Google Sheets Web App URL first.');
+        return;
+      }
+      
+      const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      const shareableUrl = `${baseUrl}?api=${encodeURIComponent(endpoint)}`;
+      
+      // Copy to clipboard safely
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = shareableUrl;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempTextArea);
+      
+      triggerToast('success', 'Public Shareable Viewer Link copied to clipboard!');
     }
 
     // Bidirectional Sync Database Action
