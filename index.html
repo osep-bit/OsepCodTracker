@@ -284,6 +284,8 @@
                     <div>
                       <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Character ID (ID Code)</label>
                       <input type="text" id="entry-id" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none font-mono transition" placeholder="e.g. 54398103">
+                      <!-- Responsive UI validation notice explaining ID rules -->
+                      <span class="block text-[10px] text-amber-500 mt-1.5 font-medium leading-relaxed">⚠️ Note: Player ID code must be completely unique. System blocks duplicates to prevent data corruption.</span>
                     </div>
 
                     <div>
@@ -1206,20 +1208,22 @@ function onEdit(e) {
         return;
       }
 
-      const duplicateIndex = roster.findIndex(p => p.id === id);
+      // Check if ID is already registered to throw an error and protect existing profiles
+      const duplicateIndex = roster.findIndex(p => String(p.id).trim() === id.trim());
+      if (duplicateIndex !== -1) {
+        const existingPlayer = roster[duplicateIndex];
+        triggerToast('error', `Registration Error: Character ID "${id}" already exists under "${existingPlayer.name}". Duplicate entries are blocked.`);
+        return;
+      }
+
       const playerData = { 
         name, id, power, merits, kills, 
         donation, buildTime, destructionTime, help, assistance, 
         timestamp: new Date().toISOString() 
       };
 
-      if (duplicateIndex !== -1) {
-        roster[duplicateIndex] = playerData;
-        triggerToast('success', `Updated member: ${name}`);
-      } else {
-        roster.push(playerData);
-        triggerToast('success', `Added new member: ${name}`);
-      }
+      roster.push(playerData);
+      triggerToast('success', `Successfully registered new member: ${name}`);
 
       saveDataToDisk();
       updateUI();
@@ -1284,6 +1288,15 @@ function onEdit(e) {
       if (!name || !id) {
         triggerToast('error', 'Name and Character ID are required.');
         return;
+      }
+
+      // Check if modified ID is already occupied by ANOTHER user profile
+      if (String(id).trim() !== String(originalId).trim()) {
+        const isIdTaken = roster.some(p => String(p.id).trim() === String(id).trim());
+        if (isIdTaken) {
+          triggerToast('error', `Edit Blocked: Player ID "${id}" is already assigned to another profile.`);
+          return;
+        }
       }
 
       // Check if original profile matches or overwrite index
