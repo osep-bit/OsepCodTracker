@@ -23,7 +23,7 @@
             codDark: '#08090c',
             codCard: '#11131c',
             codCardHover: '#161924',
-            codAccent: '#dfa13b', // Call of Dragons Gold/Orange
+            codAccent: '#dfa13b', 
             codAccentHover: '#b87f28',
             codBorder: '#1c1f2e',
             codTextMuted: '#7c869c'
@@ -33,50 +33,29 @@
     }
   </script>
   
-  <!-- Chart.js -->
+  <!-- Chart.js & Icons -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* Premium custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #08090c;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1c1f2e;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #dfa13b;
-    }
-    
-    /* Rotate on hover animation for sync icon */
-    .btn-sync-hover:hover i {
-      transform: rotate(180deg);
-      transition: transform 0.5s ease;
-    }
-    .btn-sync-hover i {
-      transition: transform 0.5s ease;
-    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #08090c; }
+    ::-webkit-scrollbar-thumb { background: #1c1f2e; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #dfa13b; }
+    .btn-sync-hover:hover i { transform: rotate(180deg); transition: transform 0.5s ease; }
+    .btn-sync-hover i { transition: transform 0.5s ease; }
   </style>
 </head>
 <body class="bg-codDark text-gray-200 font-sans h-full overflow-hidden flex flex-col">
 
-  <!-- ==================== MAIN LAYOUT WRAPPER ==================== -->
   <div class="flex h-full w-full overflow-hidden relative">
     
-    <!-- BACKDROP: Dark blurred overlay for mobile sidebar drawer -->
+    <!-- BACKDROP -->
     <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-20 md:hidden transition-all duration-300"></div>
 
-    <!-- LEFT SIDEBAR: Premium Game Hub Control -->
+    <!-- LEFT SIDEBAR -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-codCard border-r border-codBorder flex flex-col justify-between shrink-0 z-30 transform -translate-x-full transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:h-full">
       <div>
-        <!-- Logo / Title -->
         <div class="p-6 border-b border-codBorder flex items-center justify-between bg-codDark/30">
           <div class="flex items-center space-x-3">
             <div class="p-2.5 bg-codAccent/10 text-codAccent rounded-xl border border-codAccent/25 shrink-0">
@@ -87,13 +66,11 @@
               <p class="text-[10px] text-codAccent font-bold uppercase tracking-widest">Roster Management</p>
             </div>
           </div>
-          <!-- Close button for mobile -->
           <button onclick="toggleSidebar(false)" class="md:hidden p-2 text-gray-400 hover:text-white hover:bg-codBorder rounded-lg transition shrink-0">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
 
-        <!-- Navigation Menu -->
         <nav class="p-4 space-y-1">
           <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-codAccent text-black font-bold">
             <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
@@ -122,7 +99,6 @@
         </nav>
       </div>
 
-      <!-- Footer Widget -->
       <div class="p-4 border-t border-codBorder">
         <div class="bg-codDark/70 rounded-xl p-3 border border-codBorder/80">
           <div class="flex items-center space-x-2 mb-1.5">
@@ -137,10 +113,8 @@
     <!-- RIGHT CONTENT AREA -->
     <main class="flex-1 flex flex-col overflow-y-auto bg-codDark relative">
       
-      <!-- Top Sticky Header -->
       <header class="h-16 border-b border-codBorder flex items-center justify-between px-4 md:px-8 bg-codCard/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
         <div class="flex items-center space-x-2 md:space-x-3">
-          <!-- Hamburger Menu button for mobile screens -->
           <button onclick="toggleSidebar(true)" class="md:hidden p-2 text-gray-400 hover:text-white hover:bg-codBorder rounded-lg transition mr-1 shrink-0">
             <i data-lucide="menu" class="w-5 h-5"></i>
           </button>
@@ -149,7 +123,6 @@
         </div>
         
         <div class="flex items-center space-x-2 md:space-x-4">
-          <!-- Real-time Last Sync administrative display -->
           <div class="text-right hidden md:block">
             <span class="block text-[10px] text-codTextMuted uppercase font-bold tracking-wider">Last Sync (Admin)</span>
             <span id="header-last-sync" class="text-xs font-extrabold text-codAccent">Calculating...</span>
@@ -162,7 +135,6 @@
           </div>
           <div class="h-8 w-[1px] bg-codBorder hidden sm:block"></div>
           
-          <!-- Sync Database Button (Bidirectional Merge) -->
           <button onclick="syncDatabase()" class="btn-sync-hover flex items-center space-x-1 px-2.5 py-1.5 border border-codAccent/20 hover:border-codAccent/50 bg-codAccent/5 text-codAccent rounded-lg text-xs font-semibold transition shrink-0">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5 shrink-0"></i>
             <span class="hidden xs:inline">Sync Database</span>
@@ -176,47 +148,29 @@
 
         <!-- ==================== TAB: OVERVIEW DASHBOARD ==================== -->
         <section id="tab-dashboard" class="space-y-6 md:space-y-8">
-          
-          <!-- Quick Stat Cards -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
-              <div class="absolute right-0 bottom-0 text-codAccent/5 translate-x-4 translate-y-4">
-                <i data-lucide="users" class="w-20 md:w-28 h-20 md:h-28"></i>
-              </div>
+              <div class="absolute right-0 bottom-0 text-codAccent/5 translate-x-4 translate-y-4"><i data-lucide="users" class="w-20 md:w-28 h-20 md:h-28"></i></div>
               <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Members</p>
               <h3 id="stat-members" class="text-2xl md:text-3xl font-extrabold text-white mt-1 md:mt-2">0</h3>
-              <p class="text-[10px] text-codTextMuted mt-1">Maximum recommended: 150</p>
             </div>
-
             <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
-              <div class="absolute right-0 bottom-0 text-emerald-500/5 translate-x-4 translate-y-4">
-                <i data-lucide="swords" class="w-20 md:w-28 h-20 md:h-28"></i>
-              </div>
+              <div class="absolute right-0 bottom-0 text-emerald-500/5 translate-x-4 translate-y-4"><i data-lucide="swords" class="w-20 md:w-28 h-20 md:h-28"></i></div>
               <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Power</p>
               <h3 id="stat-power" class="text-2xl md:text-3xl font-extrabold text-emerald-400 mt-1 md:mt-2">0.0M</h3>
-              <p class="text-[10px] text-codTextMuted mt-1">Aggregated roster power</p>
             </div>
-
             <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
-              <div class="absolute right-0 bottom-0 text-amber-500/5 translate-x-4 translate-y-4">
-                <i data-lucide="sparkles" class="w-20 md:w-28 h-20 md:h-28"></i>
-              </div>
+              <div class="absolute right-0 bottom-0 text-amber-500/5 translate-x-4 translate-y-4"><i data-lucide="sparkles" class="w-20 md:w-28 h-20 md:h-28"></i></div>
               <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Alliance Merits</p>
               <h3 id="stat-merits" class="text-2xl md:text-3xl font-extrabold text-amber-400 mt-1 md:mt-2">0</h3>
-              <p class="text-[10px] text-codTextMuted mt-1">Combat performance rating</p>
             </div>
-
             <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
-              <div class="absolute right-0 bottom-0 text-rose-500/5 translate-x-4 translate-y-4">
-                <i data-lucide="activity" class="w-20 md:w-28 h-20 md:h-28"></i>
-              </div>
+              <div class="absolute right-0 bottom-0 text-rose-500/5 translate-x-4 translate-y-4"><i data-lucide="activity" class="w-20 md:w-28 h-20 md:h-28"></i></div>
               <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Active Kill Points</p>
               <h3 id="stat-kills" class="text-2xl md:text-3xl font-extrabold text-rose-500 mt-1 md:mt-2">0</h3>
-              <p class="text-[10px] text-codTextMuted mt-1">Total defeated enemies</p>
             </div>
           </div>
 
-          <!-- Charts and Analytics -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
             <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 lg:col-span-2">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-2">
@@ -235,16 +189,13 @@
               </div>
             </div>
 
-            <!-- Leaderboard panel -->
             <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 flex flex-col justify-between">
               <div>
                 <h4 class="font-extrabold text-sm md:text-md text-white flex items-center space-x-2 mb-4">
                   <i data-lucide="trophy" class="w-4 h-4 md:w-5 md:h-5 text-yellow-500"></i>
                   <span>Top Contributors (Support Score)</span>
                 </h4>
-                <div id="mini-leaderboard" class="space-y-3">
-                  <!-- Injected via Javascript -->
-                </div>
+                <div id="mini-leaderboard" class="space-y-3"></div>
               </div>
               <button onclick="switchTab('roster-manager')" class="w-full py-2.5 border border-codBorder hover:border-codAccent hover:text-codAccent rounded-xl text-xs font-bold text-gray-300 transition mt-6">
                 Open Full Roster Directory
@@ -253,7 +204,7 @@
           </div>
         </section>
 
-        <!-- ==================== TAB: PUBLIC ROSTER DIRECTORY (READ-ONLY) ==================== -->
+        <!-- ==================== TAB: PUBLIC ROSTER DIRECTORY ==================== -->
         <section id="tab-roster-manager" class="hidden space-y-6">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-codCard border border-codBorder rounded-2xl p-4">
             <div class="relative w-full md:w-80">
@@ -264,7 +215,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full md:w-auto justify-end">
-              <select id="sort-select" onchange="renderRoster()" class="w-full sm:w-auto bg-codDark border border-codBorder text-gray-300 text-xs rounded-xl p-2.5 focus:outline-none focus:border-codAccent">
+              <select id="sort-select" onchange="renderRoster()" class="w-full sm:w-auto bg-codDark border border-codBorder text-gray-300 text-xs rounded-xl p-2.5 focus:outline-none focus:border-codAccent font-sans">
                 <option value="merits-desc">Sort: Highest Merits</option>
                 <option value="power-desc">Sort: Highest Power</option>
                 <option value="kills-desc">Sort: Highest Kills</option>
@@ -278,7 +229,6 @@
             </div>
           </div>
 
-          <!-- Roster Table Panel -->
           <div class="bg-codCard border border-codBorder rounded-2xl overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse min-w-[1200px]">
@@ -296,13 +246,10 @@
                     <th class="py-4 px-6 text-amber-500 font-bold">Assistance</th>
                   </tr>
                 </thead>
-                <tbody id="roster-table-body" class="divide-y divide-codBorder text-xs text-gray-300">
-                  <!-- Injected via Javascript (Read-Only) -->
-                </tbody>
+                <tbody id="roster-table-body" class="divide-y divide-codBorder text-xs text-gray-300 font-sans"></tbody>
               </table>
             </div>
 
-            <!-- Empty table state -->
             <div id="roster-empty" class="hidden text-center py-20">
               <i data-lucide="shield-question" class="w-12 h-12 text-codBorder mx-auto mb-3"></i>
               <h4 class="text-sm font-bold text-white">Roster Database Empty</h4>
@@ -313,12 +260,14 @@
 
         <!-- ==================== TAB: LOCKED ADMIN PORTAL ==================== -->
         <section id="tab-admin-portal" class="hidden space-y-6">
-          
-          <!-- Admin Tab Navigation Menu Header -->
           <div class="flex border-b border-codBorder pb-2 gap-2 overflow-x-auto">
             <button onclick="switchAdminSubTab('roster-admin')" id="admin-sub-roster-admin" class="admin-sub-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-codAccent text-black flex items-center space-x-1.5 shrink-0">
               <i data-lucide="edit-3" class="w-4 h-4"></i>
               <span>Manage Directory</span>
+            </button>
+            <button onclick="switchAdminSubTab('bulk-scan')" id="admin-sub-bulk-scan" class="admin-sub-btn px-4 py-2.5 rounded-xl text-xs font-bold transition text-gray-400 hover:text-white hover:bg-codBorder flex items-center space-x-1.5 shrink-0">
+              <i data-lucide="cloud" class="w-4 h-4"></i>
+              <span>Cloud Drive Scanner</span>
             </button>
             <button onclick="switchAdminSubTab('data-entry')" id="admin-sub-data-entry" class="admin-sub-btn px-4 py-2.5 rounded-xl text-xs font-bold transition text-gray-400 hover:text-white hover:bg-codBorder flex items-center space-x-1.5 shrink-0">
               <i data-lucide="user-plus" class="w-4 h-4"></i>
@@ -330,7 +279,7 @@
             </button>
           </div>
 
-          <!-- SUB-TAB A: ADMIN DIRECTORY (WITH EDIT/DELETE CONTROLS) -->
+          <!-- SUB-TAB A: ADMIN DIRECTORY -->
           <div id="admin-sec-roster-admin" class="admin-tab-section space-y-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-codCard border border-codBorder rounded-2xl gap-3">
               <div>
@@ -358,9 +307,7 @@
                       <th class="py-4 px-6 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody id="admin-roster-table-body" class="divide-y divide-codBorder text-xs text-gray-300">
-                    <!-- Injected via Javascript (With Actions) -->
-                  </tbody>
+                  <tbody id="admin-roster-table-body" class="divide-y divide-codBorder text-xs text-gray-300"></tbody>
                 </table>
               </div>
               <div id="admin-roster-empty" class="hidden text-center py-20">
@@ -371,7 +318,48 @@
             </div>
           </div>
 
-          <!-- SUB-TAB B: MANUAL ENTRY FORM -->
+          <!-- SUB-TAB B: CLOUD DRIVE SCANNER (REPLACED BROWSER SCANNER) -->
+          <div id="admin-sec-bulk-scan" class="admin-tab-section hidden space-y-6">
+            <div class="bg-codCard border border-codBorder rounded-2xl p-6 md:p-10 shadow-xl max-w-4xl mx-auto text-center">
+              
+              <div class="w-20 h-20 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 border border-blue-500/20">
+                <i data-lucide="folder-sync" class="w-10 h-10"></i>
+              </div>
+              
+              <h3 class="font-extrabold text-xl md:text-2xl text-white mb-3">Google Drive Auto-Scanner Enabled</h3>
+              <p class="text-sm text-codTextMuted leading-relaxed max-w-2xl mx-auto mb-10">
+                Screenshot processing has been offloaded to Google's cloud servers for massive speed improvements and zero rate limits. The scanner now runs directly inside your Google Sheet.
+              </p>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-10">
+                <div class="bg-codDark border border-codBorder p-5 rounded-xl">
+                  <div class="text-codAccent mb-3"><i data-lucide="upload-cloud" class="w-6 h-6"></i></div>
+                  <h4 class="font-bold text-white text-sm mb-1.5">1. Upload Files</h4>
+                  <p class="text-[11px] text-codTextMuted leading-relaxed">Drag your batch of screenshots into your <strong>Inbox</strong> folder on Google Drive.</p>
+                </div>
+                <div class="bg-codDark border border-codBorder p-5 rounded-xl">
+                  <div class="text-emerald-500 mb-3"><i data-lucide="play-circle" class="w-6 h-6"></i></div>
+                  <h4 class="font-bold text-white text-sm mb-1.5">2. Run Cloud Engine</h4>
+                  <p class="text-[11px] text-codTextMuted leading-relaxed">Open your Google Sheet, click the <strong>🐉 Alliance Tracker</strong> menu at the top, and run the scanner.</p>
+                </div>
+                <div class="bg-codDark border border-codBorder p-5 rounded-xl">
+                  <div class="text-blue-500 mb-3"><i data-lucide="refresh-cw" class="w-6 h-6"></i></div>
+                  <h4 class="font-bold text-white text-sm mb-1.5">3. Sync Dashboard</h4>
+                  <p class="text-[11px] text-codTextMuted leading-relaxed">Once the sheet finishes processing, click the Sync button below to update this website.</p>
+                </div>
+              </div>
+
+              <div class="pt-6 border-t border-codBorder">
+                <button onclick="syncDatabase()" class="px-8 py-3.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-xl text-sm tracking-wider uppercase transition shadow-lg shadow-codAccent/15 flex items-center justify-center space-x-2 mx-auto">
+                  <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                  <span>Sync New Data to Website</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- SUB-TAB C: MANUAL ENTRY FORM -->
           <div id="admin-sec-data-entry" class="admin-tab-section hidden">
             <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 md:p-8 max-w-4xl mx-auto shadow-xl">
               <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-codBorder">
@@ -380,80 +368,71 @@
                 </div>
                 <div>
                   <h3 class="font-extrabold text-base md:text-lg text-white">Alliance Member Profile Registration</h3>
-                  <p class="text-[11px] md:text-xs text-codTextMuted mt-0.5">Quickly key in or update a player's combat, baseline, and support metrics.</p>
+                  <p class="text-[11px] md:text-xs text-codTextMuted mt-0.5 font-sans font-sans">Quickly key in or update a player's combat, baseline, and support metrics.</p>
                 </div>
               </div>
               
               <form id="quick-add-form" class="space-y-6" onsubmit="handleManualAdd(event)">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                  <!-- LEFT COLUMN: Identity & Core Power Metrics -->
                   <div class="space-y-5">
-                    <h4 class="text-xs font-bold text-codAccent tracking-wider uppercase flex items-center space-x-2">
+                    <h4 class="text-xs font-bold text-codAccent tracking-wider uppercase flex items-center space-x-2 font-sans">
                       <i data-lucide="user" class="w-4 h-4"></i>
                       <span>1. Identity & Combat Stats</span>
                     </h4>
-                    
                     <div class="space-y-4">
                       <div>
-                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Player Name</label>
+                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Player Name</label>
                         <input type="text" id="entry-name" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition font-semibold" placeholder="e.g. [W949] Caesar">
                       </div>
-                      
                       <div>
-                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Character ID (ID Code)</label>
+                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Character ID (ID Code)</label>
                         <input type="text" id="entry-id" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none font-mono transition" placeholder="e.g. 54398103">
-                        <span class="block text-[10px] text-amber-500 mt-1.5 font-medium leading-relaxed">⚠️ Note: Player ID code must be completely unique. System blocks duplicates to prevent data corruption.</span>
+                        <span class="block text-[10px] text-amber-500 mt-1.5 font-medium leading-relaxed font-sans">⚠️ Note: Player ID code must be completely unique.</span>
                       </div>
-
                       <div>
-                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Current Power</label>
+                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Current Power</label>
                         <input type="number" id="entry-power" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="e.g. 15450000">
                       </div>
-
                       <div class="grid grid-cols-2 gap-4">
                         <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Weekly Merits</label>
+                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Weekly Merits</label>
                           <input type="number" id="entry-merits" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 transition" placeholder="e.g. 350000">
                         </div>
                         <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Kill Points (KP)</label>
+                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Kill Points (KP)</label>
                           <input type="number" id="entry-kills" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 transition" placeholder="e.g. 1200000">
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- RIGHT COLUMN: Alliance Support Parameters -->
                   <div class="space-y-5">
-                    <h4 class="text-xs font-bold text-codAccent tracking-wider uppercase flex items-center space-x-2">
+                    <h4 class="text-xs font-bold text-codAccent tracking-wider uppercase flex items-center space-x-2 font-sans font-sans">
                       <i data-lucide="handshake" class="w-4 h-4"></i>
                       <span>2. Alliance Activity Metrics</span>
                     </h4>
-                    
                     <div class="space-y-4">
                       <div>
-                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Alliance Donation</label>
+                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Alliance Donation</label>
                         <input type="number" id="entry-donation" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="Donation value points">
                       </div>
-
                       <div class="grid grid-cols-2 gap-4">
                         <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Build Time</label>
+                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Build Time</label>
                           <input type="number" id="entry-buildTime" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="e.g. hours or points">
                         </div>
                         <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Destruction Time</label>
+                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Destruction Time</label>
                           <input type="number" id="entry-destructionTime" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="e.g. hours or points">
                         </div>
                       </div>
-
                       <div class="grid grid-cols-2 gap-4">
                         <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Alliance Help</label>
+                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans font-sans">Alliance Help</label>
                           <input type="number" id="entry-help" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="Clicks helped">
                         </div>
                         <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5">Resource Assistance</label>
+                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans font-sans font-sans font-sans">Resource Assistance</label>
                           <input type="number" id="entry-assistance" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="Resources donated">
                         </div>
                       </div>
@@ -461,9 +440,8 @@
                   </div>
                 </div>
 
-                <!-- Action Submission Button -->
-                <div class="pt-6 border-t border-codBorder flex justify-end">
-                  <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-xl text-xs tracking-wider uppercase transition shadow-lg shadow-codAccent/15 flex items-center justify-center space-x-2">
+                <div class="pt-6 border-t border-codBorder flex justify-end font-sans">
+                  <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-xl text-xs tracking-wider uppercase transition shadow-lg shadow-codAccent/15 flex items-center justify-center space-x-2 font-sans font-sans">
                     <i data-lucide="save" class="w-4 h-4"></i>
                     <span>Register Alliance Member</span>
                   </button>
@@ -472,40 +450,32 @@
             </div>
           </div>
 
-          <!-- SUB-TAB C: SHEETS DATABASE SYNC HUB -->
-          <div id="admin-sec-sheets" class="admin-tab-section hidden space-y-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              
-              <!-- Integration Configuration -->
-              <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 flex flex-col justify-between">
+          <!-- SUB-TAB D: DATABASE SYNC -->
+          <div id="admin-sec-sheets" class="admin-tab-section hidden space-y-8 font-sans">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 font-sans">
+              <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 flex flex-col justify-between font-sans">
                 <div class="space-y-6">
                   <div>
-                    <h3 class="font-extrabold text-base md:text-lg text-white mb-2">Sync to Google Sheets</h3>
-                    <p class="text-xs text-codTextMuted leading-relaxed">Instantly synchronize your player stats bidirectionally. You can load statistics entered on your spreadsheet directly into this client dashboard, or export any manual changes back to Google Sheets instantly.</p>
+                    <h3 class="font-extrabold text-base md:text-lg text-white mb-2 font-sans">Sync to Google Sheets</h3>
+                    <p class="text-xs text-codTextMuted leading-relaxed font-sans font-sans font-sans">Instantly synchronize your player stats bidirectionally. You can load statistics entered on your spreadsheet directly into this client dashboard, or export any manual changes back to Google Sheets instantly.</p>
                   </div>
-
                   <div class="space-y-3">
-                    <label class="block text-[10px] font-bold text-codTextMuted uppercase tracking-wider">Google Sheets Web App API Endpoint URL</label>
+                    <label class="block text-[10px] font-bold text-codTextMuted uppercase tracking-wider font-sans font-sans">Google Sheets Web App API Endpoint URL</label>
                     <input type="text" id="sheets-endpoint" oninput="saveEndpointLocally()" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-xl p-3.5 outline-none transition font-semibold" placeholder="https://script.google.com/macros/s/xxxx/exec">
                     <span class="block text-[10px] text-amber-500 font-medium leading-relaxed font-mono">🔧 Developer tip: Pasting this URL writes it directly into your local database. To freeze it permanently for public viewers, set it inside the 'DEFAULT_SHEETS_API_URL' code variable!</span>
                   </div>
-
-                  <!-- Sync Controls Box -->
                   <div class="grid grid-cols-2 gap-4">
-                    <button onclick="pullFromGoogleSheets()" class="py-3 border border-codBorder hover:border-codAccent bg-codDark hover:text-codAccent text-gray-300 font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                    <button onclick="pullFromGoogleSheets()" class="py-3 border border-codBorder hover:border-codAccent bg-codDark hover:text-codAccent text-gray-300 font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2 font-sans">
                       <i data-lucide="cloud-download" class="w-4.5 h-4.5"></i>
                       <span>Pull from Sheets</span>
                     </button>
-
-                    <button onclick="pushToGoogleSheets()" class="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/15">
+                    <button onclick="pushToGoogleSheets()" class="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/15 font-sans">
                       <i data-lucide="cloud-upload" class="w-4.5 h-4.5"></i>
                       <span>Push to Sheets</span>
                     </button>
                   </div>
-
-                  <!-- Step-by-step instructions -->
                   <div class="space-y-2 pt-4 border-t border-codBorder">
-                    <h4 class="text-xs font-bold text-white">How to connect:</h4>
+                    <h4 class="text-xs font-bold text-white font-sans font-sans">How to connect:</h4>
                     <ol class="list-decimal list-inside text-[11px] md:text-xs text-codTextMuted space-y-2 leading-relaxed font-sans">
                       <li>In your Google Sheet, open <span class="text-codAccent font-semibold">Extensions > Apps Script</span>.</li>
                       <li>Copy the script snippet shown on the right-hand panel.</li>
@@ -518,16 +488,16 @@
               </div>
 
               <!-- Interactive Script Copy Card -->
-              <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 flex flex-col">
+              <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 flex flex-col font-sans">
                 <div class="flex justify-between items-center mb-4">
-                  <h4 class="font-bold text-xs uppercase text-codTextMuted tracking-wider">Apps Script Webhook Snippet</h4>
-                  <button onclick="copySheetsSnippet()" class="flex items-center space-x-1.5 text-xs text-codAccent hover:text-codAccentHover bg-codDark/80 border border-codBorder hover:border-codAccent px-3 py-1.5 rounded-lg transition font-semibold">
+                  <h4 class="font-bold text-xs uppercase text-codTextMuted tracking-wider font-sans font-sans font-sans">Apps Script Webhook Snippet</h4>
+                  <button onclick="copySheetsSnippet()" class="flex items-center space-x-1.5 text-xs text-codAccent hover:text-codAccentHover bg-codDark/80 border border-codBorder hover:border-codAccent px-3 py-1.5 rounded-lg transition font-semibold font-sans font-sans">
                     <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                     <span>Copy Snippet</span>
                   </button>
                 </div>
-
                 <pre class="flex-1 bg-codDark border border-codBorder rounded-xl p-4 text-[10px] font-mono text-gray-400 overflow-y-auto max-h-[420px] leading-relaxed select-all">
+// Google Sheets Webhook Snippet - Version 5.1
 function doGet() {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -537,16 +507,12 @@ function doGet() {
       return ContentService.createTextOutput(JSON.stringify([]))
         .setMimeType(ContentService.MimeType.JSON);
     }
-    
-    // Fetch values across all 11 columns (A to K)
     var data = sheet.getRange(2, 1, lastRow - 1, 11).getValues();
     var roster = data.map(function(row) {
       var timestampVal = new Date(0).toISOString();
       if (row[10]) {
         var parsedDate = new Date(row[10]);
-        if (!isNaN(parsedDate.getTime())) {
-          timestampVal = parsedDate.toISOString();
-        }
+        if (!isNaN(parsedDate.getTime())) timestampVal = parsedDate.toISOString();
       }
       return {
         name: row[0].toString(),
@@ -562,7 +528,6 @@ function doGet() {
         timestamp: timestampVal
       };
     });
-    
     return ContentService.createTextOutput(JSON.stringify(roster))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
@@ -577,70 +542,33 @@ function doPost(e) {
     var parsedData = JSON.parse(rawData);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getActiveSheet();
-    
-    // Create header row if sheet is brand new and empty
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow([
-        "Player Name", 
-        "Player ID", 
-        "Power", 
-        "Merits", 
-        "Kills", 
-        "Alliance Donation", 
-        "Build Time", 
-        "Destruction Time", 
-        "Alliance Help", 
-        "Resource Assistance", 
-        "Sync Timestamp"
-      ]);
+      sheet.appendRow(["Player Name", "Player ID", "Power", "Merits", "Kills", "Alliance Donation", "Build Time", "Destruction Time", "Alliance Help", "Resource Assistance", "Sync Timestamp"]);
     }
-    
-    // Clear current database rows prior to syncing fresh
     if (sheet.getLastRow() &gt; 1) {
       sheet.getRange(2, 1, sheet.getLastRow() - 1, 11).clearContent();
     }
-    
-    // Append scanned players
     parsedData.forEach(function(member) {
       sheet.appendRow([
-        member.name,
-        member.id,
-        Number(member.power),
-        Number(member.merits),
-        Number(member.kills),
-        Number(member.donation) || 0,
-        Number(member.buildTime) || 0,
-        Number(member.destructionTime) || 0,
-        Number(member.help) || 0,
-        Number(member.assistance) || 0,
-        member.timestamp || new Date().toISOString()
+        member.name, member.id, Number(member.power), Number(member.merits), Number(member.kills), Number(member.donation) || 0, Number(member.buildTime) || 0, Number(member.destructionTime) || 0, Number(member.help) || 0, Number(member.assistance) || 0, member.timestamp || new Date().toISOString()
       ]);
     });
-    
     return ContentService.createTextOutput(JSON.stringify({"status": "success", "rows": parsedData.length}))
       .setMimeType(ContentService.MimeType.JSON);
-      
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": error.toString()}))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-// Automatically updates the Sync Timestamp column whenever rows are manually edited inside Sheets
 function onEdit(e) {
   try {
     var sheet = e.source.getActiveSheet();
     var range = e.range;
-    var row = range.getRow();
-    var col = range.getColumn();
-    
-    // If edit is in rows 2+ and columns 1-10
-    if (row &gt; 1 && col &gt;= 1 && col &lt;= 10) {
-      sheet.getRange(row, 11).setValue(new Date().toISOString());
+    if (range.getRow() &gt; 1 && range.getColumn() &gt;= 1 && range.getColumn() &lt;= 10) {
+      sheet.getRange(range.getRow(), 11).setValue(new Date().toISOString());
     }
-  } catch(err) {
-    // Fail silently on restricted sheet operations
-  }
+  } catch(err) {}
 }</pre>
               </div>
             </div>
@@ -654,55 +582,52 @@ function onEdit(e) {
 
   <!-- ==================== PREMIUM UI POPUPS & DIALOGS ==================== -->
   
-  <!-- Custom Password Lock Verification Modal -->
   <div id="password-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
     <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all mx-4">
       <div class="w-12 h-12 bg-codAccent/10 text-codAccent rounded-xl flex items-center justify-center mb-4 border border-codAccent/20">
         <i data-lucide="lock" class="w-6 h-6"></i>
       </div>
-      <h3 class="text-md font-bold text-white tracking-wide">Admin Access Required</h3>
-      <p class="text-xs text-codTextMuted mt-2 leading-relaxed">Entering the administrative command hub requires passcode authorization. Type the secret key to edit values, sync spreadsheet rows, or manage directory metrics.</p>
+      <h3 class="text-md font-bold text-white tracking-wide font-sans">Admin Access Required</h3>
+      <p class="text-xs text-codTextMuted mt-2 leading-relaxed font-sans font-sans">Entering the administrative command hub requires passcode authorization. Type the secret key to edit values, sync spreadsheet rows, or manage directory metrics.</p>
       
       <div class="mt-4">
         <input type="password" id="password-input" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-sm rounded-lg p-3 outline-none transition font-sans" placeholder="••••••••" onkeydown="if(event.key === 'Enter') submitPassword()">
       </div>
       
       <div class="flex space-x-3 mt-6">
-        <button onclick="closePasswordModal()" class="w-1/2 py-2.5 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition">
+        <button onclick="closePasswordModal()" class="w-1/2 py-2.5 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition font-sans">
           Cancel
         </button>
-        <button onclick="submitPassword()" class="w-1/2 py-2.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-lg text-xs transition border-none">
+        <button onclick="submitPassword()" class="w-1/2 py-2.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-lg text-xs transition border-none font-sans">
           Unlock Console
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Custom Confirmation Dialog (No-Alert Constraint) -->
   <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all mx-4">
       <div class="w-12 h-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-4">
         <i data-lucide="alert-triangle" class="w-6 h-6"></i>
       </div>
       <h3 id="confirm-modal-title" class="text-md font-bold text-white">Remove Player Profile</h3>
-      <p id="confirm-modal-description" class="text-xs text-codTextMuted mt-2 leading-relaxed">Are you sure you want to remove this player profile? This action cannot be undone.</p>
+      <p id="confirm-modal-description" class="text-xs text-codTextMuted mt-2 leading-relaxed font-sans">Are you sure you want to remove this player profile? This action cannot be undone.</p>
       
       <div class="flex space-x-3 mt-6">
-        <button onclick="closeConfirmModal()" class="w-1/2 py-2 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition">
+        <button onclick="closeConfirmModal()" class="w-1/2 py-2 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition font-sans">
           Cancel
         </button>
-        <button id="confirm-modal-btn" class="w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition border-none">
+        <button id="confirm-modal-btn" onclick="executeConfirmModal()" class="w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition border-none cursor-pointer font-sans">
           Confirm
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Custom Edit Modal Dialog -->
-  <div id="edit-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-codCard border border-codBorder rounded-2xl max-w-md w-full p-6 shadow-2xl scale-95 transition-all max-h-[90vh] overflow-y-auto mx-4">
-      <div class="flex justify-between items-center mb-4 pb-2 border-b border-codBorder">
-        <h3 class="text-md font-bold text-white">Modify Player Profile</h3>
+  <div id="edit-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-sans">
+    <div class="bg-codCard border border-codBorder rounded-2xl max-w-md w-full p-6 shadow-2xl scale-95 transition-all max-h-[90vh] overflow-y-auto mx-4 font-sans font-sans">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b border-codBorder font-sans">
+        <h3 class="text-md font-bold text-white font-sans">Modify Player Profile</h3>
         <button onclick="closeEditModal()" class="text-gray-400 hover:text-white transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
@@ -710,62 +635,61 @@ function onEdit(e) {
       <form id="edit-form" class="space-y-4" onsubmit="saveInlineEdit(event)">
         <input type="hidden" id="edit-original-id">
         <div>
-          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Player Name</label>
+          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Player Name</label>
           <input type="text" id="edit-name" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition font-semibold">
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Character ID</label>
-          <input type="text" id="edit-id" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none font-mono transition">
+          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Character ID</label>
+          <input type="text" id="edit-id" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none font-mono transition">
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Power Rating</label>
+          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Power Rating</label>
           <input type="number" id="edit-power" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Weekly Merits</label>
+            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Weekly Merits</label>
             <input type="number" id="edit-merits" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Kill Points</label>
+            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Kill Points</label>
             <input type="number" id="edit-kills" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
           </div>
         </div>
 
-        <!-- Edit modal parameters -->
         <div class="pt-4 border-t border-codBorder space-y-4">
-          <h4 class="text-xs font-bold text-codAccent uppercase">Alliance Metrics</h4>
+          <h4 class="text-xs font-bold text-codAccent uppercase font-sans">Alliance Metrics</h4>
           <div>
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Alliance Donation</label>
+            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Alliance Donation</label>
             <input type="number" id="edit-donation" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Build Time</label>
+              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Build Time</label>
               <input type="number" id="edit-buildTime" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Destruction Time</label>
+              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Destruction Time</label>
               <input type="number" id="edit-destructionTime" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Alliance Help</label>
+              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Alliance Help</label>
               <input type="number" id="edit-help" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1">Resource Assistance</label>
+              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Resource Assistance</label>
               <input type="number" id="edit-assistance" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
             </div>
           </div>
         </div>
 
         <div class="flex space-x-3 pt-4 border-t border-codBorder">
-          <button type="button" onclick="closeEditModal()" class="w-1/2 py-2 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition">
+          <button type="button" onclick="closeEditModal()" class="w-1/2 py-2 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition font-sans">
             Cancel
           </button>
-          <button type="submit" class="w-1/2 py-2 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-lg text-xs transition border-none">
+          <button type="submit" class="w-1/2 py-2 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-lg text-xs transition border-none cursor-pointer font-sans">
             Save Changes
           </button>
         </div>
@@ -773,29 +697,22 @@ function onEdit(e) {
     </div>
   </div>
 
-  <!-- Custom Toast Notification Box -->
-  <div id="toast-box" class="fixed bottom-6 right-6 z-50 pointer-events-none flex flex-col space-y-3">
-    <!-- Success Toast templates generated inside JS -->
-  </div>
+  <div id="toast-box" class="fixed bottom-6 right-6 z-50 pointer-events-none flex flex-col space-y-3"></div>
 
-  <!-- ==================== JAVASCRIPT MASTER APPLICATION ==================== -->
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
-    // ==================== CONFIGURATION ====================
-    // Paste your deployed Google Apps Script Web App URL here as the default.
-    // This allows everyone visiting your site to automatically load the database without needing query parameters!
     const DEFAULT_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzQn_gQG0v9-8rCMyy6800qU7vT-M1IunW_rFpSg78h1UfC_9N88xQ2U8-v6M7p9b68/exec"; 
-
-    // Application States
+    
     let roster = [];
     let overviewChartInstance = null;
-    let isUnlocked = false; // Security credentials unlock state
-    let pendingTabId = null; // Caches target tab if authorization was required
-    let pendingPlayerId = null; // Caches edit player ID if authorization was required
-    let pendingDeletePlayerId = null; // Caches delete player ID if authorization was required
-    let pendingDeletePlayerName = null; // Caches delete player Name if authorization was required
-    let activeAdminSubTab = 'roster-admin'; // Inner admin sub-tab selection state
+    let isUnlocked = false; 
+    let pendingTabId = null; 
+    let pendingPlayerId = null; 
+    let pendingDeletePlayerId = null; 
+    let pendingDeletePlayerName = null; 
+    let activeAdminSubTab = 'roster-admin'; 
+    let modalActionCallback = null;
 
-    // Load data upon DOM initialization
     window.onload = function() {
       lucide.createIcons();
       checkUrlParams(); 
@@ -804,7 +721,6 @@ function onEdit(e) {
       autoPullOnLoad();
     };
 
-    // Responsive Mobile Sidebar Toggle Control
     function toggleSidebar(open) {
       const sidebar = document.getElementById('sidebar');
       const backdrop = document.getElementById('sidebar-backdrop');
@@ -819,7 +735,6 @@ function onEdit(e) {
       }
     }
 
-    // Inspects URL parameters for the ?api=... query parameter, configures the site, and sanitizes the address bar.
     function checkUrlParams() {
       try {
         const urlParams = new URLSearchParams(window.location.search);
@@ -828,14 +743,10 @@ function onEdit(e) {
           const decodedApi = decodeURIComponent(apiParam);
           if (decodedApi.startsWith('https://script.google.com/')) {
             localStorage.setItem('cod_el_endpoint_manual', decodedApi);
-            // Instantly sync form field if rendered
             const field = document.getElementById('sheets-endpoint');
             if (field) field.value = decodedApi;
-            
-            // Clean up address bar query string silently for premium look
             const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
             window.history.replaceState({}, document.title, cleanUrl);
-            
             triggerToast('success', 'Linked sheet database successfully from parameters!');
           }
         }
@@ -844,14 +755,17 @@ function onEdit(e) {
       }
     }
 
-    // Load persisted local storage stats inside safe blocks
     function loadDataFromDisk() {
       try {
         const storedRoster = localStorage.getItem('cod_el_roster_manual');
         if (storedRoster) {
-          roster = JSON.parse(storedRoster);
+          try {
+            roster = JSON.parse(storedRoster);
+          } catch(e) {
+            console.warn("Corrupt local roster storage, resetting array.");
+            roster = [];
+          }
         }
-        
         const storedEndpoint = localStorage.getItem('cod_el_endpoint_manual');
         if (storedEndpoint) {
           document.getElementById('sheets-endpoint').value = storedEndpoint;
@@ -859,40 +773,34 @@ function onEdit(e) {
           document.getElementById('sheets-endpoint').value = DEFAULT_SHEETS_API_URL;
           localStorage.setItem('cod_el_endpoint_manual', DEFAULT_SHEETS_API_URL);
         }
-        
-        // Load active security unlock credentials from the session storage
+
         isUnlocked = sessionStorage.getItem('cod_el_unlocked') === 'true';
         updateLockBadge();
       } catch (err) {
-        console.warn("localStorage read blocked/failed:", err);
+        console.warn("localStorage read failed:", err);
       }
     }
 
-    // Save states safely
     function saveDataToDisk() {
       try {
         localStorage.setItem('cod_el_roster_manual', JSON.stringify(roster));
         localStorage.setItem('cod_el_endpoint_manual', document.getElementById('sheets-endpoint').value.trim());
       } catch (err) {
-        console.warn("localStorage write blocked/failed:", err);
+        console.warn("localStorage write failed:", err);
       }
     }
 
-    // Instantly persist the Google Sheets Web App Endpoint URL locally on any manual input/changes
     function saveEndpointLocally() {
       const url = document.getElementById('sheets-endpoint').value.trim();
       try {
         localStorage.setItem('cod_el_endpoint_manual', url);
       } catch (err) {
-        console.warn("Endpoint write to localStorage failed:", err);
+        console.warn("Endpoint write failed:", err);
       }
     }
 
-    // Master UI Refresh Function to guarantee sync across all active views
     function updateUI() {
-      // Calculate performance metrics dynamic formulas
       calculateMetricsScores();
-      
       renderDashboard();
       renderRoster();
       renderAdminRoster();
@@ -900,16 +808,12 @@ function onEdit(e) {
       const limit = 150;
       document.getElementById('header-member-count').textContent = `${roster.length} / ${limit}`;
       document.getElementById('roster-badge').textContent = roster.length;
-      
-      // Compute and update the 'Last Sync (Admin)' UI timestamp indicator
       updateLastSyncDisplay();
     }
 
-    // Dynamic Multi-Parameter Proportional Performance Scoring Engine
     function calculateMetricsScores() {
       if (roster.length === 0) return;
 
-      // Find highest values recorded in the roster dynamically (with a fallback baseline of 1 to prevent division by zero)
       const maxVals = {
         power: Math.max(...roster.map(p => Number(p.power) || 0), 1),
         merits: Math.max(...roster.map(p => Number(p.merits) || 0), 1),
@@ -921,7 +825,6 @@ function onEdit(e) {
         assistance: Math.max(...roster.map(p => Number(p.assistance) || 0), 1)
       };
 
-      // Calculate relative raw contribution scores for each player
       roster.forEach(p => {
         const normPower = (Number(p.power) || 0) / maxVals.power;
         const normMerits = (Number(p.merits) || 0) / maxVals.merits;
@@ -932,48 +835,26 @@ function onEdit(e) {
         const normHelp = (Number(p.help) || 0) / maxVals.help;
         const normAssistance = (Number(p.assistance) || 0) / maxVals.assistance;
 
-        // Overall Performance Score Formulas (All Parameters)
-        // Weights: Merits: 25% | Kills: 20% | Donation: 15% | Power: 10% | Build: 10% | Destruction: 10% | Help: 5% | Assistance: 5%
-        p.rawOverall = (normMerits * 0.25) + 
-                       (normKills * 0.20) + 
-                       (normDonation * 0.15) + 
-                       (normPower * 0.10) + 
-                       (normBuild * 0.10) + 
-                       (normDestruction * 0.10) + 
-                       (normHelp * 0.05) + 
-                       (normAssistance * 0.05);
-
-        // Support & Activity Score Formulas (Exclude Merit and Power)
-        // Weights: Kills: 30% | Donation: 25% | Build: 15% | Destruction: 15% | Help: 10% | Assistance: 5%
-        p.rawSupport = (normKills * 0.30) + 
-                       (normDonation * 0.25) + 
-                       (normBuild * 0.15) + 
-                       (normDestruction * 0.15) + 
-                       (normHelp * 0.10) + 
-                       (normAssistance * 0.05);
+        p.rawOverall = (normMerits * 0.25) + (normKills * 0.20) + (normDonation * 0.15) + (normPower * 0.10) + (normBuild * 0.10) + (normDestruction * 0.10) + (normHelp * 0.05) + (normAssistance * 0.05);
+        p.rawSupport = (normKills * 0.30) + (normDonation * 0.25) + (normBuild * 0.15) + (normDestruction * 0.15) + (normHelp * 0.10) + (normAssistance * 0.05);
       });
 
-      // Find the absolute maximum raw scores in the roster to use as a 100-point benchmark scaling factor
       const maxRawOverall = Math.max(...roster.map(p => p.rawOverall || 0), 0.001);
       const maxRawSupport = Math.max(...roster.map(p => p.rawSupport || 0), 0.001);
 
-      // Perform proportional scaling relative to the highest performer (Top 1 player is set to exactly 100 points)
       roster.forEach(p => {
         p.overallScore = Math.round((p.rawOverall / maxRawOverall) * 100);
         p.supportScore = Math.round((p.rawSupport / maxRawSupport) * 100);
       });
     }
 
-    // Parses the roster array dynamically to find and format the newest admin synchronization timestamp.
     function updateLastSyncDisplay() {
       const syncEl = document.getElementById('header-last-sync');
       if (!syncEl) return;
-      
       if (roster.length === 0) {
         syncEl.textContent = "Never";
         return;
       }
-      
       let latestTime = 0;
       roster.forEach(p => {
         if (p.timestamp) {
@@ -983,7 +864,6 @@ function onEdit(e) {
           }
         }
       });
-      
       if (latestTime === 0) {
         syncEl.textContent = "Never";
       } else {
@@ -993,36 +873,23 @@ function onEdit(e) {
       }
     }
 
-    // Toast alerts helper
     function triggerToast(type, text) {
       const toastBox = document.getElementById('toast-box');
       const toast = document.createElement('div');
       toast.className = `p-4 rounded-xl flex items-center space-x-3 shadow-2xl transition duration-300 transform translate-y-4 opacity-0 pointer-events-auto ${
         type === 'success' ? 'bg-emerald-600 text-white border border-emerald-500/20' : 'bg-red-600 text-white border border-red-500/20'
       }`;
-      
       const icon = type === 'success' ? 'check-circle' : 'alert-circle';
-      toast.innerHTML = `
-        <i data-lucide="${icon}" class="w-5 h-5 shrink-0"></i>
-        <span class="text-xs font-semibold">${text}</span>
-      `;
-      
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5 shrink-0"></i><span class="text-xs font-semibold">${text}</span>`;
       toastBox.appendChild(toast);
       lucide.createIcons();
-
-      // Trigger animation
-      setTimeout(() => {
-        toast.classList.remove('translate-y-4', 'opacity-0');
-      }, 50);
-
-      // Dismiss timer
+      setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 50);
       setTimeout(() => {
         toast.classList.add('translate-y-4', 'opacity-0');
         setTimeout(() => toast.remove(), 300);
       }, 4000);
     }
 
-    // Updates the Admin Lock Badge in the sidebar based on unlock status
     function updateLockBadge() {
       const badge = document.getElementById('admin-lock-badge');
       if (badge) {
@@ -1036,173 +903,12 @@ function onEdit(e) {
       }
     }
 
-    // Tab view router (Updated with Security passcode lock controls & Auto sidebar close for Mobile)
-    function switchTab(tabId) {
-      // Close mobile drawer seamlessly
-      toggleSidebar(false);
-
-      // If the target tab is the Admin Portal and the user hasn't authenticated yet, open password modal
-      if (tabId === 'admin-portal' && !isUnlocked) {
-        pendingTabId = tabId;
-        openPasswordModal();
-        return;
-      }
-
-      document.querySelectorAll('main > div > section').forEach(tab => {
-        tab.classList.add('hidden');
-      });
-      document.getElementById('tab-' + tabId).classList.remove('hidden');
-
-      const headerTitle = {
-        'dashboard': 'Alliance Overview',
-        'roster-manager': 'Roster Directory',
-        'admin-portal': 'Command & Sync Console'
-      };
-      document.getElementById('tab-title').textContent = headerTitle[tabId];
-
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-codAccent', 'text-black', 'font-bold');
-        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
-      });
-
-      const activeBtn = document.getElementById('nav-' + tabId);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-codAccent', 'text-black', 'font-bold');
-        activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
-      }
-
-      // Refresh views
-      if (tabId === 'dashboard') renderDashboard();
-      if (tabId === 'roster-manager') renderRoster();
-      if (tabId === 'admin-portal') {
-        renderAdminRoster();
-        switchAdminSubTab(activeAdminSubTab);
-      }
-    }
-
-    // Switch between Admin Sub-Tabs inside the Admin Portal
-    function switchAdminSubTab(subTabId) {
-      activeAdminSubTab = subTabId;
-      
-      // Hide all admin sub-tab contents
-      document.querySelectorAll('.admin-tab-section').forEach(sec => {
-        sec.classList.add('hidden');
-      });
-      // Show targeted content
-      document.getElementById('admin-sec-' + subTabId).classList.remove('hidden');
-
-      // Sync active button styles
-      document.querySelectorAll('.admin-sub-btn').forEach(btn => {
-        btn.classList.remove('bg-codAccent', 'text-black');
-        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
-      });
-
-      const activeBtn = document.getElementById('admin-sub-' + subTabId);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-codAccent', 'text-black');
-        activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
-      }
-
-      if (subTabId === 'roster-admin') renderAdminRoster();
-    }
-
-    // Password Lock Modal actions
     function openPasswordModal() {
       document.getElementById('password-input').value = '';
       document.getElementById('password-modal').classList.remove('hidden');
       setTimeout(() => {
         document.getElementById('password-input').focus();
       }, 100);
-    }
-
-    // Silently pulls spreadsheet data on page load so viewers see stats instantly without manual password requirements
-    async function autoPullOnLoad() {
-      const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint) return;
-      try {
-        const res = await fetch(endpoint);
-        if (!res.ok) return;
-        const sheetData = await res.json();
-        if (sheetData && Array.isArray(sheetData)) {
-          if (!isUnlocked) {
-            // Public viewers should simply mirror the Google Sheet state to guarantee no ghost records on sheet edits/deletions
-            roster = sheetData;
-          } else {
-            // Reconcile and merge sheet data based on ID and timestamps for Admin Session
-            let maxSheetTime = 0;
-            sheetData.forEach(p => {
-              if (p.timestamp) {
-                const t = new Date(p.timestamp).getTime();
-                if (!isNaN(t) && t > maxSheetTime) {
-                  maxSheetTime = t;
-                }
-              }
-            });
-
-            const localMap = new Map();
-            const sheetPlayerIds = new Set(sheetData.map(p => String(p.id).trim()));
-
-            // Propagate Deletions from Spreadsheet to Local State on Load:
-            roster.forEach(localPlayer => {
-              if (!localPlayer.id) return;
-              const localId = String(localPlayer.id).trim();
-              const localTime = new Date(localPlayer.timestamp || 0).getTime();
-
-              if (!sheetPlayerIds.has(localId)) {
-                if (localTime > maxSheetTime) {
-                  localMap.set(localId, localPlayer);
-                }
-              } else {
-                localMap.set(localId, localPlayer);
-              }
-            });
-            
-            sheetData.forEach(sheetPlayer => {
-              if (!sheetPlayer.id) return;
-              const sheetId = String(sheetPlayer.id).trim();
-              if (localMap.has(sheetId)) {
-                const localPlayer = localMap.get(sheetId);
-                const localTime = new Date(localPlayer.timestamp || 0).getTime();
-                const sheetTime = new Date(sheetPlayer.timestamp || 0).getTime();
-                if (sheetTime >= localTime) {
-                  localMap.set(sheetId, {
-                    name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
-                    id: sheetId,
-                    power: Number(sheetPlayer.power) || 0,
-                    merits: Number(sheetPlayer.merits) || 0,
-                    kills: Number(sheetPlayer.kills) || 0,
-                    donation: Number(sheetPlayer.donation) || 0,
-                    buildTime: Number(sheetPlayer.buildTime) || 0,
-                    destructionTime: Number(sheetPlayer.destructionTime) || 0,
-                    help: Number(sheetPlayer.help) || 0,
-                    assistance: Number(sheetPlayer.assistance) || 0,
-                    timestamp: sheetPlayer.timestamp || new Date().toISOString()
-                  });
-                }
-              } else {
-                localMap.set(sheetId, {
-                  name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
-                  id: sheetId,
-                  power: Number(sheetPlayer.power) || 0,
-                  merits: Number(sheetPlayer.merits) || 0,
-                  kills: Number(sheetPlayer.kills) || 0,
-                  donation: Number(sheetPlayer.donation) || 0,
-                  buildTime: Number(sheetPlayer.buildTime) || 0,
-                  destructionTime: Number(sheetPlayer.destructionTime) || 0,
-                  help: Number(sheetPlayer.help) || 0,
-                  assistance: Number(sheetPlayer.assistance) || 0,
-                  timestamp: sheetPlayer.timestamp || new Date().toISOString()
-                });
-              }
-            });
-            roster = Array.from(localMap.values());
-          }
-          saveDataToDisk();
-          updateUI();
-        }
-      } catch (err) {
-        console.warn("Background auto-pull on page load failed:", err);
-      }
     }
 
     function closePasswordModal() {
@@ -1213,10 +919,9 @@ function onEdit(e) {
       pendingDeletePlayerName = null;
     }
 
-    // Passcode validation check
     function submitPassword() {
       const code = document.getElementById('password-input').value;
-      if (code === '9492026') {
+      if (code === '949') { 
         isUnlocked = true;
         try {
           sessionStorage.setItem('cod_el_unlocked', 'true');
@@ -1245,186 +950,73 @@ function onEdit(e) {
       }
     }
 
-    // Modal Manager
-    let modalActionCallback = null;
-    function showDeletePlayerModal(playerId, playerName) {
-      if (!isUnlocked) {
-        triggerToast('error', 'Authentication required to remove alliance members.');
-        pendingPlayerId = null;
-        pendingDeletePlayerId = playerId;
-        pendingDeletePlayerName = playerName;
+    function switchTab(tabId) {
+      toggleSidebar(false);
+      if (tabId === 'admin-portal' && !isUnlocked) {
+        pendingTabId = tabId;
         openPasswordModal();
         return;
       }
+      document.querySelectorAll('main > div > section').forEach(tab => {
+        tab.classList.add('hidden');
+      });
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
 
-      document.getElementById('confirm-modal-title').textContent = `Remove ${playerName}?`;
-      document.getElementById('confirm-modal-description').textContent = `Are you sure you want to remove this player profile (ID: ${playerId}) from your active alliance roster?`;
-      document.getElementById('confirm-modal-btn').className = "w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition border-none cursor-pointer";
-
-      modalActionCallback = function() {
-        roster = roster.filter(p => p.id !== playerId);
-        saveDataToDisk();
-        updateUI();
-        triggerToast('success', `${playerName} removed from Roster.`);
-        // Instantly push change to sheet in background
-        pushToGoogleSheetsBackground();
+      const headerTitle = {
+        'dashboard': 'Alliance Overview',
+        'roster-manager': 'Roster Directory',
+        'admin-portal': 'Command & Sync Console'
       };
+      document.getElementById('tab-title').textContent = headerTitle[tabId];
 
-      document.getElementById('confirm-modal').classList.remove('hidden');
-    }
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-codAccent', 'text-black', 'font-bold');
+        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
+      });
 
-    // Close Confirmation Modal
-    function closeConfirmModal() {
-      document.getElementById('confirm-modal').classList.add('hidden');
-      modalActionCallback = null;
-    }
-
-    document.getElementById('confirm-modal-btn').addEventListener('click', () => {
-      if (modalActionCallback) {
-        modalActionCallback();
-        closeConfirmModal();
-      }
-    });
-
-    // ==================== MANUAL ADD / EDIT HANDLERS ====================
-    function handleManualAdd(e) {
-      e.preventDefault();
-      const name = document.getElementById('entry-name').value.trim();
-      const id = document.getElementById('entry-id').value.trim();
-      const power = parseInt(document.getElementById('entry-power').value) || 0;
-      const merits = parseInt(document.getElementById('entry-merits').value) || 0;
-      const kills = parseInt(document.getElementById('entry-kills').value) || 0;
-      const donation = parseInt(document.getElementById('entry-donation').value) || 0;
-      const buildTime = parseInt(document.getElementById('entry-buildTime').value) || 0;
-      const destructionTime = parseInt(document.getElementById('entry-destructionTime').value) || 0;
-      const help = parseInt(document.getElementById('entry-help').value) || 0;
-      const assistance = parseInt(document.getElementById('entry-assistance').value) || 0;
-
-      if (!name || !id) {
-        triggerToast('error', 'Player Name and ID fields are required.');
-        return;
+      const activeBtn = document.getElementById('nav-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-codAccent', 'text-black', 'font-bold');
+        activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
       }
 
-      // Check if ID is already registered to throw an error and protect existing profiles
-      const duplicateIndex = roster.findIndex(p => String(p.id).trim() === id.trim());
-      if (duplicateIndex !== -1) {
-        const existingPlayer = roster[duplicateIndex];
-        triggerToast('error', `Registration Error: Character ID "${id}" already exists under "${existingPlayer.name}".`);
-        return;
-      }
-
-      const playerData = { 
-        name, id, power, merits, kills, 
-        donation, buildTime, destructionTime, help, assistance, 
-        timestamp: new Date().toISOString() 
-      };
-
-      roster.push(playerData);
-      triggerToast('success', `Successfully registered new member: ${name}`);
-
-      saveDataToDisk();
-      updateUI();
-      document.getElementById('quick-add-form').reset();
-      
-      // Instantly push change to sheet in background
-      pushToGoogleSheetsBackground();
-    }
-
-    // ==================== EDIT MODAL SYSTEM ====================
-    function openEditModal(id) {
-      if (!isUnlocked) {
-        triggerToast('error', 'Authentication required to modify player statistics.');
-        pendingPlayerId = id;
-        openPasswordModal();
-        return;
-      }
-
-      const player = roster.find(p => p.id === id);
-      if (!player) return;
-
-      document.getElementById('edit-original-id').value = player.id;
-      document.getElementById('edit-name').value = player.name;
-      document.getElementById('edit-id').value = player.id;
-      document.getElementById('edit-power').value = player.power;
-      document.getElementById('edit-merits').value = player.merits;
-      document.getElementById('edit-kills').value = player.kills;
-      
-      // Load structural metrics
-      document.getElementById('edit-donation').value = player.donation || 0;
-      document.getElementById('edit-buildTime').value = player.buildTime || 0;
-      document.getElementById('edit-destructionTime').value = player.destructionTime || 0;
-      document.getElementById('edit-help').value = player.help || 0;
-      document.getElementById('edit-assistance').value = player.assistance || 0;
-
-      document.getElementById('edit-modal').classList.remove('hidden');
-    }
-
-    // Close Inline Edit Modal
-    function closeEditModal() {
-      document.getElementById('edit-modal').classList.add('hidden');
-      document.getElementById('edit-form').reset();
-    }
-
-    function saveInlineEdit(e) {
-      e.preventDefault();
-      const originalId = document.getElementById('edit-original-id').value;
-      const name = document.getElementById('edit-name').value.trim();
-      const id = document.getElementById('edit-id').value.trim();
-      const power = parseInt(document.getElementById('edit-power').value) || 0;
-      const merits = parseInt(document.getElementById('edit-merits').value) || 0;
-      const kills = parseInt(document.getElementById('edit-kills').value) || 0;
-      
-      const donation = parseInt(document.getElementById('edit-donation').value) || 0;
-      const buildTime = parseInt(document.getElementById('edit-buildTime').value) || 0;
-      const destructionTime = parseInt(document.getElementById('edit-destructionTime').value) || 0;
-      const help = parseInt(document.getElementById('edit-help').value) || 0;
-      const assistance = parseInt(document.getElementById('edit-assistance').value) || 0;
-
-      if (!name || !id) {
-        triggerToast('error', 'Name and Character ID are required.');
-        return;
-      }
-
-      // Check if modified ID is already occupied by ANOTHER user profile
-      if (String(id).trim() !== String(originalId).trim()) {
-        const isIdTaken = roster.some(p => String(p.id).trim() === String(id).trim());
-        if (isIdTaken) {
-          triggerToast('error', `Edit Blocked: Player ID "${id}" is already assigned to another profile.`);
-          return;
-        }
-      }
-
-      // Check if original profile matches or overwrite index
-      const targetIndex = roster.findIndex(p => p.id === originalId);
-      if (targetIndex !== -1) {
-        roster[targetIndex] = { 
-          name, id, power, merits, kills, 
-          donation, buildTime, destructionTime, help, assistance, 
-          timestamp: new Date().toISOString() 
-        };
-        saveDataToDisk();
-        closeEditModal();
-        updateUI();
-        triggerToast('success', `Successfully modified ${name}'s statistics.`);
-        
-        // Instantly push change to sheet in background
-        pushToGoogleSheetsBackground();
+      if (tabId === 'dashboard') renderDashboard();
+      if (tabId === 'roster-manager') renderRoster();
+      if (tabId === 'admin-portal') {
+        renderAdminRoster();
+        switchAdminSubTab(activeAdminSubTab);
       }
     }
 
-    // ==================== TAB: ALLIANCE OVERVIEW GRAPHICS ====================
+    function switchAdminSubTab(subTabId) {
+      activeAdminSubTab = subTabId;
+      document.querySelectorAll('.admin-tab-section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById('admin-sec-' + subTabId).classList.remove('hidden');
+
+      document.querySelectorAll('.admin-sub-btn').forEach(btn => {
+        btn.classList.remove('bg-codAccent', 'text-black');
+        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
+      });
+
+      const activeBtn = document.getElementById('admin-sub-' + subTabId);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-codAccent', 'text-black');
+        activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
+      }
+      if (subTabId === 'roster-admin') renderAdminRoster();
+    }
+
     function renderDashboard() {
       document.getElementById('stat-members').textContent = roster.length;
       
-      const totalPower = roster.reduce((sum, p) => sum + p.power, 0);
-      const totalMerits = roster.reduce((sum, p) => sum + p.merits, 0);
-      const totalKills = roster.reduce((sum, p) => sum + p.kills, 0);
+      const totalPower = roster.reduce((sum, p) => sum + (Number(p.power) || 0), 0);
+      const totalMerits = roster.reduce((sum, p) => sum + (Number(p.merits) || 0), 0);
+      const totalKills = roster.reduce((sum, p) => sum + (Number(p.kills) || 0), 0);
 
       document.getElementById('stat-power').textContent = (totalPower / 1000000).toFixed(1) + 'M';
       document.getElementById('stat-merits').textContent = totalMerits.toLocaleString();
       document.getElementById('stat-kills').textContent = (totalKills / 1000000).toFixed(1) + 'M';
 
-      // Top Contributors Leaderboard (Sorted by proportional activity/support Score)
       const sortedBySupport = [...roster].sort((a, b) => (b.supportScore || 0) - (a.supportScore || 0)).slice(0, 5);
       const miniLeaderboard = document.getElementById('mini-leaderboard');
 
@@ -1443,7 +1035,7 @@ function onEdit(e) {
               <span class="text-sm shrink-0">${medals[idx]}</span>
               <div class="overflow-hidden text-left">
                 <span class="block text-xs font-bold text-white truncate">${p.name}</span>
-                <span class="block text-[10px] text-codTextMuted font-mono">ID: ${p.id}</span>
+                <span class="block text-[10px] text-codTextMuted text-xs font-mono">ID: ${p.id || "N/A"}</span>
               </div>
             </div>
             <span class="text-xs font-extrabold text-amber-400 shrink-0">Score: ${p.supportScore || 0}</span>
@@ -1451,7 +1043,6 @@ function onEdit(e) {
         `).join('');
       }
 
-      // Render chart with top 10 sorted by Overall Score
       const sortedByOverall = [...roster].sort((a, b) => (b.overallScore || 0) - (a.overallScore || 0)).slice(0, 10);
       renderAnalyticsChart(sortedByOverall);
     }
@@ -1498,7 +1089,7 @@ function onEdit(e) {
           scales: {
             y: { 
               min: 0,
-              max: 100, // Lock scores between 1 and 100
+              max: 100,
               grid: { color: '#1c2130' }, 
               ticks: { color: '#8a93a6', font: { size: 10 } } 
             },
@@ -1508,7 +1099,6 @@ function onEdit(e) {
       });
     }
 
-    // ==================== TAB: PUBLIC READ-ONLY ROSTER DIRECTORY ====================
     function renderRoster() {
       const searchVal = document.getElementById('search-input').value.toLowerCase();
       const sortVal = document.getElementById('sort-select').value;
@@ -1516,12 +1106,12 @@ function onEdit(e) {
       const emptyState = document.getElementById('roster-empty');
 
       let filtered = roster.filter(p => 
-        p.name.toLowerCase().includes(searchVal) || p.id.includes(searchVal)
+        p.name.toLowerCase().includes(searchVal) || (p.id && p.id.includes(searchVal))
       );
 
-      if (sortVal === 'merits-desc') filtered.sort((a, b) => b.merits - a.merits);
-      else if (sortVal === 'power-desc') filtered.sort((a, b) => b.power - a.power);
-      else if (sortVal === 'kills-desc') filtered.sort((a, b) => b.kills - a.kills);
+      if (sortVal === 'merits-desc') filtered.sort((a, b) => (b.merits || 0) - (a.merits || 0));
+      else if (sortVal === 'power-desc') filtered.sort((a, b) => (b.power || 0) - (a.power || 0));
+      else if (sortVal === 'kills-desc') filtered.sort((a, b) => (b.kills || 0) - (a.kills || 0));
       else if (sortVal === 'name-asc') filtered.sort((a, b) => a.name.localeCompare(b.name));
 
       if (filtered.length === 0) {
@@ -1535,10 +1125,10 @@ function onEdit(e) {
         return `
           <tr class="hover:bg-codCard/40 transition border-b border-codBorder/40 text-gray-300">
             <td class="py-4 px-6 font-semibold text-white sticky left-0 bg-codDark z-10">${player.name}</td>
-            <td class="py-4 px-6 text-codTextMuted font-mono">${player.id}</td>
-            <td class="py-4 px-6 font-semibold">${player.power.toLocaleString()}</td>
-            <td class="py-4 px-6 text-amber-400 font-extrabold">${player.merits.toLocaleString()}</td>
-            <td class="py-4 px-6 text-emerald-400 font-semibold">${player.kills.toLocaleString()}</td>
+            <td class="py-4 px-6 text-codTextMuted font-mono text-xs">${player.id || "N/A"}</td>
+            <td class="py-4 px-6 font-semibold">${(player.power || 0).toLocaleString()}</td>
+            <td class="py-4 px-6 text-amber-400 font-extrabold">${(player.merits || 0).toLocaleString()}</td>
+            <td class="py-4 px-6 text-emerald-400 font-semibold">${(player.kills || 0).toLocaleString()}</td>
             <td class="py-4 px-6 font-semibold text-gray-300">${(player.donation || 0).toLocaleString()}</td>
             <td class="py-4 px-4 font-semibold text-gray-300">${player.buildTime || 0}</td>
             <td class="py-4 px-4 font-semibold text-gray-300">${player.destructionTime || 0}</td>
@@ -1550,18 +1140,21 @@ function onEdit(e) {
       lucide.createIcons();
     }
 
-    // ==================== TAB: ADMINISTRATIVE INTERACTIVE ROSTER DIRECTORY ====================
+    function escapeHtmlQuotes(str) {
+      if (!str) return "";
+      return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
     function renderAdminRoster() {
       const searchVal = document.getElementById('admin-search-input').value.toLowerCase();
       const tbody = document.getElementById('admin-roster-table-body');
       const emptyState = document.getElementById('admin-roster-empty');
 
       let filtered = roster.filter(p => 
-        p.name.toLowerCase().includes(searchVal) || p.id.includes(searchVal)
+        p.name.toLowerCase().includes(searchVal) || (p.id && p.id.includes(searchVal))
       );
 
-      // Sort administrative views descending by weekly merits by default
-      filtered.sort((a, b) => b.merits - a.merits);
+      filtered.sort((a, b) => (b.merits || 0) - (a.merits || 0));
 
       if (filtered.length === 0) {
         tbody.innerHTML = '';
@@ -1571,13 +1164,17 @@ function onEdit(e) {
       emptyState.classList.add('hidden');
 
       tbody.innerHTML = filtered.map(player => {
+        const safeIdOrName = escapeHtmlQuotes(player.id || player.name);
+        const safeId = escapeHtmlQuotes(player.id || "");
+        const safeName = escapeHtmlQuotes(player.name);
+
         return `
           <tr class="hover:bg-codCard/40 transition border-b border-codBorder/40 text-gray-300">
             <td class="py-4 px-6 font-semibold text-white sticky left-0 bg-codDark z-10">${player.name}</td>
-            <td class="py-4 px-6 text-codTextMuted font-mono">${player.id}</td>
-            <td class="py-4 px-6 font-semibold">${player.power.toLocaleString()}</td>
-            <td class="py-4 px-6 text-amber-400 font-extrabold">${player.merits.toLocaleString()}</td>
-            <td class="py-4 px-6 text-emerald-400 font-semibold">${player.kills.toLocaleString()}</td>
+            <td class="py-4 px-6 text-codTextMuted font-mono text-xs">${player.id || "N/A"}</td>
+            <td class="py-4 px-6 font-semibold">${(player.power || 0).toLocaleString()}</td>
+            <td class="py-4 px-6 text-amber-400 font-extrabold">${(player.merits || 0).toLocaleString()}</td>
+            <td class="py-4 px-6 text-emerald-400 font-semibold">${(player.kills || 0).toLocaleString()}</td>
             <td class="py-4 px-6 font-semibold text-gray-300">${(player.donation || 0).toLocaleString()}</td>
             <td class="py-4 px-4 font-semibold text-gray-300">${player.buildTime || 0}</td>
             <td class="py-4 px-4 font-semibold text-gray-300">${player.destructionTime || 0}</td>
@@ -1585,10 +1182,10 @@ function onEdit(e) {
             <td class="py-4 px-6 font-semibold text-gray-300">${(player.assistance || 0).toLocaleString()}</td>
             <td class="py-4 px-6 text-right">
               <div class="flex items-center justify-end space-x-2">
-                <button onclick="openEditModal('${player.id}')" class="text-codAccent hover:text-white p-1.5 rounded-lg hover:bg-codAccent/10 transition border-none cursor-pointer bg-transparent">
+                <button onclick="openEditModal('${safeIdOrName}')" class="text-codAccent hover:text-white p-1.5 rounded-lg hover:bg-codAccent/10 transition border-none cursor-pointer bg-transparent">
                   <i data-lucide="pencil" class="w-4 h-4"></i>
                 </button>
-                <button onclick="showDeletePlayerModal('${player.id}', '${player.name}')" class="text-red-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition border-none cursor-pointer bg-transparent">
+                <button onclick="showDeletePlayerModal('${safeId}', '${safeName}')" class="text-red-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition border-none cursor-pointer bg-transparent">
                   <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
               </div>
@@ -1599,7 +1196,6 @@ function onEdit(e) {
       lucide.createIcons();
     }
 
-    // CSV Roster Download
     function downloadCSV() {
       if (roster.length === 0) {
         triggerToast('error', 'Database is empty. No files to extract.');
@@ -1608,7 +1204,7 @@ function onEdit(e) {
 
       let csv = "Player Name,Character ID,Power,Merits,Kills,Alliance Donation,Build Time,Destruction Time,Alliance Help,Resource Assistance\n";
       roster.forEach(p => {
-        csv += `"${p.name}","${p.id}",${p.power},${p.merits},${p.kills},${p.donation || 0},${p.buildTime || 0},${p.destructionTime || 0},${p.help || 0},${p.assistance || 0}\n`;
+        csv += `"${p.name}","${p.id || ""}",${p.power || 0},${p.merits || 0},${p.kills || 0},${p.donation || 0},${p.buildTime || 0},${p.destructionTime || 0},${p.help || 0},${p.assistance || 0}\n`;
       });
 
       const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csv);
@@ -1621,216 +1217,297 @@ function onEdit(e) {
       triggerToast('success', 'CSV generation completed successfully.');
     }
 
-    // ==================== TAB: GOOGLE SHEETS SYNC HUB ====================
-    function pushToGoogleSheets() {
+    function copySheetsSnippet() {
+      const pre = document.querySelector('pre');
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = pre.innerText;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempTextArea);
+      triggerToast('success', 'Snippet copied to clipboard.');
+    }
+
+    function showDeletePlayerModal(playerId, playerName) {
       if (!isUnlocked) {
-        triggerToast('error', 'Authentication required to push database changes.');
+        triggerToast('error', 'Authentication required.');
+        pendingPlayerId = null;
+        pendingDeletePlayerId = playerId;
+        pendingDeletePlayerName = playerName;
+        openPasswordModal();
         return;
       }
 
-      const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint) {
-        triggerToast('error', 'Google Web App endpoint URL is missing.');
+      document.getElementById('confirm-modal-title').textContent = `Remove ${playerName}?`;
+      document.getElementById('confirm-modal-description').textContent = `Are you sure you want to remove this player profile (ID: ${playerId || 'N/A'}) from your active alliance roster?`;
+      
+      modalActionCallback = function() {
+        // Fallback for players deleted when ID is missing
+        roster = roster.filter(p => (p.id ? p.id !== playerId : p.name !== playerName));
+        saveDataToDisk();
+        updateUI();
+        triggerToast('success', `${playerName} removed from Roster.`);
+        pushToGoogleSheetsBackground();
+        closeConfirmModal();
+      };
+
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function executeConfirmModal() {
+        if (modalActionCallback) {
+            modalActionCallback();
+        }
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+      modalActionCallback = null;
+    }
+
+    function handleManualAdd(e) {
+      e.preventDefault();
+      const name = document.getElementById('entry-name').value.trim();
+      const id = document.getElementById('entry-id').value.trim();
+      const power = parseInt(document.getElementById('entry-power').value) || 0;
+      const merits = parseInt(document.getElementById('entry-merits').value) || 0;
+      const kills = parseInt(document.getElementById('entry-kills').value) || 0;
+      const donation = parseInt(document.getElementById('entry-donation').value) || 0;
+      const buildTime = parseInt(document.getElementById('entry-buildTime').value) || 0;
+      const destructionTime = parseInt(document.getElementById('entry-destructionTime').value) || 0;
+      const help = parseInt(document.getElementById('entry-help').value) || 0;
+      const assistance = parseInt(document.getElementById('entry-assistance').value) || 0;
+
+      if (!name) {
+        triggerToast('error', 'Player Name field is required.');
         return;
       }
 
-      if (roster.length === 0) {
-        triggerToast('error', 'Your local Roster has no player data to transmit.');
-        return;
+      if (id) {
+        const duplicateIndex = roster.findIndex(p => String(p.id).trim() === id.trim());
+        if (duplicateIndex !== -1) {
+          const existingPlayer = roster[duplicateIndex];
+          triggerToast('error', `Registration Error: Character ID "${id}" already exists under "${existingPlayer.name}".`);
+          return;
+        }
       }
+
+      const playerData = { 
+        name, id, power, merits, kills, 
+        donation, buildTime, destructionTime, help, assistance, 
+        timestamp: new Date().toISOString() 
+      };
+
+      roster.push(playerData);
+      triggerToast('success', `Successfully registered new member: ${name}`);
 
       saveDataToDisk();
-
-      fetch(endpoint, {
-        method: "POST",
-        mode: "no-cors", // Bypasses cross-origin redirect errors natively on Apps Script
-        body: JSON.stringify(roster)
-      })
-      .then(() => {
-        triggerToast('success', 'Roster synced successfully with Google Sheets!');
-      })
-      .catch(err => {
-        console.error(err);
-        triggerToast('error', 'Web App communication error. Check your API URL.');
-      });
+      updateUI();
+      document.getElementById('quick-add-form').reset();
+      pushToGoogleSheetsBackground();
     }
 
-    // Bidirectional Pull from Google Sheets Function
-    function pullFromGoogleSheets() {
+    function openEditModal(idOrName) {
       if (!isUnlocked) {
-        triggerToast('error', 'Authentication required to pull database changes.');
+        triggerToast('error', 'Authentication required.');
+        pendingPlayerId = idOrName;
+        openPasswordModal();
         return;
       }
 
-      const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint) {
-        triggerToast('error', 'Google Web App endpoint URL is missing.');
-        return;
-      }
+      const player = roster.find(p => p.id === idOrName || p.name === idOrName);
+      if (!player) return;
 
-      triggerToast('success', 'Querying sheets database...');
+      document.getElementById('edit-original-id').value = player.id || player.name;
+      document.getElementById('edit-name').value = player.name;
+      document.getElementById('edit-id').value = player.id || "";
+      document.getElementById('edit-power').value = player.power;
+      document.getElementById('edit-merits').value = player.merits;
+      document.getElementById('edit-kills').value = player.kills;
+      
+      document.getElementById('edit-donation').value = player.donation || 0;
+      document.getElementById('edit-buildTime').value = player.buildTime || 0;
+      document.getElementById('edit-destructionTime').value = player.destructionTime || 0;
+      document.getElementById('edit-help').value = player.help || 0;
+      document.getElementById('edit-assistance').value = player.assistance || 0;
 
-      fetch(endpoint)
-      .then(res => res.json())
-      .then(data => {
-        if (data) {
-          roster = data;
-          saveDataToDisk();
-          updateUI();
-          triggerToast('success', `Roster pulled! Successfully loaded ${data.length} records.`);
-        } else {
-          triggerToast('error', 'Spreadsheet was empty or parsing failed.');
-        }
-      })
-      .catch(err => {
-        console.error("Fetch pull error:", err);
-        triggerToast('error', 'Synchronization error. Verify that the Google Web App script URL is published correctly.');
-      });
+      document.getElementById('edit-modal').classList.remove('hidden');
     }
 
-    // Quiet background sync pushing site updates directly to Sheets
-    function pushToGoogleSheetsBackground() {
-      const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint) return; // Fail silently if endpoint is not set yet
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+      document.getElementById('edit-form').reset();
+    }
+
+    function saveInlineEdit(e) {
+      e.preventDefault();
+      const originalId = document.getElementById('edit-original-id').value;
+      const name = document.getElementById('edit-name').value.trim();
+      const id = document.getElementById('edit-id').value.trim();
       
+      if (!name) {
+        triggerToast('error', 'Name field is required.');
+        return;
+      }
+
+      if (id && String(id).trim() !== String(originalId).trim()) {
+        const isIdTaken = roster.some(p => p.id && String(p.id).trim() === String(id).trim());
+        if (isIdTaken) {
+          triggerToast('error', `Edit Blocked: Player ID "${id}" is already assigned to another profile.`);
+          return;
+        }
+      }
+
+      const targetIndex = roster.findIndex(p => p.id === originalId || p.name === originalId);
+      if (targetIndex !== -1) {
+        roster[targetIndex] = { 
+          name: name, 
+          id: id, 
+          power: parseInt(document.getElementById('edit-power').value) || 0, 
+          merits: parseInt(document.getElementById('edit-merits').value) || 0, 
+          kills: parseInt(document.getElementById('edit-kills').value) || 0, 
+          donation: parseInt(document.getElementById('edit-donation').value) || 0, 
+          buildTime: parseInt(document.getElementById('edit-buildTime').value) || 0, 
+          destructionTime: parseInt(document.getElementById('edit-destructionTime').value) || 0, 
+          help: parseInt(document.getElementById('edit-help').value) || 0, 
+          assistance: parseInt(document.getElementById('edit-assistance').value) || 0, 
+          timestamp: new Date().toISOString() 
+        };
+        saveDataToDisk();
+        closeEditModal();
+        updateUI();
+        triggerToast('success', `Successfully modified ${name}'s statistics.`);
+        pushToGoogleSheetsBackground();
+      }
+    }
+
+    function pushToGoogleSheets() {
+      if (!isUnlocked) { triggerToast('error', 'Authentication required.'); return; }
+      const endpoint = document.getElementById('sheets-endpoint').value.trim();
+      if (!endpoint || endpoint.includes("/s/xxxx/exec")) { triggerToast('error', 'Google API URL is invalid or missing.'); return; }
+      if (roster.length === 0) { triggerToast('error', 'No player data to transmit.'); return; }
+
+      saveDataToDisk();
       fetch(endpoint, {
         method: "POST",
         mode: "no-cors",
         body: JSON.stringify(roster)
       })
-      .then(() => {
-        console.log("Background synchronization with Google Sheets succeeded.");
-      })
-      .catch(err => {
-        console.warn("Background synchronization with Google Sheets failed:", err);
+      .then(() => triggerToast('success', 'Roster synced successfully with Google Sheets!'))
+      .catch(err => { 
+        console.error(err); 
+        triggerToast('error', 'Failed to push to Sheet. Check Web App configuration.'); 
       });
     }
 
-    // Generates a public shareable viewer link by appending the encoded sheets-endpoint as a query string param.
-    function copyShareableLink() {
+    function pullFromGoogleSheets() {
+      if (!isUnlocked) { triggerToast('error', 'Authentication required.'); return; }
       const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint) {
-        triggerToast('error', 'Please configure and save your Google Sheets Web App URL first.');
-        return;
-      }
-      
-      const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-      const shareableUrl = `${baseUrl}?api=${encodeURIComponent(endpoint)}`;
-      
-      // Copy to clipboard safely
-      const tempTextArea = document.createElement("textarea");
-      tempTextArea.value = shareableUrl;
-      document.body.appendChild(tempTextArea);
-      tempTextArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempTextArea);
-      
-      triggerToast('success', 'Public Shareable Viewer Link copied to clipboard!');
+      if (!endpoint || endpoint.includes("/s/xxxx/exec")) { triggerToast('error', 'Google API Web App URL is invalid or missing.'); return; }
+
+      triggerToast('success', 'Pulling statistics...');
+      fetch(endpoint)
+      .then(res => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
+      .then(data => {
+        if (data && Array.isArray(data)) {
+          roster = data;
+          saveDataToDisk();
+          updateUI();
+          triggerToast('success', `Roster pulled! Loaded ${data.length} records.`);
+        } else {
+          triggerToast('error', 'Web App responded with unexpected data format.');
+        }
+      })
+      .catch(err => { 
+        console.error("Fetch Exception:", err); 
+        triggerToast('error', 'Failed to fetch from sheet. Please ensure your Google Apps Script is deployed with "Who has access: Anyone" and "Execute as: Me".'); 
+      });
     }
 
-    // Bidirectional Sync Database Action
-    // Smart merge: pulls first, reconciles based on both player ID and timestamps.
-    // Overwrites older local records with sheet edits, while keeping and pushing newer website edits.
-    // Automatically handles spreadsheet-side deletions securely by comparing local timestamps to the latest sheet timestamp.
+    function pushToGoogleSheetsBackground() {
+      const endpoint = document.getElementById('sheets-endpoint').value.trim();
+      if (!endpoint || endpoint.includes("/s/xxxx/exec")) return;
+      fetch(endpoint, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(roster)
+      }).catch(err => console.warn("Background push failed:", err));
+    }
+
+    // Identifies players by ID, or falls back to using their Name for shell profiles.
+    function getPlayerKey(p) {
+      if (p.id && String(p.id).trim() !== "") return String(p.id).trim();
+      return 'NAME_' + String(p.name).trim().toLowerCase();
+    }
+
     async function syncDatabase() {
       const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint) {
-        triggerToast('error', 'Google Web App API URL is missing! Please configure it in the Sheets Sync Hub tab first.');
-        if (isUnlocked) {
-          switchTab('admin-portal');
-          switchAdminSubTab('sheets');
-        } else {
-          openPasswordModal();
-        }
+      if (!endpoint || endpoint.includes("/s/xxxx/exec")) {
+        triggerToast('error', 'Please configure your API link inside Sheets Sync.');
+        if (isUnlocked) { switchTab('admin-portal'); switchAdminSubTab('sheets'); }
+        else { openPasswordModal(); }
         return;
       }
 
       if (!isUnlocked) {
-        // Public Viewer Mode: Bypasses security passcode blocks and conducts a quick, read-only download pull from sheets
-        triggerToast('success', 'Establishing connection with Google Sheets...');
+        triggerToast('success', 'Establishing connection...');
         try {
-          triggerToast('success', 'Downloading latest spreadsheet rows...');
           const res = await fetch(endpoint);
-          if (!res.ok) throw new Error('Failed to fetch from sheet');
-          
+          if (!res.ok) throw new Error("Fetch failed");
           const sheetData = await res.json();
           if (sheetData && Array.isArray(sheetData)) {
             roster = sheetData;
             saveDataToDisk();
             updateUI();
-            triggerToast('success', `Database updated! Loaded ${roster.length} active alliance records.`);
-          } else {
-            triggerToast('error', 'Sheets endpoint returned invalid or empty data structure.');
+            triggerToast('success', 'Database updated with latest stats.');
           }
-        } catch (err) {
-          console.error("Fetch pull error:", err);
-          triggerToast('error', 'Failed to pull updated stats from Google Sheets.');
+        } catch (err) { 
+          console.error(err);
+          triggerToast('error', 'Failed to pull updated stats. Ensure script access is open to "Anyone".'); 
         }
         return;
       }
 
-      // Authorized Officer Mode: Executes the full Bidirectional Merge (Pull -> Reconcile Deletions/Edits -> Push back to cloud)
-      triggerToast('success', 'Establishing secure connection with Google Sheets...');
-
+      triggerToast('success', 'Reconciling secure database...');
       try {
-        // Step 1: ALWAYS pull first from the spreadsheet to get external edits
-        triggerToast('success', 'Downloading latest spreadsheet rows...');
         const res = await fetch(endpoint);
-        if (!res.ok) throw new Error('Failed to fetch from sheet');
-        
+        if (!res.ok) throw new Error("Fetch failed");
         const sheetData = await res.json();
-        
         if (sheetData && Array.isArray(sheetData)) {
-          // Calculate the latest timestamp present on the spreadsheet
           let maxSheetTime = 0;
           sheetData.forEach(p => {
             if (p.timestamp) {
               const t = new Date(p.timestamp).getTime();
-              if (!isNaN(t) && t > maxSheetTime) {
-                maxSheetTime = t;
-              }
+              if (!isNaN(t) && t > maxSheetTime) maxSheetTime = t;
             }
           });
 
-          // Step 2: Bidirectional Reconciliation using "ID Code" (Player ID) and Timestamps
           const mergedMap = new Map();
-          const sheetPlayerIds = new Set(sheetData.map(p => String(p.id).trim()));
-          
-          // Map existing local records first, handling potential sheet-side deletions
-          roster.forEach(localPlayer => {
-            if (!localPlayer.id) return;
-            const localId = String(localPlayer.id).trim();
-            const localTime = new Date(localPlayer.timestamp || 0).getTime();
+          const sheetPlayerKeys = new Set(sheetData.map(getPlayerKey));
 
-            // Reconcile Deletions:
-            if (!sheetPlayerIds.has(localId)) {
-              if (localTime > maxSheetTime) {
-                // Keep fresh local additions
-                mergedMap.set(localId, localPlayer);
-              } else {
-                // Propagate spreadsheet deletion
-                console.log(`Player ${localPlayer.name} (ID: ${localId}) was deleted on Sheet.`);
-              }
+          roster.forEach(localPlayer => {
+            const localKey = getPlayerKey(localPlayer);
+            const localTime = new Date(localPlayer.timestamp || 0).getTime();
+            if (!sheetPlayerKeys.has(localKey)) {
+              if (localTime > maxSheetTime) mergedMap.set(localKey, localPlayer);
             } else {
-              mergedMap.set(localId, localPlayer);
+              mergedMap.set(localKey, localPlayer);
             }
           });
 
-          // Reconcile with sheet data. Sheet changes overwrite corresponding local values ONLY if sheet timestamp is newer or equal.
           sheetData.forEach(sheetPlayer => {
-            if (!sheetPlayer.id) return;
-            const sheetId = String(sheetPlayer.id).trim();
-
-            if (mergedMap.has(sheetId)) {
-              const localPlayer = mergedMap.get(sheetId);
+            const sheetKey = getPlayerKey(sheetPlayer);
+            if (mergedMap.has(sheetKey)) {
+              const localPlayer = mergedMap.get(sheetKey);
               const localTime = new Date(localPlayer.timestamp || 0).getTime();
               const sheetTime = new Date(sheetPlayer.timestamp || 0).getTime();
-
-              // If sheet data is newer or equal, overwrite local data
               if (sheetTime >= localTime) {
-                mergedMap.set(sheetId, {
+                mergedMap.set(sheetKey, {
                   name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
-                  id: sheetId,
+                  id: sheetPlayer.id ? String(sheetPlayer.id).trim() : "",
                   power: Number(sheetPlayer.power) || 0,
                   merits: Number(sheetPlayer.merits) || 0,
                   kills: Number(sheetPlayer.kills) || 0,
@@ -1843,10 +1520,9 @@ function onEdit(e) {
                 });
               }
             } else {
-              // Not present locally - directly add it from spreadsheet
-              mergedMap.set(sheetId, {
+              mergedMap.set(sheetKey, {
                 name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
-                id: sheetId,
+                id: sheetPlayer.id ? String(sheetPlayer.id).trim() : "",
                 power: Number(sheetPlayer.power) || 0,
                 merits: Number(sheetPlayer.merits) || 0,
                 kills: Number(sheetPlayer.kills) || 0,
@@ -1860,38 +1536,96 @@ function onEdit(e) {
             }
           });
 
-          // Convert back to Array
           roster = Array.from(mergedMap.values());
           saveDataToDisk();
-          updateUI(); // Refreshes both charts and active lists on the user interface
+          updateUI();
 
-          // Step 3: Now POST the consolidated merged roster back to Google Sheets
-          triggerToast('success', 'Syncing merged roster back to sheet...');
-          await fetch(endpoint, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(roster)
-          });
-
-          triggerToast('success', `Database synced! Reconciled ${roster.length} active records.`);
-        } else {
-          triggerToast('error', 'Sheets endpoint returned invalid or empty data structure.');
+          await fetch(endpoint, { method: "POST", mode: "no-cors", body: JSON.stringify(roster) });
+          triggerToast('success', 'Database synced cleanly with Google Sheets!');
         }
-      } catch (err) {
-        console.error("Sync error details:", err);
-        triggerToast('error', 'Sync failed. Verify that your Google Web App Script URL is active and authorized.');
+      } catch (err) { 
+        console.error(err);
+        triggerToast('error', 'Synchronization pipeline failure. Please check web app config.'); 
       }
     }
 
-    function copySheetsSnippet() {
-      const pre = document.querySelector('pre');
-      const tempTextArea = document.createElement("textarea");
-      tempTextArea.value = pre.innerText;
-      document.body.appendChild(tempTextArea);
-      tempTextArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempTextArea);
-      triggerToast('success', 'Snippet copied to clipboard.');
+    async function autoPullOnLoad() {
+      const endpoint = document.getElementById('sheets-endpoint').value.trim();
+      if (!endpoint || endpoint.includes("/s/xxxx/exec")) return;
+      try {
+        const res = await fetch(endpoint);
+        if (!res.ok) return;
+        const sheetData = await res.json();
+        if (sheetData && Array.isArray(sheetData)) {
+          if (!isUnlocked) {
+            roster = sheetData;
+          } else {
+            let maxSheetTime = 0;
+            sheetData.forEach(p => {
+              if (p.timestamp) {
+                const t = new Date(p.timestamp).getTime();
+                if (!isNaN(t) && t > maxSheetTime) maxSheetTime = t;
+              }
+            });
+
+            const localMap = new Map();
+            const sheetPlayerKeys = new Set(sheetData.map(getPlayerKey));
+
+            roster.forEach(localPlayer => {
+              const localKey = getPlayerKey(localPlayer);
+              const localTime = new Date(localPlayer.timestamp || 0).getTime();
+              if (!sheetPlayerKeys.has(localKey)) {
+                if (localTime > maxSheetTime) localMap.set(localKey, localPlayer);
+              } else {
+                localMap.set(localKey, localPlayer);
+              }
+            });
+            
+            sheetData.forEach(sheetPlayer => {
+              const sheetKey = getPlayerKey(sheetPlayer);
+              if (localMap.has(sheetKey)) {
+                const localPlayer = localMap.get(sheetKey);
+                const localTime = new Date(localPlayer.timestamp || 0).getTime();
+                const sheetTime = new Date(sheetPlayer.timestamp || 0).getTime();
+                if (sheetTime >= localTime) {
+                  localMap.set(sheetKey, {
+                    name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
+                    id: sheetPlayer.id ? String(sheetPlayer.id).trim() : "",
+                    power: Number(sheetPlayer.power) || 0,
+                    merits: Number(sheetPlayer.merits) || 0,
+                    kills: Number(sheetPlayer.kills) || 0,
+                    donation: Number(sheetPlayer.donation) || 0,
+                    buildTime: Number(sheetPlayer.buildTime) || 0,
+                    destructionTime: Number(sheetPlayer.destructionTime) || 0,
+                    help: Number(sheetPlayer.help) || 0,
+                    assistance: Number(sheetPlayer.assistance) || 0,
+                    timestamp: sheetPlayer.timestamp || new Date().toISOString()
+                  });
+                }
+              } else {
+                localMap.set(sheetKey, {
+                  name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
+                  id: sheetPlayer.id ? String(sheetPlayer.id).trim() : "",
+                  power: Number(sheetPlayer.power) || 0,
+                  merits: Number(sheetPlayer.merits) || 0,
+                  kills: Number(sheetPlayer.kills) || 0,
+                  donation: Number(sheetPlayer.donation) || 0,
+                  buildTime: Number(sheetPlayer.buildTime) || 0,
+                  destructionTime: Number(sheetPlayer.destructionTime) || 0,
+                  help: Number(sheetPlayer.help) || 0,
+                  assistance: Number(sheetPlayer.assistance) || 0,
+                  timestamp: sheetPlayer.timestamp || new Date().toISOString()
+                });
+              }
+            });
+            roster = Array.from(localMap.values());
+          }
+          saveDataToDisk();
+          updateUI();
+        }
+      } catch (err) {
+        console.warn("Background pull load failed:", err);
+      }
     }
   </script>
 </body>
