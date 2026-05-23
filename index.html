@@ -1,51 +1,67 @@
 <!DOCTYPE html>
-<html lang="en" class="dark h-full">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wrath Family S949 - Call of Dragons Hub</title>
-  
-  <!-- Tailwind CSS CDN -->
+  <title>Wrath Family S949 Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
-        screens: {
-          'xs': '400px',
-          'sm': '640px',
-          'md': '768px',
-          'lg': '1024px',
-          'xl': '1280px',
-        },
         extend: {
           colors: {
-            codDark: '#08090c',
-            codCard: '#11131c',
-            codCardHover: '#161924',
-            codAccent: '#dfa13b', 
-            codAccentHover: '#b87f28',
-            codBorder: '#1c1f2e',
-            codTextMuted: '#7c869c'
+            codDark: '#161920',
+            codCard: '#1a1e27',
+            codBorder: '#2a303c',
+            codAccent: '#dfa13b',
+            codAccentHover: '#f0b554',
+            codTextMuted: '#8b949e',
+            alertRed: '#f87171'
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
           }
         }
       }
     }
   </script>
-  
-  <!-- Chart.js & Icons -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #08090c; }
-    ::-webkit-scrollbar-thumb { background: #1c1f2e; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #dfa13b; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .btn-sync-hover:hover i { transform: rotate(180deg); transition: transform 0.5s ease; }
-    .btn-sync-hover i { transition: transform 0.5s ease; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    body { font-family: 'Inter', sans-serif; }
+    
+    /* Sleek Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #161920; 
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a303c; 
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #dfa13b; 
+    }
+
+    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    /* Upgraded active-view to be a flex container */
+    .active-view { display: flex !important; flex-direction: column; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast-enter { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
   </style>
 </head>
 <body class="bg-codDark text-gray-200 font-sans h-full overflow-hidden flex flex-col">
@@ -72,624 +88,320 @@
 
   <div class="flex h-full w-full overflow-hidden relative">
     
-    <!-- BACKDROP -->
-    <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-20 md:hidden transition-all duration-300"></div>
+    <!-- BACKDROP FOR MOBILE SIDEBAR -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden" onclick="toggleSidebar(false)"></div>
 
-    <!-- LEFT SIDEBAR -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-codCard border-r border-codBorder flex flex-col justify-between shrink-0 z-30 transform -translate-x-full transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:h-full">
-      <div>
-        <div class="p-6 border-b border-codBorder flex items-center justify-between bg-codDark/30">
-          <div class="flex items-center space-x-3">
-            <div class="p-2.5 bg-codAccent/10 text-codAccent rounded-xl border border-codAccent/25 shrink-0">
-              <i data-lucide="shield" class="w-6 h-6"></i>
-            </div>
-            <div>
-              <h1 class="font-extrabold text-sm tracking-wider text-white">WRATH FAMILY</h1>
-              <p class="text-[10px] text-codAccent font-bold uppercase tracking-widest">S949 Hub</p>
-            </div>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-64 bg-codCard border-r border-codBorder flex flex-col fixed md:relative z-30 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+      <div class="p-6 border-b border-codBorder flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg border border-codAccent/30 bg-codAccent/10 flex items-center justify-center text-codAccent shadow-[0_0_15px_rgba(223,161,59,0.15)]">
+            <i data-lucide="shield" class="w-5 h-5"></i>
           </div>
-          <button onclick="toggleSidebar(false)" class="md:hidden p-2 text-gray-400 hover:text-white hover:bg-codBorder rounded-lg transition shrink-0">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
+          <div>
+            <h1 class="font-black text-white tracking-wider text-sm leading-tight uppercase">Wrath Family</h1>
+            <p class="text-[10px] text-codAccent font-bold tracking-widest uppercase">S949 Hub</p>
+          </div>
         </div>
-
-        <nav class="p-4 space-y-1">
-          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-codAccent text-black font-bold">
-            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-            <span>Overview Dashboard</span>
-          </button>
-          
-          <button onclick="switchTab('roster-manager')" id="nav-roster-manager" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition text-gray-400 hover:text-white hover:bg-codBorder">
-            <div class="flex items-center space-x-3">
-              <i data-lucide="users" class="w-5 h-5"></i>
-              <span>Roster Directory</span>
-            </div>
-            <span id="roster-badge" class="text-[10px] bg-codBorder text-gray-300 font-extrabold px-2 py-0.5 rounded-full">0</span>
-          </button>
-
-          <div class="pt-4 pb-2 px-4">
-            <span class="text-[10px] font-extrabold text-codTextMuted uppercase tracking-widest">Administration</span>
-          </div>
-
-          <button onclick="switchTab('admin-portal')" id="nav-admin-portal" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition text-gray-400 hover:text-white hover:bg-codBorder">
-            <div class="flex items-center space-x-3">
-              <i data-lucide="lock" class="w-5 h-5 text-amber-500"></i>
-              <span>Admin Portal</span>
-            </div>
-            <span id="admin-lock-badge" class="text-[9px] border border-amber-500/30 text-amber-500 bg-amber-500/10 font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider">Locked</span>
-          </button>
-        </nav>
+        <button class="md:hidden text-codTextMuted hover:text-white" onclick="toggleSidebar(false)">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
-
-      <div class="p-4 border-t border-codBorder">
-        <div class="bg-codDark/70 rounded-xl p-3 border border-codBorder/80">
-          <div class="flex items-center space-x-2 mb-1.5">
-            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-            <span class="text-[11px] font-bold text-gray-300">Live Browser DB</span>
+      
+      <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+        <div class="text-[10px] font-bold text-codTextMuted uppercase tracking-widest mb-3 ml-2 mt-4">Overview Dashboard</div>
+        <a href="#" onclick="switchView('roster', event)" id="nav-roster" class="flex items-center justify-between px-4 py-3 rounded-xl bg-codAccent/10 text-codAccent font-semibold transition group">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span class="text-sm">Roster Directory</span>
           </div>
-          <p class="text-[10px] text-codTextMuted leading-relaxed">Changes save immediately to local storage and sync with Google Sheets automatically.</p>
+          <span id="nav-total-members" class="bg-codAccent text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">0</span>
+        </a>
+        
+        <div class="text-[10px] font-bold text-codTextMuted uppercase tracking-widest mb-3 ml-2 mt-8">Administration</div>
+        <a href="#" onclick="switchView('admin', event)" id="nav-admin" class="flex items-center justify-between px-4 py-3 rounded-xl text-codTextMuted hover:bg-codBorder/50 hover:text-white transition font-medium">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+            <span class="text-sm">Admin Portal</span>
+          </div>
+          <span id="nav-admin-badge" class="bg-codDark text-codTextMuted border border-codBorder text-[9px] font-bold px-2 py-0.5 rounded-full">LOCKED</span>
+        </a>
+      </nav>
+      
+      <div class="p-4 border-t border-codBorder bg-codDark/30">
+        <div class="flex items-center space-x-3 text-xs text-codTextMuted">
+          <i data-lucide="server" class="w-4 h-4 text-codAccent"></i>
+          <div>
+            <p class="font-semibold text-gray-300">Live Database</p>
+            <p class="text-[10px]" id="last-sync-time">Last sync: Just now</p>
+          </div>
         </div>
       </div>
     </aside>
 
-    <!-- RIGHT CONTENT AREA -->
-    <main class="flex-1 flex flex-col overflow-y-auto bg-codDark relative">
-      
-      <header class="h-16 border-b border-codBorder flex items-center justify-between px-4 md:px-8 bg-codCard/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
-        <div class="flex items-center space-x-2 md:space-x-3">
-          <button onclick="toggleSidebar(true)" class="md:hidden p-2 text-gray-400 hover:text-white hover:bg-codBorder rounded-lg transition mr-1 shrink-0">
-            <i data-lucide="menu" class="w-5 h-5"></i>
-          </button>
-          <h2 id="tab-title" class="text-sm md:text-lg font-bold text-white tracking-wide truncate max-w-[120px] xs:max-w-none">Alliance Overview</h2>
-          <span class="text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold px-1.5 md:px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">Active</span>
-        </div>
-        
-        <div class="flex items-center space-x-2 md:space-x-4">
-          <div class="text-right hidden md:block">
-            <span class="block text-[10px] text-codTextMuted uppercase font-bold tracking-wider">Last Sync (Admin)</span>
-            <span id="header-last-sync" class="text-xs font-extrabold text-codAccent">Calculating...</span>
-          </div>
-          <div class="h-8 w-[1px] bg-codBorder hidden md:block"></div>
+    <!-- MAIN CONTENT (Made overflow-hidden and flex-col for Option B) -->
+    <main id="main-content" class="flex-1 p-4 sm:p-8 overflow-hidden w-full relative z-10 flex flex-col">
+      <button class="md:hidden mb-4 text-codTextMuted hover:text-white flex items-center space-x-2 bg-codCard border border-codBorder px-3 py-2 rounded-lg w-max" onclick="toggleSidebar(true)">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+        <span class="text-sm font-semibold">Menu</span>
+      </button>
 
-          <div class="text-right hidden sm:block">
-            <span class="block text-[10px] text-codTextMuted uppercase font-bold tracking-wider">Filtered Roster</span>
-            <span id="header-member-count" class="text-xs md:text-sm font-extrabold text-white">0</span>
+      <!-- ==================== ROSTER DIRECTORY VIEW ==================== -->
+      <div id="roster-view" class="fade-in active-view h-full min-h-0 w-full">
+        <!-- Header (Shrink-0 prevents it from squishing) -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 shrink-0">
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center space-x-3">
+              <span>Roster Directory</span>
+              <span id="active-alliance-badge" class="text-xs bg-codAccent/10 text-codAccent border border-codAccent/20 px-2 py-1 rounded-md uppercase tracking-wider font-bold">ALL</span>
+            </h2>
+            <p class="text-sm text-codTextMuted mt-1">Live tracking of merits, power, and contributions.</p>
           </div>
-          <div class="h-8 w-[1px] bg-codBorder hidden sm:block"></div>
+          <button onclick="syncDatabase()" id="sync-btn" class="mt-4 sm:mt-0 flex items-center space-x-2 bg-codCard border border-codBorder hover:border-codAccent/50 px-4 py-2.5 rounded-xl transition group shadow-sm">
+            <i data-lucide="refresh-cw" class="w-4 h-4 text-codAccent group-hover:rotate-180 transition duration-500"></i>
+            <span class="text-sm font-semibold text-gray-300 group-hover:text-white">Sync Database</span>
+          </button>
+        </div>
+
+        <!-- Alliance Tabs (Shrink-0) -->
+        <div class="flex flex-wrap gap-3 mb-6 shrink-0">
+          <button onclick="filterAlliance('All', this)" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codAccent text-black shadow-lg shadow-codAccent/20">
+            <span>🌍</span><span>Family Overall</span>
+          </button>
+          <button onclick="filterAlliance('Wrath of God', this)" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
+            <span>⚔️</span><span>Wrath of God</span>
+          </button>
+          <button onclick="filterAlliance('Wrath of Power', this)" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
+            <span>🛡️</span><span>Wrath of Power</span>
+          </button>
+          <button onclick="filterAlliance('Wrath of Justice', this)" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
+            <span>⚖️</span><span>Wrath of Justice</span>
+          </button>
+        </div>
+
+        <!-- Search & Filter Bar (Shrink-0) -->
+        <div class="bg-codCard border border-codBorder rounded-2xl p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center shrink-0 shadow-sm">
+          <div class="relative w-full">
+            <i data-lucide="search" class="w-4 h-4 absolute left-4 top-3.5 text-codTextMuted"></i>
+            <input type="text" id="search-input" placeholder="Search by Player Name or ID..." class="w-full bg-codDark border border-codBorder rounded-xl py-3 pl-11 pr-4 text-sm text-white focus:outline-none focus:border-codAccent transition" onkeyup="renderTable()">
+          </div>
+          <div class="w-full sm:w-auto flex items-center space-x-2 shrink-0">
+            <label class="text-xs font-bold text-codTextMuted uppercase tracking-wider ml-1 sm:ml-0">Sort:</label>
+            <select id="sort-select" class="bg-codDark border border-codBorder text-white text-sm rounded-xl py-2.5 px-4 focus:outline-none focus:border-codAccent appearance-none cursor-pointer pr-10" onchange="renderTable()" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238b949e%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1em;">
+              <option value="merits">Highest Merits</option>
+              <option value="power">Highest Power</option>
+              <option value="kills">Highest Kills</option>
+              <option value="donation">Highest Donation</option>
+              <option value="help">Highest Help</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- THE LOCKED VIEWPORT TABLE CONTAINER -->
+        <div class="bg-codCard border border-codBorder rounded-2xl flex-1 flex flex-col min-h-0 relative shadow-xl overflow-hidden mb-4">
+          <!-- The wrapper that handles the actual scrolling -->
+          <div class="overflow-auto w-full h-full custom-scrollbar">
+            <table class="w-full text-left border-collapse min-w-[1200px]">
+              <!-- Sticky Header -->
+              <thead class="sticky top-0 z-20">
+                <tr class="bg-[#1a1e27] border-b border-codBorder text-[10px] font-bold uppercase tracking-wider text-codTextMuted shadow-md">
+                  <th class="py-4 px-6">Player Identity</th>
+                  <th class="py-4 px-6">ID Code</th>
+                  <th class="py-4 px-6">Power</th>
+                  <th class="py-4 px-6 text-codAccent">Merit Count</th>
+                  <th class="py-4 px-6 text-green-400">Kill Points</th>
+                  <th class="py-4 px-6 text-orange-400">Donation</th>
+                  <th class="py-4 px-6 text-orange-400">Build</th>
+                  <th class="py-4 px-6 text-orange-400">Destruct.</th>
+                  <th class="py-4 px-6 text-orange-400">Help</th>
+                  <th class="py-4 px-6 text-orange-400">Assistance</th>
+                </tr>
+              </thead>
+              <tbody id="roster-tbody" class="text-sm">
+                <!-- Javascript will populate rows here -->
+              </tbody>
+            </table>
+          </div>
           
-          <button onclick="syncDatabase()" class="btn-sync-hover flex items-center space-x-1 px-2.5 py-1.5 border border-codAccent/20 hover:border-codAccent/50 bg-codAccent/5 text-codAccent rounded-lg text-xs font-semibold transition shrink-0">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5 shrink-0"></i>
-            <span class="hidden xs:inline">Sync Database</span>
-            <span class="xs:hidden">Sync</span>
-          </button>
-        </div>
-      </header>
-
-      <!-- Context Window -->
-      <div class="p-4 md:p-8 max-w-7xl w-full mx-auto flex-1">
-
-        <!-- FAMILY TABS -->
-        <div class="flex space-x-2 overflow-x-auto pb-4 mb-6 border-b border-codBorder hide-scrollbar">
-          <button onclick="setAllianceFilter('All')" id="filter-All" class="alliance-filter-btn px-4 py-2 bg-codAccent text-black font-bold rounded-lg text-xs whitespace-nowrap transition shrink-0 shadow-lg shadow-codAccent/10">🌍 Family Overall</button>
-          <button onclick="setAllianceFilter('Wrath of God')" id="filter-Wrath of God" class="alliance-filter-btn px-4 py-2 bg-codDark border border-codBorder text-gray-400 hover:text-white rounded-lg text-xs whitespace-nowrap transition shrink-0">⚔️ Wrath of God</button>
-          <button onclick="setAllianceFilter('Wrath of Power')" id="filter-Wrath of Power" class="alliance-filter-btn px-4 py-2 bg-codDark border border-codBorder text-gray-400 hover:text-white rounded-lg text-xs whitespace-nowrap transition shrink-0">🛡️ Wrath of Power</button>
-          <button onclick="setAllianceFilter('Wrath of Justice')" id="filter-Wrath of Justice" class="alliance-filter-btn px-4 py-2 bg-codDark border border-codBorder text-gray-400 hover:text-white rounded-lg text-xs whitespace-nowrap transition shrink-0">⚖️ Wrath of Justice</button>
-        </div>
-
-        <!-- ==================== TAB: OVERVIEW DASHBOARD ==================== -->
-        <section id="tab-dashboard" class="space-y-6 md:space-y-8">
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
-              <div class="absolute right-0 bottom-0 text-codAccent/5 translate-x-4 translate-y-4"><i data-lucide="users" class="w-20 md:w-28 h-20 md:h-28"></i></div>
-              <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Filtered Members</p>
-              <h3 id="stat-members" class="text-2xl md:text-3xl font-extrabold text-white mt-1 md:mt-2">0</h3>
+          <!-- Empty State -->
+          <div id="empty-state" class="hidden absolute inset-0 flex flex-col items-center justify-center p-12 text-center bg-codCard z-10 pointer-events-none">
+            <div class="w-16 h-16 bg-codDark border border-codBorder rounded-full flex items-center justify-center mb-4">
+              <i data-lucide="database" class="w-8 h-8 text-codTextMuted"></i>
             </div>
-            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
-              <div class="absolute right-0 bottom-0 text-emerald-500/5 translate-x-4 translate-y-4"><i data-lucide="swords" class="w-20 md:w-28 h-20 md:h-28"></i></div>
-              <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Total Power</p>
-              <h3 id="stat-power" class="text-2xl md:text-3xl font-extrabold text-emerald-400 mt-1 md:mt-2">0.0M</h3>
-            </div>
-            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
-              <div class="absolute right-0 bottom-0 text-amber-500/5 translate-x-4 translate-y-4"><i data-lucide="sparkles" class="w-20 md:w-28 h-20 md:h-28"></i></div>
-              <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Total Merits</p>
-              <h3 id="stat-merits" class="text-2xl md:text-3xl font-extrabold text-amber-400 mt-1 md:mt-2">0</h3>
-            </div>
-            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 relative overflow-hidden">
-              <div class="absolute right-0 bottom-0 text-rose-500/5 translate-x-4 translate-y-4"><i data-lucide="activity" class="w-20 md:w-28 h-20 md:h-28"></i></div>
-              <p class="text-[10px] md:text-xs font-bold text-codTextMuted uppercase tracking-wider">Active Kills</p>
-              <h3 id="stat-kills" class="text-2xl md:text-3xl font-extrabold text-rose-500 mt-1 md:mt-2">0</h3>
-            </div>
+            <h3 class="text-white font-bold text-lg mb-1">No Records Found</h3>
+            <p class="text-codTextMuted text-sm max-w-md mx-auto">We couldn't find any players matching your current search or alliance filter.</p>
           </div>
+        </div>
+      </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 lg:col-span-2">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-2">
-                <h4 class="font-extrabold text-sm md:text-md text-white flex items-center space-x-2">
-                  <i data-lucide="bar-chart-3" class="w-4 h-4 md:w-5 md:h-5 text-codAccent"></i>
-                  <span>Top 10 Roster Overall Performance (Score 1-100)</span>
-                </h4>
-                <span class="self-start sm:self-auto text-[9px] bg-codAccent/10 text-codAccent px-2 py-0.5 rounded font-bold uppercase shrink-0">Dynamic Ranking</span>
+      <!-- ==================== ADMIN PORTAL VIEW ==================== -->
+      <div id="admin-view" class="fade-in hidden h-full min-h-0 w-full">
+        <!-- Auth Overlay -->
+        <div id="admin-auth" class="absolute inset-0 bg-codDark z-50 flex items-center justify-center p-4">
+          <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-8 shadow-2xl text-center">
+            <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-red-500/20">
+              <i data-lucide="lock-keyhole" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white mb-2">Restricted Area</h2>
+            <p class="text-xs text-codTextMuted mb-8 leading-relaxed">Enter the Wrath Family leadership passcode to access database administration.</p>
+            <input type="password" id="admin-passcode" placeholder="Enter Passcode..." class="w-full bg-codDark border border-codBorder rounded-xl py-3.5 px-4 text-center text-white font-mono tracking-[0.2em] focus:outline-none focus:border-red-500 transition mb-4" onkeypress="if(event.key === 'Enter') unlockAdmin()">
+            <button onclick="unlockAdmin()" class="w-full py-3.5 bg-white hover:bg-gray-200 text-black font-extrabold rounded-xl text-sm tracking-wider uppercase transition shadow-lg">Unlock Console</button>
+            <p id="admin-error" class="text-red-400 text-xs mt-4 font-semibold hidden">Invalid Passcode. Access Denied.</p>
+          </div>
+        </div>
+
+        <!-- Admin Content (Shrink-0 headers) -->
+        <div class="mb-8 shrink-0">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center space-x-3">
+            <span>Administration Console</span>
+            <span class="text-xs bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-1 rounded-md uppercase tracking-wider font-bold">UNLOCKED</span>
+          </h2>
+          <p class="text-sm text-codTextMuted mt-1">Manage database records and overwrite statistics.</p>
+        </div>
+
+        <!-- Sub Tabs (Shrink-0) -->
+        <div class="flex gap-4 border-b border-codBorder pb-4 mb-8 shrink-0">
+          <button id="tab-roster-admin" onclick="toggleAdminSubTab('roster-admin')" class="px-5 py-2.5 rounded-lg text-sm font-bold transition bg-codAccent/10 text-codAccent border border-codAccent/30">Register Member</button>
+          <button id="tab-manage-dir" onclick="toggleAdminSubTab('manage-dir')" class="px-5 py-2.5 rounded-lg text-sm font-bold transition text-codTextMuted hover:text-white">Manage Directory</button>
+        </div>
+
+        <!-- Register Member Section (Scrolls independently) -->
+        <div id="admin-register-section" class="max-w-2xl overflow-y-auto h-full pr-4 pb-10 custom-scrollbar">
+          <div class="bg-codCard border border-codBorder rounded-2xl p-6 sm:p-8 shadow-sm">
+            <h3 class="text-lg font-bold text-white mb-6 border-b border-codBorder pb-4 flex items-center space-x-2">
+              <i data-lucide="user-plus" class="w-5 h-5 text-codAccent"></i>
+              <span>Manual Entry Form</span>
+            </h3>
+            
+            <div class="space-y-6">
+              <!-- Alliance Selection -->
+              <div>
+                <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Alliance Assignment <span class="text-red-500">*</span></label>
+                <select id="form-alliance" class="w-full bg-codDark border border-codBorder rounded-xl py-3 px-4 text-white focus:outline-none focus:border-codAccent appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238b949e%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em;">
+                  <option value="Wrath of God">⚔️ Wrath of God</option>
+                  <option value="Wrath of Power">🛡️ Wrath of Power</option>
+                  <option value="Wrath of Justice">⚖️ Wrath of Justice</option>
+                </select>
               </div>
-              <div class="h-64 sm:h-80 md:h-85 w-full relative flex items-center justify-center">
-                <canvas id="overviewChart"></canvas>
-                <div id="no-chart-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-codCard text-center p-4">
-                  <i data-lucide="bar-chart-2" class="w-10 h-10 text-codBorder mb-3"></i>
-                  <p class="text-sm font-semibold text-gray-500">Database needs sync configuration to generate alliance metrics.</p>
+
+              <!-- Identity Section -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 bg-codDark/50 rounded-xl border border-codBorder">
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Player Name <span class="text-red-500">*</span></label>
+                  <input type="text" id="form-name" class="w-full bg-codDark border border-codBorder rounded-xl py-3 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="e.g. S949 King">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Character ID</label>
+                  <input type="text" id="form-id" class="w-full bg-codDark border border-codBorder rounded-xl py-3 px-4 text-white font-mono focus:outline-none focus:border-codAccent" placeholder="e.g. 25195029">
                 </div>
               </div>
-            </div>
 
-            <div class="bg-codCard border border-codBorder rounded-2xl p-4 md:p-6 flex flex-col justify-between">
-              <div>
-                <h4 class="font-extrabold text-sm md:text-md text-white flex items-center space-x-2 mb-4">
-                  <i data-lucide="trophy" class="w-4 h-4 md:w-5 md:h-5 text-yellow-500"></i>
-                  <span>Top Contributors (Support Score)</span>
-                </h4>
-                <div id="mini-leaderboard" class="space-y-3"></div>
+              <!-- Metrics Section -->
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Power</label>
+                  <input type="number" id="form-power" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Merits</label>
+                  <input type="number" id="form-merits" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Kills</label>
+                  <input type="number" id="form-kills" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Donation</label>
+                  <input type="number" id="form-donation" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Build (sec)</label>
+                  <input type="number" id="form-build" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Destruct (sec)</label>
+                  <input type="number" id="form-destruct" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Help</label>
+                  <input type="number" id="form-help" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Resource Asst.</label>
+                  <input type="number" id="form-asst" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
               </div>
-              <button onclick="switchTab('roster-manager')" class="w-full py-2.5 border border-codBorder hover:border-codAccent hover:text-codAccent rounded-xl text-xs font-bold text-gray-300 transition mt-6">
-                Open Full Roster Directory
+
+              <button onclick="saveAdminForm()" class="w-full py-4 mt-4 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-xl text-sm tracking-wider uppercase transition shadow-lg shadow-codAccent/15 flex items-center justify-center space-x-2">
+                <i data-lucide="save" class="w-5 h-5"></i>
+                <span>Register Alliance Member</span>
               </button>
             </div>
           </div>
-        </section>
+        </div>
 
-        <!-- ==================== TAB: PUBLIC ROSTER DIRECTORY ==================== -->
-        <section id="tab-roster-manager" class="hidden space-y-6">
-          <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-codCard border border-codBorder rounded-2xl p-4">
-            <div class="relative w-full md:w-80">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-codTextMuted">
-                <i data-lucide="search" class="w-4 h-4"></i>
-              </span>
-              <input type="text" id="search-input" oninput="renderRoster()" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white pl-10 pr-4 py-2.5 text-xs rounded-xl outline-none transition" placeholder="Search by Player Name or ID...">
+        <!-- Manage Directory Section (Locked Viewport) -->
+        <div id="admin-manage-section" class="hidden flex-1 min-h-0 w-full">
+          <div class="flex flex-col h-full min-h-0">
+            
+            <div class="bg-codCard border border-codBorder rounded-2xl p-4 mb-4 flex items-center shrink-0">
+              <i data-lucide="search" class="w-4 h-4 text-codTextMuted mr-3"></i>
+              <input type="text" id="admin-search-input" placeholder="Find member to edit or delete..." class="w-full bg-transparent border-none text-sm text-white focus:outline-none" onkeyup="renderAdminTable()">
             </div>
 
-            <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full md:w-auto justify-end">
-              <select id="sort-select" onchange="renderRoster()" class="w-full sm:w-auto bg-codDark border border-codBorder text-gray-300 text-xs rounded-xl p-2.5 focus:outline-none focus:border-codAccent font-sans">
-                <option value="merits-desc">Sort: Highest Merits</option>
-                <option value="power-desc">Sort: Highest Power</option>
-                <option value="kills-desc">Sort: Highest Kills</option>
-                <option value="name-asc">Sort: Name (A-Z)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="bg-codCard border border-codBorder rounded-2xl overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse min-w-[1200px]">
-                <thead>
-                  <tr class="border-b border-codBorder bg-codDark/30 text-[10px] font-bold uppercase tracking-wider text-codTextMuted">
-                    <th class="py-4 px-6 sticky left-0 bg-codCard z-10">Player Identity</th>
-                    <th class="py-4 px-6">ID Code</th>
-                    <th class="py-4 px-6">Power</th>
-                    <th class="py-4 px-6">Merit Count</th>
-                    <th class="py-4 px-6">Kill Points</th>
-                    <th class="py-4 px-6 text-amber-500 font-bold">Donation</th>
-                    <th class="py-4 px-4 text-amber-500 font-bold">Build</th>
-                    <th class="py-4 px-4 text-amber-500 font-bold">Destruct.</th>
-                    <th class="py-4 px-4 text-amber-500 font-bold">Help</th>
-                    <th class="py-4 px-6 text-amber-500 font-bold">Assistance</th>
-                  </tr>
-                </thead>
-                <tbody id="roster-table-body" class="divide-y divide-codBorder text-xs text-gray-300 font-sans"></tbody>
-              </table>
-            </div>
-
-            <div id="roster-empty" class="hidden text-center py-20">
-              <i data-lucide="shield-question" class="w-12 h-12 text-codBorder mx-auto mb-3"></i>
-              <h4 class="text-sm font-bold text-white">Roster Database Empty</h4>
-              <p class="text-xs text-codTextMuted mt-1">Populate records inside the sheets spreadsheet to see alliance stats.</p>
-            </div>
-          </div>
-        </section>
-
-        <!-- ==================== TAB: LOCKED ADMIN PORTAL ==================== -->
-        <section id="tab-admin-portal" class="hidden space-y-6">
-          <div class="flex border-b border-codBorder pb-2 gap-2 overflow-x-auto">
-            <button onclick="switchAdminSubTab('roster-admin')" id="admin-sub-roster-admin" class="admin-sub-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-codAccent text-black flex items-center space-x-1.5 shrink-0">
-              <i data-lucide="edit-3" class="w-4 h-4"></i>
-              <span>Manage Directory</span>
-            </button>
-            <button onclick="switchAdminSubTab('bulk-scan')" id="admin-sub-bulk-scan" class="admin-sub-btn px-4 py-2.5 rounded-xl text-xs font-bold transition text-gray-400 hover:text-white hover:bg-codBorder flex items-center space-x-1.5 shrink-0">
-              <i data-lucide="cloud" class="w-4 h-4"></i>
-              <span>Cloud Drive Scanner</span>
-            </button>
-            <button onclick="switchAdminSubTab('data-entry')" id="admin-sub-data-entry" class="admin-sub-btn px-4 py-2.5 rounded-xl text-xs font-bold transition text-gray-400 hover:text-white hover:bg-codBorder flex items-center space-x-1.5 shrink-0">
-              <i data-lucide="user-plus" class="w-4 h-4"></i>
-              <span>Register Member</span>
-            </button>
-            <button onclick="switchAdminSubTab('sheets')" id="admin-sub-sheets" class="admin-sub-btn px-4 py-2.5 rounded-xl text-xs font-bold transition text-gray-400 hover:text-white hover:bg-codBorder flex items-center space-x-1.5 shrink-0">
-              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
-              <span>Database Sync</span>
-            </button>
-          </div>
-
-          <!-- SUB-TAB A: ADMIN DIRECTORY -->
-          <div id="admin-sec-roster-admin" class="admin-tab-section space-y-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-codCard border border-codBorder rounded-2xl gap-3">
-              <div>
-                <h4 class="font-extrabold text-sm text-white">Alliance Master Database Controller</h4>
-                <p class="text-[11px] text-codTextMuted mt-0.5">Edit players, delete profiles, and track weekly roster contribution parameters.</p>
-              </div>
-              <input type="text" id="admin-search-input" oninput="renderAdminRoster()" class="bg-codDark border border-codBorder focus:border-codAccent text-white pl-4 pr-4 py-2 text-xs rounded-xl outline-none transition w-full sm:w-64" placeholder="Quick Filter Admin Directory...">
-            </div>
-
-            <div class="bg-codCard border border-codBorder rounded-2xl overflow-hidden">
-              <div class="overflow-x-auto">
+            <!-- Admin Table Container -->
+            <div class="bg-codCard border border-codBorder rounded-2xl flex-1 flex flex-col min-h-0 relative shadow-xl overflow-hidden">
+              <div class="overflow-auto w-full h-full custom-scrollbar">
                 <table class="w-full text-left border-collapse min-w-[1200px]">
-                  <thead>
-                    <tr class="border-b border-codBorder bg-codDark/30 text-[10px] font-bold uppercase tracking-wider text-codTextMuted">
-                      <th class="py-4 px-6 sticky left-0 bg-codCard z-10">Player Identity</th>
+                  <thead class="sticky top-0 z-20">
+                    <tr class="bg-[#1a1e27] border-b border-codBorder text-[10px] font-bold uppercase tracking-wider text-codTextMuted shadow-md">
+                      <th class="py-4 px-6">Player Identity</th>
                       <th class="py-4 px-6">ID Code</th>
                       <th class="py-4 px-6">Power</th>
-                      <th class="py-4 px-6">Merits</th>
-                      <th class="py-4 px-6">Kill Points</th>
-                      <th class="py-4 px-6 text-amber-500 font-bold">Donation</th>
-                      <th class="py-4 px-4 text-amber-500 font-bold">Build</th>
-                      <th class="py-4 px-4 text-amber-500 font-bold">Destruct.</th>
-                      <th class="py-4 px-4 text-amber-500 font-bold">Help</th>
-                      <th class="py-4 px-6 text-amber-500 font-bold">Assistance</th>
+                      <th class="py-4 px-6 text-codAccent">Merit Count</th>
+                      <th class="py-4 px-6 text-green-400">Kill Points</th>
+                      <th class="py-4 px-6 text-orange-400">Alliance Metrics</th>
                       <th class="py-4 px-6 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody id="admin-roster-table-body" class="divide-y divide-codBorder text-xs text-gray-300"></tbody>
+                  <tbody id="admin-tbody" class="text-sm">
+                    <!-- Javascript populates this -->
+                  </tbody>
                 </table>
               </div>
-              <div id="admin-roster-empty" class="hidden text-center py-20">
-                <i data-lucide="shield-question" class="w-12 h-12 text-codBorder mx-auto mb-3"></i>
-                <h4 class="text-sm font-bold text-white">No Matching Records</h4>
-                <p class="text-xs text-codTextMuted mt-1">Make sure you have pulled statistics from your Google Sheets.</p>
-              </div>
             </div>
           </div>
-
-          <!-- SUB-TAB B: CLOUD DRIVE SCANNER -->
-          <div id="admin-sec-bulk-scan" class="admin-tab-section hidden space-y-6">
-            <div class="bg-codCard border border-codBorder rounded-2xl p-6 md:p-10 shadow-xl max-w-4xl mx-auto text-center">
-              
-              <div class="w-20 h-20 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 border border-blue-500/20">
-                <i data-lucide="folder-sync" class="w-10 h-10"></i>
-              </div>
-              
-              <h3 class="font-extrabold text-xl md:text-2xl text-white mb-3">Google Drive Auto-Scanner Enabled</h3>
-              <p class="text-sm text-codTextMuted leading-relaxed max-w-2xl mx-auto mb-10">
-                Screenshot processing has been offloaded to Google's cloud servers. The scanner now runs directly inside your Google Sheet and supports multi-alliance folders!
-              </p>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-10">
-                <div class="bg-codDark border border-codBorder p-5 rounded-xl">
-                  <div class="text-codAccent mb-3"><i data-lucide="upload-cloud" class="w-6 h-6"></i></div>
-                  <h4 class="font-bold text-white text-sm mb-1.5">1. Upload Files</h4>
-                  <p class="text-[11px] text-codTextMuted leading-relaxed">Drag your screenshots into the correct <strong>Inbox</strong> folder (God, Power, or Justice) on Google Drive.</p>
-                </div>
-                <div class="bg-codDark border border-codBorder p-5 rounded-xl">
-                  <div class="text-emerald-500 mb-3"><i data-lucide="play-circle" class="w-6 h-6"></i></div>
-                  <h4 class="font-bold text-white text-sm mb-1.5">2. Run Cloud Engine</h4>
-                  <p class="text-[11px] text-codTextMuted leading-relaxed">Open your Google Sheet, click the <strong>🐉 Alliance Tracker</strong> menu at the top, and run the scanner.</p>
-                </div>
-                <div class="bg-codDark border border-codBorder p-5 rounded-xl">
-                  <div class="text-blue-500 mb-3"><i data-lucide="refresh-cw" class="w-6 h-6"></i></div>
-                  <h4 class="font-bold text-white text-sm mb-1.5">3. Sync Dashboard</h4>
-                  <p class="text-[11px] text-codTextMuted leading-relaxed">Once the sheet finishes processing, click the Sync button below to update this website.</p>
-                </div>
-              </div>
-
-              <div class="pt-6 border-t border-codBorder">
-                <button onclick="syncDatabase()" class="px-8 py-3.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-xl text-sm tracking-wider uppercase transition shadow-lg shadow-codAccent/15 flex items-center justify-center space-x-2 mx-auto">
-                  <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-                  <span>Sync New Data to Website</span>
-                </button>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- SUB-TAB C: MANUAL ENTRY FORM -->
-          <div id="admin-sec-data-entry" class="admin-tab-section hidden">
-            <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 md:p-8 max-w-4xl mx-auto shadow-xl">
-              <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-codBorder">
-                <div class="p-2 bg-codAccent/10 text-codAccent rounded-lg shrink-0">
-                  <i data-lucide="user-plus" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h3 class="font-extrabold text-base md:text-lg text-white">Alliance Member Profile Registration</h3>
-                  <p class="text-[11px] md:text-xs text-codTextMuted mt-0.5 font-sans font-sans">Quickly key in or update a player's combat, baseline, and support metrics.</p>
-                </div>
-              </div>
-              
-              <form id="quick-add-form" class="space-y-6" onsubmit="handleManualAdd(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                  <div class="space-y-5">
-                    <h4 class="text-xs font-bold text-codAccent tracking-wider uppercase flex items-center space-x-2 font-sans">
-                      <i data-lucide="user" class="w-4 h-4"></i>
-                      <span>1. Identity & Combat Stats</span>
-                    </h4>
-                    <div class="space-y-4">
-                      <div>
-                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Alliance Assignment</label>
-                        <select id="entry-alliance" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition">
-                          <option value="Wrath of God">⚔️ Wrath of God</option>
-                          <option value="Wrath of Power">🛡️ Wrath of Power</option>
-                          <option value="Wrath of Justice">⚖️ Wrath of Justice</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Player Name</label>
-                        <input type="text" id="entry-name" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition font-semibold" placeholder="e.g. [W949] Caesar">
-                      </div>
-                      <div>
-                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Character ID (ID Code)</label>
-                        <input type="text" id="entry-id" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none font-mono transition" placeholder="e.g. 54398103">
-                      </div>
-                      <div>
-                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Current Power</label>
-                        <input type="number" id="entry-power" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="e.g. 15450000">
-                      </div>
-                      <div class="grid grid-cols-2 gap-4">
-                        <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Weekly Merits</label>
-                          <input type="number" id="entry-merits" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 transition" placeholder="e.g. 350000">
-                        </div>
-                        <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Kill Points (KP)</label>
-                          <input type="number" id="entry-kills" required class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 transition" placeholder="e.g. 1200000">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="space-y-5">
-                    <h4 class="text-xs font-bold text-codAccent tracking-wider uppercase flex items-center space-x-2 font-sans font-sans">
-                      <i data-lucide="handshake" class="w-4 h-4"></i>
-                      <span>2. Alliance Activity Metrics</span>
-                    </h4>
-                    <div class="space-y-4">
-                      <div>
-                        <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Alliance Donation</label>
-                        <input type="number" id="entry-donation" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="Donation value points">
-                      </div>
-                      <div class="grid grid-cols-2 gap-4">
-                        <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Build Time</label>
-                          <input type="number" id="entry-buildTime" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="e.g. hours or points">
-                        </div>
-                        <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans">Destruction Time</label>
-                          <input type="number" id="entry-destructionTime" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="e.g. hours or points">
-                        </div>
-                      </div>
-                      <div class="grid grid-cols-2 gap-4">
-                        <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans font-sans">Alliance Help</label>
-                          <input type="number" id="entry-help" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="Clicks helped">
-                        </div>
-                        <div>
-                          <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1.5 font-sans font-sans font-sans font-sans">Resource Assistance</label>
-                          <input type="number" id="entry-assistance" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-lg p-3 outline-none transition" placeholder="Resources donated">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="pt-6 border-t border-codBorder flex justify-end font-sans">
-                  <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-xl text-xs tracking-wider uppercase transition shadow-lg shadow-codAccent/15 flex items-center justify-center space-x-2 font-sans font-sans">
-                    <i data-lucide="save" class="w-4 h-4"></i>
-                    <span>Register Alliance Member</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- SUB-TAB D: DATABASE SYNC -->
-          <div id="admin-sec-sheets" class="admin-tab-section hidden space-y-8 font-sans">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 font-sans">
-              <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 flex flex-col justify-between font-sans">
-                <div class="space-y-6">
-                  <div>
-                    <h3 class="font-extrabold text-base md:text-lg text-white mb-2 font-sans">Sync to Google Sheets</h3>
-                    <p class="text-xs text-codTextMuted leading-relaxed font-sans font-sans font-sans">Instantly synchronize your player stats bidirectionally. You can load statistics entered on your spreadsheet directly into this client dashboard, or export any manual changes back to Google Sheets instantly.</p>
-                  </div>
-                  <div class="space-y-3">
-                    <label class="block text-[10px] font-bold text-codTextMuted uppercase tracking-wider font-sans font-sans">Google Sheets Web App API Endpoint URL</label>
-                    <input type="text" id="sheets-endpoint" oninput="saveEndpointLocally()" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-xs rounded-xl p-3.5 outline-none transition font-semibold" placeholder="https://script.google.com/macros/s/xxxx/exec">
-                    <span class="block text-[10px] text-amber-500 font-medium leading-relaxed font-mono">🔧 Developer tip: Pasting this URL writes it directly into your local database. To freeze it permanently for public viewers, set it inside the 'DEFAULT_SHEETS_API_URL' code variable!</span>
-                  </div>
-                  <div class="grid grid-cols-2 gap-4">
-                    <button onclick="pullFromGoogleSheets()" class="py-3 border border-codBorder hover:border-codAccent bg-codDark hover:text-codAccent text-gray-300 font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2 font-sans">
-                      <i data-lucide="cloud-download" class="w-4.5 h-4.5"></i>
-                      <span>Pull from Sheets</span>
-                    </button>
-                    <button onclick="pushToGoogleSheets()" class="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/15 font-sans">
-                      <i data-lucide="cloud-upload" class="w-4.5 h-4.5"></i>
-                      <span>Push to Sheets</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Interactive Script Copy Card -->
-              <div class="bg-codCard border border-codBorder rounded-2xl p-4 sm:p-6 flex flex-col font-sans">
-                <div class="flex justify-between items-center mb-4">
-                  <h4 class="font-bold text-xs uppercase text-codTextMuted tracking-wider font-sans font-sans font-sans">Apps Script Webhook Snippet</h4>
-                  <button onclick="copySheetsSnippet()" class="flex items-center space-x-1.5 text-xs text-codAccent hover:text-codAccentHover bg-codDark/80 border border-codBorder hover:border-codAccent px-3 py-1.5 rounded-lg transition font-semibold font-sans font-sans">
-                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                    <span>Copy Snippet</span>
-                  </button>
-                </div>
-                <pre class="flex-1 bg-codDark border border-codBorder rounded-xl p-4 text-[10px] font-mono text-gray-400 overflow-y-auto max-h-[420px] leading-relaxed select-all">
-// Google Sheets Webhook Snippet - 12 Column Family Array
-function doGet() {
-  try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getActiveSheet();
-    var lastRow = sheet.getLastRow();
-    if (lastRow &lt; 2) return ContentService.createTextOutput("[]").setMimeType(ContentService.MimeType.JSON);
-    var data = sheet.getRange(2, 1, lastRow - 1, 12).getValues();
-    var roster = data.map(function(row) {
-      var timestampVal = row[11] ? new Date(row[11]).toISOString() : new Date(0).toISOString();
-      return {
-        name: row[0].toString(), id: row[1].toString(), alliance: row[2] ? row[2].toString() : "Wrath of God",
-        power: Number(row[3]) || 0, merits: Number(row[4]) || 0, kills: Number(row[5]) || 0,
-        donation: Number(row[6]) || 0, buildTime: Number(row[7]) || 0, destructionTime: Number(row[8]) || 0,
-        help: Number(row[9]) || 0, assistance: Number(row[10]) || 0, timestamp: timestampVal
-      };
-    });
-    return ContentService.createTextOutput(JSON.stringify(roster)).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) { return ContentService.createTextOutput(JSON.stringify({"error": error.toString()})).setMimeType(ContentService.MimeType.JSON); }
-}</pre>
-              </div>
-            </div>
-          </div>
-
-        </section>
-
+        </div>
       </div>
     </main>
   </div>
 
-  <!-- ==================== PREMIUM UI POPUPS & DIALOGS ==================== -->
-  
-  <div id="password-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
-    <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all mx-4">
-      <div class="w-12 h-12 bg-codAccent/10 text-codAccent rounded-xl flex items-center justify-center mb-4 border border-codAccent/20">
-        <i data-lucide="lock" class="w-6 h-6"></i>
-      </div>
-      <h3 class="text-md font-bold text-white tracking-wide font-sans">Admin Access Required</h3>
-      <p class="text-xs text-codTextMuted mt-2 leading-relaxed font-sans font-sans">Entering the administrative command hub requires passcode authorization. Type the secret key to edit values, sync spreadsheet rows, or manage directory metrics.</p>
-      
-      <div class="mt-4">
-        <input type="password" id="password-input" class="w-full bg-codDark border border-codBorder focus:border-codAccent text-white text-sm rounded-lg p-3 outline-none transition font-sans" placeholder="••••••••" onkeydown="if(event.key === 'Enter') submitPassword()">
-      </div>
-      
-      <div class="flex space-x-3 mt-6">
-        <button onclick="closePasswordModal()" class="w-1/2 py-2.5 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition font-sans">
-          Cancel
-        </button>
-        <button onclick="submitPassword()" class="w-1/2 py-2.5 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-lg text-xs transition border-none font-sans">
-          Unlock Console
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-all mx-4">
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-transform" id="delete-modal-content">
       <div class="w-12 h-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-4">
         <i data-lucide="alert-triangle" class="w-6 h-6"></i>
       </div>
-      <h3 id="confirm-modal-title" class="text-md font-bold text-white">Remove Player Profile</h3>
-      <p id="confirm-modal-description" class="text-xs text-codTextMuted mt-2 leading-relaxed font-sans">Are you sure you want to remove this player profile? This action cannot be undone.</p>
-      
-      <div class="flex space-x-3 mt-6">
-        <button onclick="closeConfirmModal()" class="w-1/2 py-2 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition font-sans">
-          Cancel
-        </button>
-        <button id="confirm-modal-btn" onclick="executeConfirmModal()" class="w-1/2 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg text-xs transition border-none cursor-pointer font-sans">
-          Confirm
-        </button>
+      <h3 class="text-lg font-bold text-white mb-2">Delete Member Record</h3>
+      <p class="text-sm text-codTextMuted mb-6">Are you sure you want to permanently delete <strong id="delete-target-name" class="text-white">Player</strong> from the database? This action cannot be undone.</p>
+      <div class="flex space-x-3">
+        <button onclick="closeModal()" class="flex-1 py-2.5 bg-codDark border border-codBorder text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition">Cancel</button>
+        <button onclick="confirmDelete()" class="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-bold transition shadow-lg shadow-red-500/20">Yes, Delete</button>
       </div>
     </div>
   </div>
 
-  <div id="edit-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-sans">
-    <div class="bg-codCard border border-codBorder rounded-2xl max-w-md w-full p-6 shadow-2xl scale-95 transition-all max-h-[90vh] overflow-y-auto mx-4 font-sans font-sans">
-      <div class="flex justify-between items-center mb-4 pb-2 border-b border-codBorder font-sans">
-        <h3 class="text-md font-bold text-white font-sans">Modify Player Profile</h3>
-        <button onclick="closeEditModal()" class="text-gray-400 hover:text-white transition">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      <form id="edit-form" class="space-y-4" onsubmit="saveInlineEdit(event)">
-        <input type="hidden" id="edit-original-id">
-        <div class="grid grid-cols-2 gap-4">
-          <div class="col-span-2">
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Alliance Assignment</label>
-            <select id="edit-alliance" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
-              <option value="Wrath of God">⚔️ Wrath of God</option>
-              <option value="Wrath of Power">🛡️ Wrath of Power</option>
-              <option value="Wrath of Justice">⚖️ Wrath of Justice</option>
-            </select>
-          </div>
-          <div class="col-span-2">
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Player Name</label>
-            <input type="text" id="edit-name" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition font-semibold">
-          </div>
-          <div class="col-span-2">
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Character ID</label>
-            <input type="text" id="edit-id" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none font-mono transition">
-          </div>
-          <div class="col-span-2">
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Power Rating</label>
-            <input type="number" id="edit-power" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Weekly Merits</label>
-            <input type="number" id="edit-merits" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Kill Points</label>
-            <input type="number" id="edit-kills" required class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
-          </div>
-        </div>
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3"></div>
 
-        <div class="pt-4 border-t border-codBorder space-y-4">
-          <h4 class="text-xs font-bold text-codAccent uppercase font-sans">Alliance Metrics</h4>
-          <div>
-            <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Alliance Donation</label>
-            <input type="number" id="edit-donation" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Build Time</label>
-              <input type="number" id="edit-buildTime" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Destruction Time</label>
-              <input type="number" id="edit-destructionTime" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Alliance Help</label>
-              <input type="number" id="edit-help" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-codTextMuted uppercase mb-1 font-sans">Resource Assistance</label>
-              <input type="number" id="edit-assistance" class="w-full bg-codDark border border-codBorder text-white text-xs rounded-lg p-2.5 outline-none transition">
-            </div>
-          </div>
-        </div>
-
-        <div class="flex space-x-3 pt-4 border-t border-codBorder">
-          <button type="button" onclick="closeEditModal()" class="w-1/2 py-2 border border-codBorder hover:bg-codBorder text-gray-400 font-semibold rounded-lg text-xs transition font-sans">
-            Cancel
-          </button>
-          <button type="submit" class="w-1/2 py-2 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-lg text-xs transition border-none cursor-pointer font-sans">
-            Save Changes
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="toast-box" class="fixed bottom-6 right-6 z-50 pointer-events-none flex flex-col space-y-3"></div>
-
-  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
-    const DEFAULT_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyI3Jwp99-SXyKjTr9f6xCA1nof-vubaHgd0VkHW7-e7ePAK9f7U9orflKeQeIpwaYUjA/exec"; 
+    const DEFAULT_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyq8X7f5n2R-T76E87sU6Z6QjOq0O82J3-Q4uF50H6XWjF4P_L4E3E-L4C4I2G5W_J8/exec";
     
-    let roster = [];
-    let overviewChartInstance = null;
-    let isUnlocked = false; 
-    let pendingTabId = null; 
-    let pendingPlayerId = null; 
-    let pendingDeletePlayerId = null; 
+    let dbData = []; 
     let pendingDeletePlayerName = null; 
     let activeAdminSubTab = 'roster-admin'; 
     let modalActionCallback = null;
-    let activeAllianceFilter = 'All'; // "All", "Wrath of God", "Wrath of Power", "Wrath of Justice"
+    let activeAllianceFilter = 'All'; 
 
     window.onload = function() {
       lucide.createIcons();
@@ -700,437 +412,262 @@ function doGet() {
       // Smart Memory: Check if the user has visited before
       if (localStorage.getItem('wrath_hub_visited') === 'true') {
         document.getElementById('welcome-splash').classList.add('hidden');
-        autoPullOnLoad(); // Quietly syncs background data for returning users
+        autoPullOnLoad(); 
       }
     };
 
     function enterHub() {
-      // Save the memory note in their browser
       localStorage.setItem('wrath_hub_visited', 'true');
-      
       const splash = document.getElementById('welcome-splash');
-      splash.style.opacity = '0'; // Smooth fade out
-      
+      splash.style.opacity = '0'; 
       setTimeout(() => {
-        splash.classList.add('hidden'); // Remove from screen
-        syncDatabase(); // Trigger the loud sync and toast notification
+        splash.classList.add('hidden'); 
+        syncDatabase(); 
       }, 400);
     }
 
     function toggleSidebar(open) {
       const sidebar = document.getElementById('sidebar');
       const backdrop = document.getElementById('sidebar-backdrop');
-      if (sidebar && backdrop) {
-        if (open) {
-          sidebar.classList.remove('-translate-x-full');
-          backdrop.classList.remove('hidden');
-        } else {
-          sidebar.classList.add('-translate-x-full');
-          backdrop.classList.add('hidden');
-        }
+      if (open) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
       }
-    }
-
-    function setAllianceFilter(alliance) {
-      activeAllianceFilter = alliance;
-      
-      document.querySelectorAll('.alliance-filter-btn').forEach(btn => {
-        btn.className = "alliance-filter-btn px-4 py-2 bg-codDark border border-codBorder text-gray-400 hover:text-white rounded-lg text-xs whitespace-nowrap transition shrink-0";
-      });
-      const activeBtn = document.getElementById('filter-' + alliance);
-      if(activeBtn) {
-        activeBtn.className = "alliance-filter-btn px-4 py-2 bg-codAccent text-black font-bold rounded-lg text-xs whitespace-nowrap transition shrink-0 shadow-lg shadow-codAccent/10";
-      }
-      
-      updateUI();
-    }
-
-    function getFilteredRoster() {
-      if (activeAllianceFilter === 'All') return roster;
-      return roster.filter(p => p.alliance === activeAllianceFilter);
     }
 
     function checkUrlParams() {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const apiParam = urlParams.get('api');
-        if (apiParam) {
-          const decodedApi = decodeURIComponent(apiParam);
-          if (decodedApi.startsWith('https://script.google.com/')) {
-            localStorage.setItem('cod_el_endpoint_manual', decodedApi);
-            const field = document.getElementById('sheets-endpoint');
-            if (field) field.value = decodedApi;
-            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            window.history.replaceState({}, document.title, cleanUrl);
-            triggerToast('success', 'Linked sheet database successfully from parameters!');
-          }
-        }
-      } catch (e) {
-        console.warn("URL Parameters parsing failed:", e);
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('admin') === 'true') {
+        unlockAdmin(true); 
+        switchView('admin');
       }
     }
 
-    function loadDataFromDisk() {
-      try {
-        const storedRoster = localStorage.getItem('cod_el_roster_manual');
-        if (storedRoster) {
-          try {
-            roster = JSON.parse(storedRoster);
-          } catch(e) {
-            console.warn("Corrupt local roster storage, resetting array.");
-            roster = [];
-          }
-        }
-        const storedEndpoint = localStorage.getItem('cod_el_endpoint_manual');
-        if (storedEndpoint) {
-          document.getElementById('sheets-endpoint').value = storedEndpoint;
-        } else if (DEFAULT_SHEETS_API_URL) {
-          document.getElementById('sheets-endpoint').value = DEFAULT_SHEETS_API_URL;
-          localStorage.setItem('cod_el_endpoint_manual', DEFAULT_SHEETS_API_URL);
-        }
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const isSuccess = type === 'success';
+      const bgColor = isSuccess ? 'bg-codCard' : 'bg-red-950';
+      const borderColor = isSuccess ? 'border-codAccent/30' : 'border-red-500/30';
+      const iconColor = isSuccess ? 'text-codAccent' : 'text-red-500';
+      const iconName = isSuccess ? 'check-circle' : 'alert-circle';
+      
+      toast.className = `toast-enter flex items-center space-x-3 ${bgColor} border ${borderColor} text-white px-5 py-4 rounded-xl shadow-2xl min-w-[300px] relative overflow-hidden`;
+      
+      toast.innerHTML = `
+        <div class="absolute left-0 top-0 bottom-0 w-1 ${isSuccess ? 'bg-codAccent' : 'bg-red-500'}"></div>
+        <i data-lucide="${iconName}" class="w-5 h-5 ${iconColor}"></i>
+        <span class="text-sm font-medium tracking-wide">${message}</span>
+      `;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
 
-        isUnlocked = sessionStorage.getItem('cod_el_unlocked') === 'true';
-        updateLockBadge();
-      } catch (err) {
-        console.warn("localStorage read failed:", err);
+    function switchView(viewId, event = null) {
+      if (event) { event.preventDefault(); toggleSidebar(false); }
+      
+      document.getElementById('roster-view').classList.remove('active-view');
+      document.getElementById('roster-view').classList.add('hidden');
+      document.getElementById('admin-view').classList.remove('active-view');
+      document.getElementById('admin-view').classList.add('hidden');
+      
+      document.getElementById('nav-roster').classList.remove('bg-codAccent/10', 'text-codAccent');
+      document.getElementById('nav-roster').classList.add('text-codTextMuted');
+      document.getElementById('nav-admin').classList.remove('bg-codAccent/10', 'text-codAccent');
+      document.getElementById('nav-admin').classList.add('text-codTextMuted');
+      
+      const targetView = document.getElementById(viewId + '-view');
+      targetView.classList.remove('hidden');
+      targetView.classList.add('active-view');
+      
+      const targetNav = document.getElementById('nav-' + viewId);
+      targetNav.classList.remove('text-codTextMuted');
+      targetNav.classList.add('bg-codAccent/10', 'text-codAccent');
+    }
+
+    function toggleAdminSubTab(tabId) {
+      activeAdminSubTab = tabId;
+      document.getElementById('tab-roster-admin').className = "px-5 py-2.5 rounded-lg text-sm font-bold transition text-codTextMuted hover:text-white";
+      document.getElementById('tab-manage-dir').className = "px-5 py-2.5 rounded-lg text-sm font-bold transition text-codTextMuted hover:text-white";
+      
+      document.getElementById('tab-' + tabId).className = "px-5 py-2.5 rounded-lg text-sm font-bold transition bg-codAccent/10 text-codAccent border border-codAccent/30";
+      
+      document.getElementById('admin-register-section').classList.add('hidden');
+      document.getElementById('admin-manage-section').classList.add('hidden');
+      
+      // Crucial part for Option B: remove hidden to reveal the flex-col wrapper inside.
+      document.getElementById(tabId === 'roster-admin' ? 'admin-register-section' : 'admin-manage-section').classList.remove('hidden');
+      
+      if(tabId === 'manage-dir') renderAdminTable();
+    }
+
+    function unlockAdmin(force = false) {
+      const code = document.getElementById('admin-passcode').value;
+      if (force || code === '949') {
+        document.getElementById('admin-auth').style.display = 'none';
+        document.getElementById('nav-admin-badge').textContent = 'UNLOCKED';
+        document.getElementById('nav-admin-badge').className = 'bg-red-500/20 text-red-400 border border-red-500/30 text-[9px] font-bold px-2 py-0.5 rounded-full';
+        if (!force) showToast("Admin Portal Unlocked");
+      } else {
+        document.getElementById('admin-error').classList.remove('hidden');
       }
+    }
+
+    function getApiUrl() {
+      return localStorage.getItem('custom_sheets_api_url') || DEFAULT_SHEETS_API_URL;
+    }
+    
+    function autoPullOnLoad() {
+      const url = getApiUrl();
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.data) {
+            mergeDataSafely(data.data);
+            saveDataToDisk();
+            updateUI();
+          }
+        })
+        .catch(err => console.log("Background sync failed silently."));
+    }
+
+    function syncDatabase() {
+      const btn = document.getElementById('sync-btn');
+      // Fix: Safely target the SVG that Lucide created, avoiding the null crash
+      const icon = btn ? btn.querySelector('svg') : null;
+      
+      if (icon) icon.classList.add('animate-spin');
+      if (btn) btn.classList.add('opacity-75', 'cursor-not-allowed');
+      
+      const url = getApiUrl();
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if(data && data.data) {
+            mergeDataSafely(data.data);
+            saveDataToDisk();
+            updateUI();
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const syncLabel = document.getElementById('last-sync-time');
+            if (syncLabel) syncLabel.textContent = `Last sync: Today at ${timeString}`;
+            
+            showToast(`Synchronized ${data.data.length} records from Cloud`);
+          } else {
+            showToast("Sync failed: No data returned", "error");
+          }
+        })
+        .catch(error => {
+          showToast("Network Error: Could not reach database", "error");
+          console.error("Fetch Error:", error);
+        })
+        .finally(() => {
+          // Fix: Ensure the spinner always turns off, even if fetch fails
+          if (icon) icon.classList.remove('animate-spin');
+          if (btn) btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        });
+    }
+
+    function mergeDataSafely(cloudData) {
+       cloudData.forEach(cloudPlayer => {
+          if (!cloudPlayer.name) return;
+          
+          let existingIndex = dbData.findIndex(p => 
+            (cloudPlayer.id && p.id == cloudPlayer.id) || 
+            p.name.toLowerCase() === cloudPlayer.name.toLowerCase()
+          );
+
+          if (existingIndex > -1) {
+             let localPlayer = dbData[existingIndex];
+             let cloudTime = new Date(cloudPlayer.timestamp || 0).getTime();
+             let localTime = new Date(localPlayer.timestamp || 0).getTime();
+
+             if (cloudTime > localTime) {
+                dbData[existingIndex] = cloudPlayer;
+             }
+          } else {
+             dbData.push(cloudPlayer);
+          }
+       });
     }
 
     function saveDataToDisk() {
-      try {
-        localStorage.setItem('cod_el_roster_manual', JSON.stringify(roster));
-        localStorage.setItem('cod_el_endpoint_manual', document.getElementById('sheets-endpoint').value.trim());
-      } catch (err) {
-        console.warn("localStorage write failed:", err);
-      }
+      localStorage.setItem('wrath_hub_db', JSON.stringify(dbData));
     }
 
-    function saveEndpointLocally() {
-      const url = document.getElementById('sheets-endpoint').value.trim();
-      try {
-        localStorage.setItem('cod_el_endpoint_manual', url);
-      } catch (err) {
-        console.warn("Endpoint write failed:", err);
+    function loadDataFromDisk() {
+      const saved = localStorage.getItem('wrath_hub_db');
+      if (saved) {
+        try {
+          dbData = JSON.parse(saved);
+        } catch(e) { dbData = []; }
       }
     }
 
     function updateUI() {
-      calculateMetricsScores();
-      renderDashboard();
-      renderRoster();
-      renderAdminRoster();
+      document.getElementById('nav-total-members').textContent = dbData.length;
+      renderTable();
+      if(activeAdminSubTab === 'manage-dir') renderAdminTable();
+    }
+
+    function filterAlliance(allianceName, btnElement) {
+      activeAllianceFilter = allianceName;
+      document.getElementById('active-alliance-badge').textContent = allianceName === 'All' ? 'ALL' : allianceName;
       
-      const filteredCount = getFilteredRoster().length;
-      document.getElementById('header-member-count').textContent = `${filteredCount}`;
-      document.getElementById('roster-badge').textContent = filteredCount;
-      updateLastSyncDisplay();
-    }
-
-    function calculateMetricsScores() {
-      const activeRoster = getFilteredRoster();
-      if (activeRoster.length === 0) return;
-
-      const maxVals = {
-        power: Math.max(...activeRoster.map(p => Number(p.power) || 0), 1),
-        merits: Math.max(...activeRoster.map(p => Number(p.merits) || 0), 1),
-        kills: Math.max(...activeRoster.map(p => Number(p.kills) || 0), 1),
-        donation: Math.max(...activeRoster.map(p => Number(p.donation) || 0), 1),
-        buildTime: Math.max(...activeRoster.map(p => Number(p.buildTime) || 0), 1),
-        destructionTime: Math.max(...activeRoster.map(p => Number(p.destructionTime) || 0), 1),
-        help: Math.max(...activeRoster.map(p => Number(p.help) || 0), 1),
-        assistance: Math.max(...activeRoster.map(p => Number(p.assistance) || 0), 1)
-      };
-
-      activeRoster.forEach(p => {
-        const normPower = (Number(p.power) || 0) / maxVals.power;
-        const normMerits = (Number(p.merits) || 0) / maxVals.merits;
-        const normKills = (Number(p.kills) || 0) / maxVals.kills;
-        const normDonation = (Number(p.donation) || 0) / maxVals.donation;
-        const normBuild = (Number(p.buildTime) || 0) / maxVals.buildTime;
-        const normDestruction = (Number(p.destructionTime) || 0) / maxVals.destructionTime;
-        const normHelp = (Number(p.help) || 0) / maxVals.help;
-        const normAssistance = (Number(p.assistance) || 0) / maxVals.assistance;
-
-        p.rawOverall = (normMerits * 0.25) + (normKills * 0.20) + (normDonation * 0.15) + (normPower * 0.10) + (normBuild * 0.10) + (normDestruction * 0.10) + (normHelp * 0.05) + (normAssistance * 0.05);
-        p.rawSupport = (normKills * 0.30) + (normDonation * 0.25) + (normBuild * 0.15) + (normDestruction * 0.15) + (normHelp * 0.10) + (normAssistance * 0.05);
+      document.querySelectorAll('.alliance-tab').forEach(btn => {
+        btn.className = "alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500";
       });
-
-      const maxRawOverall = Math.max(...activeRoster.map(p => p.rawOverall || 0), 0.001);
-      const maxRawSupport = Math.max(...activeRoster.map(p => p.rawSupport || 0), 0.001);
-
-      activeRoster.forEach(p => {
-        p.overallScore = Math.round((p.rawOverall / maxRawOverall) * 100);
-        p.supportScore = Math.round((p.rawSupport / maxRawSupport) * 100);
-      });
-    }
-
-    function updateLastSyncDisplay() {
-      const syncEl = document.getElementById('header-last-sync');
-      if (!syncEl) return;
-      if (roster.length === 0) {
-        syncEl.textContent = "Never";
-        return;
-      }
-      let latestTime = 0;
-      roster.forEach(p => {
-        if (p.timestamp) {
-          const t = new Date(p.timestamp).getTime();
-          if (!isNaN(t) && t > latestTime) {
-            latestTime = t;
-          }
-        }
-      });
-      if (latestTime === 0) {
-        syncEl.textContent = "Never";
-      } else {
-        const date = new Date(latestTime);
-        const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        syncEl.textContent = date.toLocaleDateString(undefined, options);
-      }
-    }
-
-    function triggerToast(type, text) {
-      const toastBox = document.getElementById('toast-box');
-      const toast = document.createElement('div');
-      toast.className = `p-4 rounded-xl flex items-center space-x-3 shadow-2xl transition duration-300 transform translate-y-4 opacity-0 pointer-events-auto ${
-        type === 'success' ? 'bg-emerald-600 text-white border border-emerald-500/20' : 'bg-red-600 text-white border border-red-500/20'
-      }`;
-      const icon = type === 'success' ? 'check-circle' : 'alert-circle';
-      toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5 shrink-0"></i><span class="text-xs font-semibold">${text}</span>`;
-      toastBox.appendChild(toast);
-      lucide.createIcons();
-      setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 50);
-      setTimeout(() => {
-        toast.classList.add('translate-y-4', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
-      }, 4000);
-    }
-
-    function updateLockBadge() {
-      const badge = document.getElementById('admin-lock-badge');
-      if (badge) {
-        if (isUnlocked) {
-          badge.className = "text-[9px] border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider";
-          badge.textContent = "Open";
-        } else {
-          badge.className = "text-[9px] border border-amber-500/30 text-amber-500 bg-amber-500/10 font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider";
-          badge.textContent = "Locked";
-        }
-      }
-    }
-
-    function openPasswordModal() {
-      document.getElementById('password-input').value = '';
-      document.getElementById('password-modal').classList.remove('hidden');
-      setTimeout(() => {
-        document.getElementById('password-input').focus();
-      }, 100);
-    }
-
-    function closePasswordModal() {
-      document.getElementById('password-modal').classList.add('hidden');
-      pendingTabId = null;
-      pendingPlayerId = null;
-      pendingDeletePlayerId = null;
-      pendingDeletePlayerName = null;
-    }
-
-    function submitPassword() {
-      const code = document.getElementById('password-input').value;
-      if (code === '949') { 
-        isUnlocked = true;
-        try {
-          sessionStorage.setItem('cod_el_unlocked', 'true');
-        } catch (e) {}
-        document.getElementById('password-modal').classList.add('hidden');
-        triggerToast('success', 'Console unlocked! Welcome back, Commander.');
-        updateLockBadge();
-        
-        if (pendingTabId) {
-          switchTab(pendingTabId);
-          pendingTabId = null;
-        }
-        if (pendingPlayerId) {
-          openEditModal(pendingPlayerId);
-          pendingPlayerId = null;
-        }
-        if (pendingDeletePlayerId && pendingDeletePlayerName) {
-          showDeletePlayerModal(pendingDeletePlayerId, pendingDeletePlayerName);
-          pendingDeletePlayerId = null;
-          pendingDeletePlayerName = null;
-        }
-      } else {
-        triggerToast('error', 'Access Denied: Incorrect alliance access code.');
-        document.getElementById('password-input').value = '';
-        document.getElementById('password-input').focus();
-      }
-    }
-
-    function switchTab(tabId) {
-      toggleSidebar(false);
-      if (tabId === 'admin-portal' && !isUnlocked) {
-        pendingTabId = tabId;
-        openPasswordModal();
-        return;
-      }
-      document.querySelectorAll('main > div > section').forEach(tab => {
-        tab.classList.add('hidden');
-      });
-      document.getElementById('tab-' + tabId).classList.remove('hidden');
-
-      const headerTitle = {
-        'dashboard': 'Alliance Overview',
-        'roster-manager': 'Roster Directory',
-        'admin-portal': 'Command & Sync Console'
-      };
-      document.getElementById('tab-title').textContent = headerTitle[tabId];
-
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-codAccent', 'text-black', 'font-bold');
-        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
-      });
-
-      const activeBtn = document.getElementById('nav-' + tabId);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-codAccent', 'text-black', 'font-bold');
-        activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
-      }
-
-      if (tabId === 'dashboard') renderDashboard();
-      if (tabId === 'roster-manager') renderRoster();
-      if (tabId === 'admin-portal') {
-        renderAdminRoster();
-        switchAdminSubTab(activeAdminSubTab);
-      }
-    }
-
-    function switchAdminSubTab(subTabId) {
-      activeAdminSubTab = subTabId;
-      document.querySelectorAll('.admin-tab-section').forEach(sec => sec.classList.add('hidden'));
-      document.getElementById('admin-sec-' + subTabId).classList.remove('hidden');
-
-      document.querySelectorAll('.admin-sub-btn').forEach(btn => {
-        btn.classList.remove('bg-codAccent', 'text-black');
-        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
-      });
-
-      const activeBtn = document.getElementById('admin-sub-' + subTabId);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-codAccent', 'text-black');
-        activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-codBorder');
-      }
-      if (subTabId === 'roster-admin') renderAdminRoster();
-    }
-
-    function renderDashboard() {
-      const activeRoster = getFilteredRoster();
-      document.getElementById('stat-members').textContent = activeRoster.length;
       
-      const totalPower = activeRoster.reduce((sum, p) => sum + (Number(p.power) || 0), 0);
-      const totalMerits = activeRoster.reduce((sum, p) => sum + (Number(p.merits) || 0), 0);
-      const totalKills = activeRoster.reduce((sum, p) => sum + (Number(p.kills) || 0), 0);
-
-      document.getElementById('stat-power').textContent = (totalPower / 1000000).toFixed(1) + 'M';
-      document.getElementById('stat-merits').textContent = totalMerits.toLocaleString();
-      document.getElementById('stat-kills').textContent = (totalKills / 1000000).toFixed(1) + 'M';
-
-      const sortedBySupport = [...activeRoster].sort((a, b) => (b.supportScore || 0) - (a.supportScore || 0)).slice(0, 5);
-      const miniLeaderboard = document.getElementById('mini-leaderboard');
-
-      if (sortedBySupport.length === 0) {
-        miniLeaderboard.innerHTML = `
-          <div class="text-center py-12">
-            <i data-lucide="shield-alert" class="w-8 h-8 text-codBorder mx-auto mb-2"></i>
-            <p class="text-xs text-codTextMuted">Roster database empty.</p>
-          </div>
-        `;
-      } else {
-        const medals = ["🥇", "🥈", "🥉", "🏅", "🏅"];
-        miniLeaderboard.innerHTML = sortedBySupport.map((p, idx) => `
-          <div class="flex items-center justify-between p-3 bg-codDark/40 rounded-xl border border-codBorder/60 hover:border-codAccent/20 transition">
-            <div class="flex items-center space-x-3 overflow-hidden font-sans">
-              <span class="text-sm shrink-0">${medals[idx]}</span>
-              <div class="overflow-hidden text-left">
-                <span class="block text-xs font-bold text-white truncate">${p.name}</span>
-                <span class="block text-[9px] text-codAccent/80 font-bold tracking-wider mt-0.5">${p.alliance || 'Wrath of God'}</span>
-              </div>
-            </div>
-            <span class="text-xs font-extrabold text-amber-400 shrink-0">Score: ${p.supportScore || 0}</span>
-          </div>
-        `).join('');
-      }
-
-      const sortedByOverall = [...activeRoster].sort((a, b) => (b.overallScore || 0) - (a.overallScore || 0)).slice(0, 10);
-      renderAnalyticsChart(sortedByOverall);
+      btnElement.className = "alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codAccent text-black shadow-lg shadow-codAccent/20";
+      
+      renderTable();
     }
 
-    function renderAnalyticsChart(topPlayers) {
-      const canvas = document.getElementById('overviewChart');
-      const placeholder = document.getElementById('no-chart-placeholder');
-
-      if (topPlayers.length === 0) {
-        canvas.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-        return;
-      }
-
-      canvas.classList.remove('hidden');
-      placeholder.classList.add('hidden');
-
-      const ctx = canvas.getContext('2d');
-      if (overviewChartInstance) {
-        overviewChartInstance.destroy();
-      }
-
-      const labels = topPlayers.map(p => p.name);
-      const data = topPlayers.map(p => p.overallScore || 0);
-
-      overviewChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Overall Performance Score (1-100)',
-            data: data,
-            backgroundColor: 'rgba(223, 161, 59, 0.15)',
-            borderColor: '#dfa13b',
-            borderWidth: 2,
-            borderRadius: 8,
-            barThickness: 32
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { 
-              min: 0,
-              max: 100,
-              grid: { color: '#1c2130' }, 
-              ticks: { color: '#8a93a6', font: { size: 10 } } 
-            },
-            x: { grid: { display: false }, ticks: { color: '#8a93a6', font: { size: 10 } } }
-          }
-        }
-      });
+    function formatNumber(num) {
+      if (!num && num !== 0) return "0";
+      return parseInt(num).toLocaleString();
+    }
+    
+    function escapeHtmlQuotes(str) {
+      if (!str) return "";
+      return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    function renderRoster() {
-      const activeRoster = getFilteredRoster();
-      const searchVal = document.getElementById('search-input').value.toLowerCase();
+    function renderTable() {
+      const searchStr = document.getElementById('search-input').value.toLowerCase();
       const sortVal = document.getElementById('sort-select').value;
-      const tbody = document.getElementById('roster-table-body');
-      const emptyState = document.getElementById('roster-empty');
+      const tbody = document.getElementById('roster-tbody');
+      const emptyState = document.getElementById('empty-state');
 
-      let filtered = activeRoster.filter(p => 
-        p.name.toLowerCase().includes(searchVal) || (p.id && p.id.includes(searchVal))
-      );
+      let filtered = dbData.filter(p => {
+        const matchesSearch = (p.name && p.name.toLowerCase().includes(searchStr)) || 
+                              (p.id && String(p.id).includes(searchStr));
+        
+        const matchesAlliance = activeAllianceFilter === 'All' || p.alliance === activeAllianceFilter;
+        
+        return matchesSearch && matchesAlliance;
+      });
 
-      if (sortVal === 'merits-desc') filtered.sort((a, b) => (b.merits || 0) - (a.merits || 0));
-      else if (sortVal === 'power-desc') filtered.sort((a, b) => (b.power || 0) - (a.power || 0));
-      else if (sortVal === 'kills-desc') filtered.sort((a, b) => (b.kills || 0) - (a.kills || 0));
-      else if (sortVal === 'name-asc') filtered.sort((a, b) => a.name.localeCompare(b.name));
+      filtered.sort((a, b) => {
+        if (sortVal === 'power') return (b.power || 0) - (a.power || 0);
+        if (sortVal === 'kills') return (b.kills || 0) - (a.kills || 0);
+        if (sortVal === 'donation') return (b.donation || 0) - (a.donation || 0);
+        if (sortVal === 'help') return (b.help || 0) - (a.help || 0);
+        return (b.merits || 0) - (a.merits || 0); // default merits
+      });
 
       if (filtered.length === 0) {
         tbody.innerHTML = '';
@@ -1142,503 +679,193 @@ function doGet() {
       tbody.innerHTML = filtered.map(player => {
         return `
           <tr class="hover:bg-codCard/40 transition border-b border-codBorder/40 text-gray-300">
-            <td class="py-4 px-6 sticky left-0 bg-codDark z-10">
+            <td class="py-4 px-6">
               <span class="block font-semibold text-white">${player.name}</span>
               <span class="block text-[9px] text-codAccent/80 font-bold tracking-wider mt-1">${player.alliance || 'Wrath of God'}</span>
             </td>
             <td class="py-4 px-6 text-codTextMuted font-mono text-xs">${player.id || "N/A"}</td>
-            <td class="py-4 px-6 font-semibold">${(player.power || 0).toLocaleString()}</td>
-            <td class="py-4 px-6 text-amber-400 font-extrabold">${(player.merits || 0).toLocaleString()}</td>
-            <td class="py-4 px-6 text-emerald-400 font-semibold">${(player.kills || 0).toLocaleString()}</td>
-            <td class="py-4 px-6 font-semibold text-gray-300">${(player.donation || 0).toLocaleString()}</td>
-            <td class="py-4 px-4 font-semibold text-gray-300">${player.buildTime || 0}</td>
-            <td class="py-4 px-4 font-semibold text-gray-300">${player.destructionTime || 0}</td>
-            <td class="py-4 px-4 font-semibold text-gray-300">${player.help || 0}</td>
-            <td class="py-4 px-6 font-semibold text-gray-300">${(player.assistance || 0).toLocaleString()}</td>
+            <td class="py-4 px-6 font-mono">${formatNumber(player.power)}</td>
+            <td class="py-4 px-6 font-mono font-bold text-codAccent">${formatNumber(player.merits)}</td>
+            <td class="py-4 px-6 font-mono text-green-400">${formatNumber(player.kills)}</td>
+            <td class="py-4 px-6 font-mono text-orange-200/70">${formatNumber(player.donation)}</td>
+            <td class="py-4 px-6 font-mono text-orange-200/70">${formatNumber(player.buildTime)}</td>
+            <td class="py-4 px-6 font-mono text-orange-200/70">${formatNumber(player.destructionTime)}</td>
+            <td class="py-4 px-6 font-mono text-orange-200/70">${formatNumber(player.help)}</td>
+            <td class="py-4 px-6 font-mono text-orange-200/70">${formatNumber(player.assistance)}</td>
           </tr>
         `;
       }).join('');
-      lucide.createIcons();
     }
 
-    function escapeHtmlQuotes(str) {
-      if (!str) return "";
-      return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    }
+    function renderAdminTable() {
+      const searchStr = document.getElementById('admin-search-input').value.toLowerCase();
+      const tbody = document.getElementById('admin-tbody');
 
-    function renderAdminRoster() {
-      const activeRoster = getFilteredRoster();
-      const searchVal = document.getElementById('admin-search-input').value.toLowerCase();
-      const tbody = document.getElementById('admin-roster-table-body');
-      const emptyState = document.getElementById('admin-roster-empty');
-
-      let filtered = activeRoster.filter(p => 
-        p.name.toLowerCase().includes(searchVal) || (p.id && p.id.includes(searchVal))
-      );
-
-      filtered.sort((a, b) => (b.merits || 0) - (a.merits || 0));
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = '';
-        emptyState.classList.remove('hidden');
-        return;
-      }
-      emptyState.classList.add('hidden');
+      let filtered = dbData.filter(p => {
+        return (p.name && p.name.toLowerCase().includes(searchStr)) || 
+               (p.id && String(p.id).includes(searchStr));
+      });
 
       tbody.innerHTML = filtered.map(player => {
         const safeIdOrName = escapeHtmlQuotes(player.id || player.name);
         const safeId = escapeHtmlQuotes(player.id || "");
         const safeName = escapeHtmlQuotes(player.name);
-
+        
         return `
           <tr class="hover:bg-codCard/40 transition border-b border-codBorder/40 text-gray-300">
-            <td class="py-4 px-6 sticky left-0 bg-codDark z-10">
+            <td class="py-3 px-6">
               <span class="block font-semibold text-white">${player.name}</span>
               <span class="block text-[9px] text-codAccent/80 font-bold tracking-wider mt-1">${player.alliance || 'Wrath of God'}</span>
             </td>
-            <td class="py-4 px-6 text-codTextMuted font-mono text-xs">${player.id || "N/A"}</td>
-            <td class="py-4 px-6 font-semibold">${(player.power || 0).toLocaleString()}</td>
-            <td class="py-4 px-6 text-amber-400 font-extrabold">${(player.merits || 0).toLocaleString()}</td>
-            <td class="py-4 px-6 text-emerald-400 font-semibold">${(player.kills || 0).toLocaleString()}</td>
-            <td class="py-4 px-6 font-semibold text-gray-300">${(player.donation || 0).toLocaleString()}</td>
-            <td class="py-4 px-4 font-semibold text-gray-300">${player.buildTime || 0}</td>
-            <td class="py-4 px-4 font-semibold text-gray-300">${player.destructionTime || 0}</td>
-            <td class="py-4 px-4 font-semibold text-gray-300">${player.help || 0}</td>
-            <td class="py-4 px-6 font-semibold text-gray-300">${(player.assistance || 0).toLocaleString()}</td>
-            <td class="py-4 px-6 text-right">
-              <div class="flex items-center justify-end space-x-2">
-                <button onclick="openEditModal('${safeIdOrName}')" class="text-codAccent hover:text-white p-1.5 rounded-lg hover:bg-codAccent/10 transition border-none cursor-pointer bg-transparent">
-                  <i data-lucide="pencil" class="w-4 h-4"></i>
-                </button>
-                <button onclick="showDeletePlayerModal('${safeId}', '${safeName}')" class="text-red-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition border-none cursor-pointer bg-transparent">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-              </div>
+            <td class="py-3 px-6 text-codTextMuted font-mono text-xs">${player.id || "N/A"}</td>
+            <td class="py-3 px-6 font-mono">${formatNumber(player.power)}</td>
+            <td class="py-3 px-6 font-mono text-codAccent">${formatNumber(player.merits)}</td>
+            <td class="py-3 px-6 font-mono text-green-400">${formatNumber(player.kills)}</td>
+            <td class="py-3 px-6 font-mono text-[10px] text-orange-200/70">
+              D:${formatNumber(player.donation)} | H:${formatNumber(player.help)}
+            </td>
+            <td class="py-3 px-6 text-right space-x-2">
+              <button onclick="editPlayer('${safeId}', '${safeName}')" class="p-2 bg-codDark border border-codBorder rounded-lg hover:text-codAccent transition text-codTextMuted" title="Edit">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+              </button>
+              <button onclick="promptDelete('${safeIdOrName}')" class="p-2 bg-red-950/30 border border-red-500/20 rounded-lg hover:text-red-400 hover:bg-red-950/50 transition text-red-500/70" title="Delete">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
             </td>
           </tr>
         `;
       }).join('');
+      
       lucide.createIcons();
     }
 
-    function copySheetsSnippet() {
-      const pre = document.querySelector('pre');
-      const tempTextArea = document.createElement("textarea");
-      tempTextArea.value = pre.innerText;
-      document.body.appendChild(tempTextArea);
-      tempTextArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempTextArea);
-      triggerToast('success', 'Snippet copied to clipboard.');
-    }
-
-    function showDeletePlayerModal(playerId, playerName) {
-      if (!isUnlocked) {
-        triggerToast('error', 'Authentication required.');
-        pendingPlayerId = null;
-        pendingDeletePlayerId = playerId;
-        pendingDeletePlayerName = playerName;
-        openPasswordModal();
-        return;
-      }
-
-      document.getElementById('confirm-modal-title').textContent = `Remove ${playerName}?`;
-      document.getElementById('confirm-modal-description').textContent = `Are you sure you want to remove this player profile (ID: ${playerId || 'N/A'}) from your active alliance roster?`;
+    function saveAdminForm() {
+      const name = document.getElementById('form-name').value.trim();
+      const id = document.getElementById('form-id').value.trim();
       
-      modalActionCallback = function() {
-        // Fallback for players deleted when ID is missing
-        roster = roster.filter(p => (p.id ? p.id !== playerId : p.name !== playerName));
-        saveDataToDisk();
-        updateUI();
-        triggerToast('success', `${playerName} removed from Roster.`);
-        pushToGoogleSheetsBackground();
-        closeConfirmModal();
-      };
-
-      document.getElementById('confirm-modal').classList.remove('hidden');
-    }
-
-    function executeConfirmModal() {
-        if (modalActionCallback) {
-            modalActionCallback();
-        }
-    }
-
-    function closeConfirmModal() {
-      document.getElementById('confirm-modal').classList.add('hidden');
-      modalActionCallback = null;
-    }
-
-    function handleManualAdd(e) {
-      e.preventDefault();
-      const alliance = document.getElementById('entry-alliance').value;
-      const name = document.getElementById('entry-name').value.trim();
-      const id = document.getElementById('entry-id').value.trim();
-      const power = parseInt(document.getElementById('entry-power').value) || 0;
-      const merits = parseInt(document.getElementById('entry-merits').value) || 0;
-      const kills = parseInt(document.getElementById('entry-kills').value) || 0;
-      const donation = parseInt(document.getElementById('entry-donation').value) || 0;
-      const buildTime = parseInt(document.getElementById('entry-buildTime').value) || 0;
-      const destructionTime = parseInt(document.getElementById('entry-destructionTime').value) || 0;
-      const help = parseInt(document.getElementById('entry-help').value) || 0;
-      const assistance = parseInt(document.getElementById('entry-assistance').value) || 0;
-
       if (!name) {
-        triggerToast('error', 'Player Name field is required.');
+        showToast("Player Name is required!", "error");
         return;
       }
 
-      if (id) {
-        const duplicateIndex = roster.findIndex(p => String(p.id).trim() === id.trim());
-        if (duplicateIndex !== -1) {
-          const existingPlayer = roster[duplicateIndex];
-          triggerToast('error', `Registration Error: Character ID "${id}" already exists under "${existingPlayer.name}".`);
-          return;
-        }
-      }
-
-      const playerData = { 
-        alliance, name, id, power, merits, kills, 
-        donation, buildTime, destructionTime, help, assistance, 
-        timestamp: new Date().toISOString() 
+      const playerObj = {
+        name: name,
+        id: id,
+        alliance: document.getElementById('form-alliance').value,
+        power: parseInt(document.getElementById('form-power').value) || 0,
+        merits: parseInt(document.getElementById('form-merits').value) || 0,
+        kills: parseInt(document.getElementById('form-kills').value) || 0,
+        donation: parseInt(document.getElementById('form-donation').value) || 0,
+        buildTime: parseInt(document.getElementById('form-build').value) || 0,
+        destructionTime: parseInt(document.getElementById('form-destruct').value) || 0,
+        help: parseInt(document.getElementById('form-help').value) || 0,
+        assistance: parseInt(document.getElementById('form-asst').value) || 0,
+        timestamp: new Date().toISOString()
       };
 
-      roster.push(playerData);
-      triggerToast('success', `Successfully registered new member: ${name}`);
+      let existingIndex = dbData.findIndex(p => (id && p.id == id) || p.name.toLowerCase() === name.toLowerCase());
+      if (existingIndex > -1) {
+        dbData[existingIndex] = playerObj;
+      } else {
+        dbData.push(playerObj);
+      }
 
       saveDataToDisk();
+      pushDataToCloud([playerObj]);
       updateUI();
-      document.getElementById('quick-add-form').reset();
-      document.getElementById('entry-alliance').value = alliance; // keep dropdown selection
-      pushToGoogleSheetsBackground();
+      
+      showToast(`${name} registered successfully!`);
+      
+      // Clear form except alliance
+      document.getElementById('form-name').value = '';
+      document.getElementById('form-id').value = '';
+      document.getElementById('form-power').value = '';
+      document.getElementById('form-merits').value = '';
+      document.getElementById('form-kills').value = '';
+      document.getElementById('form-donation').value = '';
+      document.getElementById('form-build').value = '';
+      document.getElementById('form-destruct').value = '';
+      document.getElementById('form-help').value = '';
+      document.getElementById('form-asst').value = '';
     }
 
-    function openEditModal(idOrName) {
-      if (!isUnlocked) {
-        triggerToast('error', 'Authentication required.');
-        pendingPlayerId = idOrName;
-        openPasswordModal();
-        return;
-      }
-
-      const player = roster.find(p => p.id === idOrName || p.name === idOrName);
+    function editPlayer(id, name) {
+      const player = dbData.find(p => (id && p.id == id) || p.name === name);
       if (!player) return;
 
-      document.getElementById('edit-original-id').value = player.id || player.name;
-      document.getElementById('edit-alliance').value = player.alliance || "Wrath of God";
-      document.getElementById('edit-name').value = player.name;
-      document.getElementById('edit-id').value = player.id || "";
-      document.getElementById('edit-power').value = player.power;
-      document.getElementById('edit-merits').value = player.merits;
-      document.getElementById('edit-kills').value = player.kills;
+      document.getElementById('form-name').value = player.name || '';
+      document.getElementById('form-id').value = player.id || '';
+      document.getElementById('form-alliance').value = player.alliance || 'Wrath of God';
+      document.getElementById('form-power').value = player.power || '';
+      document.getElementById('form-merits').value = player.merits || '';
+      document.getElementById('form-kills').value = player.kills || '';
+      document.getElementById('form-donation').value = player.donation || '';
+      document.getElementById('form-build').value = player.buildTime || '';
+      document.getElementById('form-destruct').value = player.destructionTime || '';
+      document.getElementById('form-help').value = player.help || '';
+      document.getElementById('form-asst').value = player.assistance || '';
+
+      toggleAdminSubTab('roster-admin');
+      showToast(`Editing ${player.name}`);
+    }
+
+    function promptDelete(identifier) {
+      const player = dbData.find(p => p.id == identifier || p.name === identifier);
+      if(!player) return;
       
-      document.getElementById('edit-donation').value = player.donation || 0;
-      document.getElementById('edit-buildTime').value = player.buildTime || 0;
-      document.getElementById('edit-destructionTime').value = player.destructionTime || 0;
-      document.getElementById('edit-help').value = player.help || 0;
-      document.getElementById('edit-assistance').value = player.assistance || 0;
-
-      document.getElementById('edit-modal').classList.remove('hidden');
-    }
-
-    function closeEditModal() {
-      document.getElementById('edit-modal').classList.add('hidden');
-      document.getElementById('edit-form').reset();
-    }
-
-    function saveInlineEdit(e) {
-      e.preventDefault();
-      const originalId = document.getElementById('edit-original-id').value;
-      const alliance = document.getElementById('edit-alliance').value;
-      const name = document.getElementById('edit-name').value.trim();
-      const id = document.getElementById('edit-id').value.trim();
+      pendingDeletePlayerName = player.name;
+      document.getElementById('delete-target-name').textContent = player.name;
       
-      if (!name) {
-        triggerToast('error', 'Name field is required.');
-        return;
-      }
-
-      if (id && String(id).trim() !== String(originalId).trim()) {
-        const isIdTaken = roster.some(p => p.id && String(p.id).trim() === String(id).trim());
-        if (isIdTaken) {
-          triggerToast('error', `Edit Blocked: Player ID "${id}" is already assigned to another profile.`);
-          return;
-        }
-      }
-
-      const targetIndex = roster.findIndex(p => p.id === originalId || p.name === originalId);
-      if (targetIndex !== -1) {
-        roster[targetIndex] = { 
-          alliance: alliance,
-          name: name, 
-          id: id, 
-          power: parseInt(document.getElementById('edit-power').value) || 0, 
-          merits: parseInt(document.getElementById('edit-merits').value) || 0, 
-          kills: parseInt(document.getElementById('edit-kills').value) || 0, 
-          donation: parseInt(document.getElementById('edit-donation').value) || 0, 
-          buildTime: parseInt(document.getElementById('edit-buildTime').value) || 0, 
-          destructionTime: parseInt(document.getElementById('edit-destructionTime').value) || 0, 
-          help: parseInt(document.getElementById('edit-help').value) || 0, 
-          assistance: parseInt(document.getElementById('edit-assistance').value) || 0, 
-          timestamp: new Date().toISOString() 
-        };
-        saveDataToDisk();
-        closeEditModal();
-        updateUI();
-        triggerToast('success', `Successfully modified ${name}'s statistics.`);
-        pushToGoogleSheetsBackground();
-      }
+      const modal = document.getElementById('delete-modal');
+      const content = document.getElementById('delete-modal-content');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        content.classList.remove('scale-95');
+        content.classList.add('scale-100');
+      }, 10);
     }
 
-    function pushToGoogleSheets() {
-      if (!isUnlocked) { triggerToast('error', 'Authentication required.'); return; }
-      const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint || endpoint.includes("/s/xxxx/exec")) { triggerToast('error', 'Google API URL is invalid or missing.'); return; }
-      if (roster.length === 0) { triggerToast('error', 'No player data to transmit.'); return; }
+    function closeModal() {
+      const modal = document.getElementById('delete-modal');
+      const content = document.getElementById('delete-modal-content');
+      content.classList.remove('scale-100');
+      content.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        pendingDeletePlayerName = null;
+      }, 150);
+    }
 
+    function confirmDelete() {
+      if(!pendingDeletePlayerName) return;
+      
+      dbData = dbData.filter(p => p.name !== pendingDeletePlayerName);
       saveDataToDisk();
-      fetch(endpoint, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(roster) // Always pushes entire database
+      
+      // Cloud deletion mechanism
+      const url = getApiUrl();
+      fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'delete', name: pendingDeletePlayerName }),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      }).catch(e => console.log("Cloud delete failed"));
+
+      showToast(`Deleted ${pendingDeletePlayerName} from database`);
+      closeModal();
+      updateUI();
+    }
+
+    function pushDataToCloud(dataArray) {
+      const url = getApiUrl();
+      fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(dataArray),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       })
-      .then(() => triggerToast('success', 'Roster synced successfully with Google Sheets!'))
-      .catch(err => { 
-        console.error(err); 
-        triggerToast('error', 'Failed to push to Sheet. Check Web App configuration.'); 
+      .then(res => res.json())
+      .catch(err => {
+        console.error("Failed to push to cloud", err);
       });
-    }
-
-    function pullFromGoogleSheets() {
-      if (!isUnlocked) { triggerToast('error', 'Authentication required.'); return; }
-      const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint || endpoint.includes("/s/xxxx/exec")) { triggerToast('error', 'Google API Web App URL is invalid or missing.'); return; }
-
-      triggerToast('success', 'Pulling statistics...');
-      fetch(endpoint)
-      .then(res => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
-      .then(data => {
-        if (data && Array.isArray(data)) {
-          roster = data;
-          saveDataToDisk();
-          updateUI();
-          triggerToast('success', `Roster pulled! Loaded ${data.length} records.`);
-        } else {
-          triggerToast('error', 'Web App responded with unexpected data format.');
-        }
-      })
-      .catch(err => { 
-        console.error("Fetch Exception:", err); 
-        triggerToast('error', 'Failed to fetch from sheet. Please ensure your Google Apps Script is deployed with "Who has access: Anyone" and "Execute as: Me".'); 
-      });
-    }
-
-    function pushToGoogleSheetsBackground() {
-      const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint || endpoint.includes("/s/xxxx/exec")) return;
-      fetch(endpoint, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(roster)
-      }).catch(err => console.warn("Background push failed:", err));
-    }
-
-    // Identifies players by ID, or falls back to using their Name for shell profiles.
-    function getPlayerKey(p) {
-      if (p.id && String(p.id).trim() !== "") return String(p.id).trim();
-      return 'NAME_' + String(p.name).trim().toLowerCase();
-    }
-
-    async function syncDatabase() {
-      const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint || endpoint.includes("/s/xxxx/exec")) {
-        triggerToast('error', 'Please configure your API link inside Sheets Sync.');
-        if (isUnlocked) { switchTab('admin-portal'); switchAdminSubTab('sheets'); }
-        else { openPasswordModal(); }
-        return;
-      }
-
-      if (!isUnlocked) {
-        triggerToast('success', 'Establishing connection...');
-        try {
-          const res = await fetch(endpoint);
-          if (!res.ok) throw new Error("Fetch failed");
-          const sheetData = await res.json();
-          if (sheetData && Array.isArray(sheetData)) {
-            roster = sheetData;
-            saveDataToDisk();
-            updateUI();
-            triggerToast('success', 'Database updated with latest stats.');
-          }
-        } catch (err) { 
-          console.error(err);
-          triggerToast('error', 'Failed to pull updated stats. Ensure script access is open to "Anyone".'); 
-        }
-        return;
-      }
-
-      triggerToast('success', 'Reconciling secure database...');
-      try {
-        const res = await fetch(endpoint);
-        if (!res.ok) throw new Error("Fetch failed");
-        const sheetData = await res.json();
-        if (sheetData && Array.isArray(sheetData)) {
-          let maxSheetTime = 0;
-          sheetData.forEach(p => {
-            if (p.timestamp) {
-              const t = new Date(p.timestamp).getTime();
-              if (!isNaN(t) && t > maxSheetTime) maxSheetTime = t;
-            }
-          });
-
-          const mergedMap = new Map();
-          const sheetPlayerKeys = new Set(sheetData.map(getPlayerKey));
-
-          roster.forEach(localPlayer => {
-            const localKey = getPlayerKey(localPlayer);
-            const localTime = new Date(localPlayer.timestamp || 0).getTime();
-            if (!sheetPlayerKeys.has(localKey)) {
-              if (localTime > maxSheetTime) mergedMap.set(localKey, localPlayer);
-            } else {
-              mergedMap.set(localKey, localPlayer);
-            }
-          });
-
-          sheetData.forEach(sheetPlayer => {
-            const sheetKey = getPlayerKey(sheetPlayer);
-            if (mergedMap.has(sheetKey)) {
-              const localPlayer = mergedMap.get(sheetKey);
-              const localTime = new Date(localPlayer.timestamp || 0).getTime();
-              const sheetTime = new Date(sheetPlayer.timestamp || 0).getTime();
-              if (sheetTime >= localTime) {
-                mergedMap.set(sheetKey, {
-                  alliance: sheetPlayer.alliance ? String(sheetPlayer.alliance).trim() : "Wrath of God",
-                  name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
-                  id: sheetPlayer.id ? String(sheetPlayer.id).trim() : "",
-                  power: Number(sheetPlayer.power) || 0,
-                  merits: Number(sheetPlayer.merits) || 0,
-                  kills: Number(sheetPlayer.kills) || 0,
-                  donation: Number(sheetPlayer.donation) || 0,
-                  buildTime: Number(sheetPlayer.buildTime) || 0,
-                  destructionTime: Number(sheetPlayer.destructionTime) || 0,
-                  help: Number(sheetPlayer.help) || 0,
-                  assistance: Number(sheetPlayer.assistance) || 0,
-                  timestamp: sheetPlayer.timestamp || new Date().toISOString()
-                });
-              }
-            } else {
-              mergedMap.set(sheetKey, {
-                alliance: sheetPlayer.alliance ? String(sheetPlayer.alliance).trim() : "Wrath of God",
-                name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
-                id: sheetPlayer.id ? String(sheetPlayer.id).trim() : "",
-                power: Number(sheetPlayer.power) || 0,
-                merits: Number(sheetPlayer.merits) || 0,
-                kills: Number(sheetPlayer.kills) || 0,
-                donation: Number(sheetPlayer.donation) || 0,
-                buildTime: Number(sheetPlayer.buildTime) || 0,
-                destructionTime: Number(sheetPlayer.destructionTime) || 0,
-                help: Number(sheetPlayer.help) || 0,
-                assistance: Number(sheetPlayer.assistance) || 0,
-                timestamp: sheetPlayer.timestamp || new Date().toISOString()
-              });
-            }
-          });
-
-          roster = Array.from(mergedMap.values());
-          saveDataToDisk();
-          updateUI();
-
-          await fetch(endpoint, { method: "POST", mode: "no-cors", body: JSON.stringify(roster) });
-          triggerToast('success', 'Database synced cleanly with Google Sheets!');
-        }
-      } catch (err) { 
-        console.error(err);
-        triggerToast('error', 'Synchronization pipeline failure. Please check web app config.'); 
-      }
-    }
-
-    async function autoPullOnLoad() {
-      const endpoint = document.getElementById('sheets-endpoint').value.trim();
-      if (!endpoint || endpoint.includes("/s/xxxx/exec")) return;
-      try {
-        const res = await fetch(endpoint);
-        if (!res.ok) return;
-        const sheetData = await res.json();
-        if (sheetData && Array.isArray(sheetData)) {
-          if (!isUnlocked) {
-            roster = sheetData;
-          } else {
-            let maxSheetTime = 0;
-            sheetData.forEach(p => {
-              if (p.timestamp) {
-                const t = new Date(p.timestamp).getTime();
-                if (!isNaN(t) && t > maxSheetTime) maxSheetTime = t;
-              }
-            });
-
-            const localMap = new Map();
-            const sheetPlayerKeys = new Set(sheetData.map(getPlayerKey));
-
-            roster.forEach(localPlayer => {
-              const localKey = getPlayerKey(localPlayer);
-              const localTime = new Date(localPlayer.timestamp || 0).getTime();
-              if (!sheetPlayerKeys.has(localKey)) {
-                if (localTime > maxSheetTime) localMap.set(localKey, localPlayer);
-              } else {
-                localMap.set(localKey, localPlayer);
-              }
-            });
-            
-            sheetData.forEach(sheetPlayer => {
-              const sheetKey = getPlayerKey(sheetPlayer);
-              if (localMap.has(sheetKey)) {
-                const localPlayer = localMap.get(sheetKey);
-                const localTime = new Date(localPlayer.timestamp || 0).getTime();
-                const sheetTime = new Date(sheetPlayer.timestamp || 0).getTime();
-                if (sheetTime >= localTime) {
-                  localMap.set(sheetKey, {
-                    alliance: sheetPlayer.alliance ? String(sheetPlayer.alliance).trim() : "Wrath of God",
-                    name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
-                    id: sheetPlayer.id ? String(sheetPlayer.id).trim() : "",
-                    power: Number(sheetPlayer.power) || 0,
-                    merits: Number(sheetPlayer.merits) || 0,
-                    kills: Number(sheetPlayer.kills) || 0,
-                    donation: Number(sheetPlayer.donation) || 0,
-                    buildTime: Number(sheetPlayer.buildTime) || 0,
-                    destructionTime: Number(sheetPlayer.destructionTime) || 0,
-                    help: Number(sheetPlayer.help) || 0,
-                    assistance: Number(sheetPlayer.assistance) || 0,
-                    timestamp: sheetPlayer.timestamp || new Date().toISOString()
-                  });
-                }
-              } else {
-                localMap.set(sheetKey, {
-                  alliance: sheetPlayer.alliance ? String(sheetPlayer.alliance).trim() : "Wrath of God",
-                  name: sheetPlayer.name ? String(sheetPlayer.name).trim() : "Unknown",
-                  id: sheetPlayer.id ? String(sheetPlayer.id).trim() : "",
-                  power: Number(sheetPlayer.power) || 0,
-                  merits: Number(sheetPlayer.merits) || 0,
-                  kills: Number(sheetPlayer.kills) || 0,
-                  donation: Number(sheetPlayer.donation) || 0,
-                  buildTime: Number(sheetPlayer.buildTime) || 0,
-                  destructionTime: Number(sheetPlayer.destructionTime) || 0,
-                  help: Number(sheetPlayer.help) || 0,
-                  assistance: Number(sheetPlayer.assistance) || 0,
-                  timestamp: sheetPlayer.timestamp || new Date().toISOString()
-                });
-              }
-            });
-            roster = Array.from(localMap.values());
-          }
-          saveDataToDisk();
-          updateUI();
-        }
-      } catch (err) {
-        console.warn("Background pull load failed:", err);
-      }
     }
   </script>
 </body>
