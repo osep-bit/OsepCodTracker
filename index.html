@@ -163,6 +163,40 @@
           </button>
         </div>
 
+        <!-- Dynamic Summary Tiles -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" id="summary-tiles">
+          <div class="bg-codCard border border-codBorder rounded-2xl p-5 shadow-sm flex items-center space-x-4">
+            <div class="p-3 bg-gray-500/10 text-gray-400 rounded-xl">
+              <i data-lucide="zap" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-[10px] text-codTextMuted font-bold uppercase tracking-wider">Total Power</p>
+              <h4 id="summary-power" class="text-xl font-black text-white font-mono mt-0.5">0</h4>
+            </div>
+          </div>
+          
+          <div class="bg-codCard border border-codBorder rounded-2xl p-5 shadow-sm flex items-center space-x-4">
+            <div class="p-3 bg-red-500/10 text-red-400 rounded-xl">
+              <i data-lucide="swords" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-[10px] text-codTextMuted font-bold uppercase tracking-wider">Total Merits</p>
+              <h4 id="summary-merits" class="text-xl font-black text-white font-mono mt-0.5">0</h4>
+            </div>
+          </div>
+          
+          <div class="bg-codCard border border-codAccent/30 rounded-2xl p-5 shadow-[0_0_15px_rgba(223,161,59,0.05)] flex items-center space-x-4 relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-16 h-16 bg-codAccent/5 rounded-bl-full pointer-events-none"></div>
+            <div class="p-3 bg-codAccent/10 text-codAccent rounded-xl">
+              <i data-lucide="crown" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-[10px] text-codAccent/80 font-bold uppercase tracking-wider">Total Wrath Points</p>
+              <h4 id="summary-wp" class="text-xl font-black text-codAccent font-mono mt-0.5">0.00</h4>
+            </div>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           <div class="bg-codCard border border-codAccent/30 rounded-2xl p-6 shadow-[0_0_30px_rgba(223,161,59,0.1)] lg:col-span-2 relative overflow-hidden">
@@ -601,9 +635,14 @@
             updateUI();
             
             const now = new Date();
-            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const formattedDate = now.toLocaleString('en-US', { 
+              month: 'short', 
+              day: 'numeric', 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            });
             const syncLabel = document.getElementById('last-sync-time');
-            if (syncLabel) syncLabel.textContent = `Last sync: Today at ${timeString}`;
+            if (syncLabel) syncLabel.textContent = `Last sync: ${formattedDate}`;
             
             showToast(`Synchronized ${data.length} records from Cloud`);
           } else {
@@ -696,6 +735,19 @@
       let filtered = dbData.filter(p => activeAllianceFilter === 'All' || p.alliance === activeAllianceFilter);
       filtered = attachWP(filtered); // Ensure WP is attached
       
+      // Update Summary Tiles
+      let sumPower = filtered.reduce((acc, p) => acc + (p.power || 0), 0);
+      let sumMerits = filtered.reduce((acc, p) => acc + (p.merits || 0), 0);
+      let sumWP = filtered.reduce((acc, p) => acc + (p.wp || 0), 0);
+
+      const elPower = document.getElementById('summary-power');
+      const elMerits = document.getElementById('summary-merits');
+      const elWP = document.getElementById('summary-wp');
+
+      if(elPower) elPower.textContent = formatNumber(sumPower);
+      if(elMerits) elMerits.textContent = formatNumber(sumMerits);
+      if(elWP) elWP.textContent = sumWP.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
       let topWP = [...filtered].sort((a,b) => (b.wp||0) - (a.wp||0)).slice(0, 10);
       let topPower = [...filtered].sort((a,b) => (b.power||0) - (a.power||0)).slice(0, 10);
       let topMerits = [...filtered].sort((a,b) => (b.merits||0) - (a.merits||0)).slice(0, 10);
@@ -900,7 +952,7 @@
         destructionTime: parseInt(document.getElementById('form-destruct').value) || 0,
         help: parseInt(document.getElementById('form-help').value) || 0,
         assistance: parseInt(document.getElementById('form-asst').value) || 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
       };
 
       let existingIndex = dbData.findIndex(p => (id && p.id == id) || p.name.toLowerCase() === name.toLowerCase());
