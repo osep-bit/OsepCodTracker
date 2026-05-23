@@ -6,6 +6,8 @@
   <title>Wrath Family S949 Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Added Chart.js for the Analytics Dashboard -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -92,6 +94,15 @@
       
       <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
         <div class="text-[10px] font-bold text-codTextMuted uppercase tracking-widest mb-3 ml-2 mt-4">Overview Dashboard</div>
+        
+        <!-- Added Overview Analytics Tab -->
+        <a href="#" onclick="switchView('overview', event)" id="nav-overview" class="flex items-center justify-between px-4 py-3 rounded-xl text-codTextMuted hover:bg-codBorder/50 hover:text-white transition font-medium">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+            <span class="text-sm">Analytics Hub</span>
+          </div>
+        </a>
+
         <a href="#" onclick="switchView('roster', event)" id="nav-roster" class="flex items-center justify-between px-4 py-3 rounded-xl bg-codAccent/10 text-codAccent font-semibold transition group">
           <div class="flex items-center space-x-3">
             <i data-lucide="users" class="w-4 h-4"></i>
@@ -121,21 +132,81 @@
       </div>
     </aside>
 
-    <!-- MAIN CONTENT (Reverted to natural scrolling) -->
+    <!-- MAIN CONTENT -->
     <main id="main-content" class="flex-1 p-4 sm:p-8 overflow-y-auto relative z-10">
       <button class="md:hidden mb-4 text-codTextMuted hover:text-white flex items-center space-x-2 bg-codCard border border-codBorder px-3 py-2 rounded-lg w-max" onclick="toggleSidebar(true)">
         <i data-lucide="menu" class="w-5 h-5"></i>
         <span class="text-sm font-semibold">Menu</span>
       </button>
 
+      <!-- ==================== OVERVIEW ANALYTICS VIEW ==================== -->
+      <div id="overview-view" class="fade-in hidden relative">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center space-x-3">
+              <span>Analytics Hub</span>
+              <span class="active-alliance-badge text-xs bg-codAccent/10 text-codAccent border border-codAccent/20 px-2 py-1 rounded-md uppercase tracking-wider font-bold">ALL</span>
+            </h2>
+            <p class="text-sm text-codTextMuted mt-1">Visual performance metrics and top contributors.</p>
+          </div>
+          <button onclick="syncDatabase()" class="mt-4 sm:mt-0 flex items-center space-x-2 bg-codCard border border-codBorder hover:border-codAccent/50 px-4 py-2.5 rounded-xl transition group shadow-sm">
+            <i data-lucide="refresh-cw" class="w-4 h-4 text-codAccent group-hover:rotate-180 transition duration-500"></i>
+            <span class="text-sm font-semibold text-gray-300 group-hover:text-white">Sync Database</span>
+          </button>
+        </div>
+
+        <!-- Reusable Alliance Filters -->
+        <div class="flex flex-wrap gap-3 mb-6">
+          <button onclick="filterAlliance('All')" data-alliance="All" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codAccent text-black shadow-lg shadow-codAccent/20">
+            <span>🌍</span><span>Family Overall</span>
+          </button>
+          <button onclick="filterAlliance('Wrath of God')" data-alliance="Wrath of God" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
+            <span>⚔️</span><span>Wrath of God</span>
+          </button>
+          <button onclick="filterAlliance('Wrath of Power')" data-alliance="Wrath of Power" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
+            <span>🛡️</span><span>Wrath of Power</span>
+          </button>
+          <button onclick="filterAlliance('Wrath of Justice')" data-alliance="Wrath of Justice" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
+            <span>⚖️</span><span>Wrath of Justice</span>
+          </button>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-codCard border border-codBorder rounded-2xl p-6 shadow-xl">
+            <h3 class="text-white font-bold mb-4 flex items-center space-x-2">
+              <i data-lucide="zap" class="w-5 h-5 text-codAccent"></i>
+              <span>Top 10 Power</span>
+            </h3>
+            <div class="h-64 relative"><canvas id="powerChart"></canvas></div>
+          </div>
+          
+          <div class="bg-codCard border border-codBorder rounded-2xl p-6 shadow-xl">
+            <h3 class="text-white font-bold mb-4 flex items-center space-x-2">
+              <i data-lucide="award" class="w-5 h-5 text-red-400"></i>
+              <span>Top 10 Merits</span>
+            </h3>
+            <div class="h-64 relative"><canvas id="meritsChart"></canvas></div>
+          </div>
+          
+          <div class="bg-codCard border border-codBorder rounded-2xl p-6 shadow-xl lg:col-span-2">
+            <h3 class="text-white font-bold mb-4 flex items-center space-x-2">
+              <i data-lucide="heart-handshake" class="w-5 h-5 text-green-400"></i>
+              <span>Top 10 Support (Donations + Help)</span>
+            </h3>
+            <div class="h-64 relative"><canvas id="supportChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
       <!-- ==================== ROSTER DIRECTORY VIEW ==================== -->
-      <div id="roster-view" class="fade-in active-view">
+      <div id="roster-view" class="fade-in active-view relative">
         
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>
             <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center space-x-3">
               <span>Roster Directory</span>
-              <span id="active-alliance-badge" class="text-xs bg-codAccent/10 text-codAccent border border-codAccent/20 px-2 py-1 rounded-md uppercase tracking-wider font-bold">ALL</span>
+              <span class="active-alliance-badge text-xs bg-codAccent/10 text-codAccent border border-codAccent/20 px-2 py-1 rounded-md uppercase tracking-wider font-bold">ALL</span>
             </h2>
             <p class="text-sm text-codTextMuted mt-1">Live tracking of merits, power, and contributions.</p>
           </div>
@@ -146,16 +217,16 @@
         </div>
 
         <div class="flex flex-wrap gap-3 mb-6">
-          <button onclick="filterAlliance('All', this)" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codAccent text-black shadow-lg shadow-codAccent/20">
+          <button onclick="filterAlliance('All')" data-alliance="All" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codAccent text-black shadow-lg shadow-codAccent/20">
             <span>🌍</span><span>Family Overall</span>
           </button>
-          <button onclick="filterAlliance('Wrath of God', this)" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
+          <button onclick="filterAlliance('Wrath of God')" data-alliance="Wrath of God" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
             <span>⚔️</span><span>Wrath of God</span>
           </button>
-          <button onclick="filterAlliance('Wrath of Power', this)" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
+          <button onclick="filterAlliance('Wrath of Power')" data-alliance="Wrath of Power" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
             <span>🛡️</span><span>Wrath of Power</span>
           </button>
-          <button onclick="filterAlliance('Wrath of Justice', this)" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
+          <button onclick="filterAlliance('Wrath of Justice')" data-alliance="Wrath of Justice" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500">
             <span>⚖️</span><span>Wrath of Justice</span>
           </button>
         </div>
@@ -177,7 +248,6 @@
           </div>
         </div>
 
-        <!-- REVERTED TABLE CONTAINER -->
         <div class="bg-codCard border border-codBorder rounded-2xl overflow-hidden relative shadow-xl">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse min-w-[1200px]">
@@ -368,6 +438,9 @@
     let pendingDeletePlayerName = null; 
     let activeAdminSubTab = 'roster-admin'; 
     let activeAllianceFilter = 'All'; 
+    
+    // Global Chart Objects
+    let charts = { powerChart: null, meritsChart: null, supportChart: null };
 
     window.onload = function() {
       lucide.createIcons();
@@ -444,23 +517,37 @@
     function switchView(viewId, event = null) {
       if (event) { event.preventDefault(); toggleSidebar(false); }
       
-      document.getElementById('roster-view').classList.remove('active-view');
-      document.getElementById('roster-view').classList.add('hidden');
-      document.getElementById('admin-view').classList.remove('active-view');
-      document.getElementById('admin-view').classList.add('hidden');
+      // Reset all views and nav links
+      ['overview', 'roster', 'admin'].forEach(v => {
+        const el = document.getElementById(v + '-view');
+        if(el) {
+          el.classList.remove('active-view');
+          el.classList.add('hidden');
+        }
+        const nav = document.getElementById('nav-' + v);
+        if(nav) {
+          nav.classList.remove('bg-codAccent/10', 'text-codAccent', 'font-semibold');
+          nav.classList.add('text-codTextMuted', 'font-medium');
+        }
+      });
       
-      document.getElementById('nav-roster').classList.remove('bg-codAccent/10', 'text-codAccent');
-      document.getElementById('nav-roster').classList.add('text-codTextMuted');
-      document.getElementById('nav-admin').classList.remove('bg-codAccent/10', 'text-codAccent');
-      document.getElementById('nav-admin').classList.add('text-codTextMuted');
-      
+      // Set active view and nav link
       const targetView = document.getElementById(viewId + '-view');
-      targetView.classList.remove('hidden');
-      targetView.classList.add('active-view');
+      if (targetView) {
+        targetView.classList.remove('hidden');
+        targetView.classList.add('active-view');
+      }
       
       const targetNav = document.getElementById('nav-' + viewId);
-      targetNav.classList.remove('text-codTextMuted');
-      targetNav.classList.add('bg-codAccent/10', 'text-codAccent');
+      if (targetNav) {
+        targetNav.classList.remove('text-codTextMuted', 'font-medium');
+        targetNav.classList.add('bg-codAccent/10', 'text-codAccent', 'font-semibold');
+      }
+
+      // If switching to Overview, ensure charts re-render visually
+      if (viewId === 'overview') {
+        setTimeout(renderCharts, 50); 
+      }
     }
 
     function toggleAdminSubTab(tabId) {
@@ -500,7 +587,7 @@
         .then(res => res.json())
         .then(data => {
           if (data && data.length >= 0) {
-            mergeDataSafely(data);
+            dbData = data; 
             saveDataToDisk();
             updateUI();
           }
@@ -520,7 +607,7 @@
         .then(response => response.json())
         .then(data => {
           if(data && data.length >= 0) {
-            mergeDataSafely(data);
+            dbData = data; 
             saveDataToDisk();
             updateUI();
             
@@ -539,32 +626,10 @@
           console.error("Fetch Error:", error);
         })
         .finally(() => {
-          if (icon) icon.classList.remove('animate-spin');
+          const currentIcon = btn ? (btn.querySelector('svg') || btn.querySelector('i')) : null;
+          if (currentIcon) currentIcon.classList.remove('animate-spin');
           if (btn) btn.classList.remove('opacity-75', 'cursor-not-allowed');
         });
-    }
-
-    function mergeDataSafely(cloudData) {
-       cloudData.forEach(cloudPlayer => {
-          if (!cloudPlayer.name) return;
-          
-          let existingIndex = dbData.findIndex(p => 
-            (cloudPlayer.id && p.id == cloudPlayer.id) || 
-            p.name.toLowerCase() === cloudPlayer.name.toLowerCase()
-          );
-
-          if (existingIndex > -1) {
-             let localPlayer = dbData[existingIndex];
-             let cloudTime = new Date(cloudPlayer.timestamp || 0).getTime();
-             let localTime = new Date(localPlayer.timestamp || 0).getTime();
-
-             if (cloudTime > localTime) {
-                dbData[existingIndex] = cloudPlayer;
-             }
-          } else {
-             dbData.push(cloudPlayer);
-          }
-       });
     }
 
     function saveDataToDisk() {
@@ -583,20 +648,81 @@
     function updateUI() {
       document.getElementById('nav-total-members').textContent = dbData.length;
       renderTable();
+      renderCharts();
       if(activeAdminSubTab === 'manage-dir') renderAdminTable();
     }
 
-    function filterAlliance(allianceName, btnElement) {
+    function filterAlliance(allianceName) {
       activeAllianceFilter = allianceName;
-      document.getElementById('active-alliance-badge').textContent = allianceName === 'All' ? 'ALL' : allianceName;
       
-      document.querySelectorAll('.alliance-tab').forEach(btn => {
-        btn.className = "alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500";
+      // Update ALL alliance badges on the screen
+      document.querySelectorAll('.active-alliance-badge').forEach(badge => {
+        badge.textContent = allianceName === 'All' ? 'ALL' : allianceName;
       });
       
-      btnElement.className = "alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codAccent text-black shadow-lg shadow-codAccent/20";
+      // Update ALL alliance buttons
+      document.querySelectorAll('.alliance-tab').forEach(btn => {
+        if (btn.dataset.alliance === allianceName) {
+          btn.className = "alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codAccent text-black shadow-lg shadow-codAccent/20";
+        } else {
+          btn.className = "alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codCard border border-codBorder text-codTextMuted hover:text-white hover:border-gray-500";
+        }
+      });
       
       renderTable();
+      renderCharts();
+    }
+
+    // ================== ANALYTICS CHARTS ENGINE ==================
+    function renderCharts() {
+      let filtered = dbData.filter(p => activeAllianceFilter === 'All' || p.alliance === activeAllianceFilter);
+      
+      // Grab Top 10 Arrays
+      let topPower = [...filtered].sort((a,b) => (b.power||0) - (a.power||0)).slice(0, 10);
+      let topMerits = [...filtered].sort((a,b) => (b.merits||0) - (a.merits||0)).slice(0, 10);
+      let topSupport = [...filtered].sort((a,b) => ((b.donation||0)+(b.help||0)) - ((a.donation||0)+(a.help||0))).slice(0, 10);
+
+      updateChart('powerChart', topPower, 'Power', 'power', '#dfa13b');
+      updateChart('meritsChart', topMerits, 'Merits', 'merits', '#f87171');
+      updateChart('supportChart', topSupport, 'Support Points', p => (p.donation||0) + (p.help||0), '#4ade80');
+    }
+
+    function updateChart(canvasId, dataArr, label, dataKey, colorHex) {
+      const ctx = document.getElementById(canvasId);
+      if(!ctx) return;
+      
+      const labels = dataArr.map(p => p.name);
+      const data = dataArr.map(p => typeof dataKey === 'function' ? dataKey(p) : p[dataKey]);
+
+      if (charts[canvasId]) {
+         charts[canvasId].data.labels = labels;
+         charts[canvasId].data.datasets[0].data = data;
+         charts[canvasId].update();
+      } else {
+         charts[canvasId] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+               labels: labels,
+               datasets: [{
+                  label: label,
+                  data: data,
+                  backgroundColor: colorHex + '80', 
+                  borderColor: colorHex,
+                  borderWidth: 1,
+                  borderRadius: 4
+               }]
+            },
+            options: {
+               responsive: true,
+               maintainAspectRatio: false,
+               plugins: { legend: { display: false } },
+               scales: {
+                  y: { ticks: { color: '#8b949e' }, grid: { color: '#2a303c' } },
+                  x: { ticks: { color: '#8b949e', maxRotation: 45, minRotation: 45 }, grid: { display: false } }
+               }
+            }
+         });
+      }
     }
 
     function formatNumber(num) {
