@@ -678,13 +678,13 @@
       
       return dataArr.map(p => {
         let wp = 0;
-        wp += ((p.power || 0) / max.power) * 5;           // 5% Weight
+        wp += ((p.power || 0) / max.power) * 15;          // 15% Weight
         wp += ((p.merits || 0) / max.merits) * 20;        // 20% Weight
-        wp += ((p.donation || 0) / max.donation) * 25;    // 25% Weight
-        wp += ((p.buildTime || 0) / max.buildTime) * 10;  // 10% Weight
-        wp += ((p.destructionTime || 0) / max.destructionTime) * 10; // 10% Weight
-        wp += ((p.help || 0) / max.help) * 15;            // 15% Weight
-        wp += ((p.assistance || 0) / max.assistance) * 15;// 15% Weight
+        wp += ((p.donation || 0) / max.donation) * 23;    // 23% Weight
+        wp += ((p.buildTime || 0) / max.buildTime) * 5;   // 5% Weight
+        wp += ((p.destructionTime || 0) / max.destructionTime) * 5;  // 5% Weight
+        wp += ((p.help || 0) / max.help) * 16;            // 16% Weight
+        wp += ((p.assistance || 0) / max.assistance) * 16;// 16% Weight
         
         p.wp = parseFloat(wp.toFixed(2)); 
         return p;
