@@ -224,7 +224,7 @@
           </div>
           
           <!-- Empty State -->
-          <div id="empty-state" class="hidden absolute inset-0 flex flex-col items-center justify-center p-12 text-center bg-codCard z-10 pointer-events-none">
+          <div id="empty-state" class="hidden absolute inset-0 flex flex-col items-center justify-center p-12 text-center bg-codCard z-30 pointer-events-none">
             <div class="w-16 h-16 bg-codDark border border-codBorder rounded-full flex items-center justify-center mb-4">
               <i data-lucide="database" class="w-8 h-8 text-codTextMuted"></i>
             </div>
@@ -395,7 +395,7 @@
   <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3"></div>
 
   <script>
-    const DEFAULT_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyq8X7f5n2R-T76E87sU6Z6QjOq0O82J3-Q4uF50H6XWjF4P_L4E3E-L4C4I2G5W_J8/exec";
+    const DEFAULT_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyI3Jwp99-SXyKjTr9f6xCA1nof-vubaHgd0VkHW7-e7ePAK9f7U9orflKeQeIpwaYUjA/exec";
     
     let dbData = []; 
     let pendingDeletePlayerName = null; 
@@ -526,11 +526,11 @@
     }
 
     function getApiUrl() {
-      return localStorage.getItem('custom_sheets_api_url') || DEFAULT_SHEETS_API_URL;
+      return DEFAULT_SHEETS_API_URL;
     }
     
     function autoPullOnLoad() {
-      const url = getApiUrl();
+      const url = getApiUrl().trim();
       fetch(url)
         .then(res => res.json())
         .then(data => {
@@ -551,7 +551,7 @@
       if (icon) icon.classList.add('animate-spin');
       if (btn) btn.classList.add('opacity-75', 'cursor-not-allowed');
       
-      const url = getApiUrl();
+      const url = getApiUrl().trim();
       fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -843,11 +843,11 @@
       saveDataToDisk();
       
       // Cloud deletion mechanism
-      const url = getApiUrl();
+      const url = getApiUrl().trim();
       fetch(url, {
         method: 'POST',
         body: JSON.stringify({ action: 'delete', name: pendingDeletePlayerName }),
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
       }).catch(e => console.log("Cloud delete failed"));
 
       showToast(`Deleted ${pendingDeletePlayerName} from database`);
@@ -856,11 +856,11 @@
     }
 
     function pushDataToCloud(dataArray) {
-      const url = getApiUrl();
+      const url = getApiUrl().trim();
       fetch(url, {
         method: 'POST',
         body: JSON.stringify(dataArray),
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
       })
       .then(res => res.json())
       .catch(err => {
