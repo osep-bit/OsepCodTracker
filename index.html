@@ -6,7 +6,6 @@
   <title>Wrath Family S949 Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Added Chart.js for the Analytics Dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     tailwind.config = {
@@ -30,7 +29,7 @@
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
     
     body { font-family: 'Inter', sans-serif; }
 
@@ -50,7 +49,6 @@
 </head>
 <body class="bg-codDark text-gray-200 font-sans min-h-screen flex flex-col relative">
 
-  <!-- ==================== WELCOME SPLASH SCREEN ==================== -->
   <div id="welcome-splash" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[100] transition-opacity duration-500">
     <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-8 shadow-2xl scale-95 transition-transform text-center mx-4 flex flex-col items-center">
       <div class="w-16 h-16 bg-codAccent/10 text-codAccent rounded-2xl flex items-center justify-center mb-6 border border-codAccent/20 shadow-lg shadow-codAccent/10">
@@ -72,10 +70,8 @@
 
   <div class="flex flex-1 w-full overflow-hidden relative">
     
-    <!-- BACKDROP FOR MOBILE SIDEBAR -->
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden" onclick="toggleSidebar(false)"></div>
 
-    <!-- SIDEBAR -->
     <aside id="sidebar" class="w-64 bg-codCard border-r border-codBorder flex flex-col fixed md:relative z-30 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
       <div class="p-6 border-b border-codBorder flex items-center justify-between">
         <div class="flex items-center space-x-3">
@@ -95,7 +91,6 @@
       <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
         <div class="text-[10px] font-bold text-codTextMuted uppercase tracking-widest mb-3 ml-2 mt-4">Overview Dashboard</div>
         
-        <!-- Added Overview Analytics Tab -->
         <a href="#" onclick="switchView('overview', event)" id="nav-overview" class="flex items-center justify-between px-4 py-3 rounded-xl text-codTextMuted hover:bg-codBorder/50 hover:text-white transition font-medium">
           <div class="flex items-center space-x-3">
             <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
@@ -132,14 +127,12 @@
       </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main id="main-content" class="flex-1 p-4 sm:p-8 overflow-y-auto relative z-10">
       <button class="md:hidden mb-4 text-codTextMuted hover:text-white flex items-center space-x-2 bg-codCard border border-codBorder px-3 py-2 rounded-lg w-max" onclick="toggleSidebar(true)">
         <i data-lucide="menu" class="w-5 h-5"></i>
         <span class="text-sm font-semibold">Menu</span>
       </button>
 
-      <!-- ==================== OVERVIEW ANALYTICS VIEW ==================== -->
       <div id="overview-view" class="fade-in hidden relative">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>
@@ -147,7 +140,7 @@
               <span>Analytics Hub</span>
               <span class="active-alliance-badge text-xs bg-codAccent/10 text-codAccent border border-codAccent/20 px-2 py-1 rounded-md uppercase tracking-wider font-bold">ALL</span>
             </h2>
-            <p class="text-sm text-codTextMuted mt-1">Visual performance metrics and top contributors.</p>
+            <p class="text-sm text-codTextMuted mt-1">Visual performance metrics and overall MVP rankings.</p>
           </div>
           <button onclick="syncDatabase()" class="mt-4 sm:mt-0 flex items-center space-x-2 bg-codCard border border-codBorder hover:border-codAccent/50 px-4 py-2.5 rounded-xl transition group shadow-sm">
             <i data-lucide="refresh-cw" class="w-4 h-4 text-codAccent group-hover:rotate-180 transition duration-500"></i>
@@ -155,7 +148,6 @@
           </button>
         </div>
 
-        <!-- Reusable Alliance Filters -->
         <div class="flex flex-wrap gap-3 mb-6">
           <button onclick="filterAlliance('All')" data-alliance="All" class="alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codAccent text-black shadow-lg shadow-codAccent/20">
             <span>🌍</span><span>Family Overall</span>
@@ -171,11 +163,20 @@
           </button>
         </div>
 
-        <!-- Charts Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <div class="bg-codCard border border-codAccent/30 rounded-2xl p-6 shadow-[0_0_30px_rgba(223,161,59,0.1)] lg:col-span-2 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-codAccent/5 rounded-bl-full pointer-events-none"></div>
+            <h3 class="text-white font-black text-xl mb-6 flex items-center space-x-3">
+              <i data-lucide="crown" class="w-6 h-6 text-codAccent"></i>
+              <span>Top 10 Overall MVPs (Wrath Points)</span>
+            </h3>
+            <div class="h-80 relative"><canvas id="wpChart"></canvas></div>
+          </div>
+
           <div class="bg-codCard border border-codBorder rounded-2xl p-6 shadow-xl">
             <h3 class="text-white font-bold mb-4 flex items-center space-x-2">
-              <i data-lucide="zap" class="w-5 h-5 text-codAccent"></i>
+              <i data-lucide="zap" class="w-5 h-5 text-gray-400"></i>
               <span>Top 10 Power</span>
             </h3>
             <div class="h-64 relative"><canvas id="powerChart"></canvas></div>
@@ -183,7 +184,7 @@
           
           <div class="bg-codCard border border-codBorder rounded-2xl p-6 shadow-xl">
             <h3 class="text-white font-bold mb-4 flex items-center space-x-2">
-              <i data-lucide="award" class="w-5 h-5 text-red-400"></i>
+              <i data-lucide="swords" class="w-5 h-5 text-red-400"></i>
               <span>Top 10 Merits</span>
             </h3>
             <div class="h-64 relative"><canvas id="meritsChart"></canvas></div>
@@ -199,7 +200,6 @@
         </div>
       </div>
 
-      <!-- ==================== ROSTER DIRECTORY VIEW ==================== -->
       <div id="roster-view" class="fade-in active-view relative">
         
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
@@ -208,7 +208,7 @@
               <span>Roster Directory</span>
               <span class="active-alliance-badge text-xs bg-codAccent/10 text-codAccent border border-codAccent/20 px-2 py-1 rounded-md uppercase tracking-wider font-bold">ALL</span>
             </h2>
-            <p class="text-sm text-codTextMuted mt-1">Live tracking of merits, power, and contributions.</p>
+            <p class="text-sm text-codTextMuted mt-1">Live tracking of overall impact, stats, and contributions.</p>
           </div>
           <button onclick="syncDatabase()" id="sync-btn" class="mt-4 sm:mt-0 flex items-center space-x-2 bg-codCard border border-codBorder hover:border-codAccent/50 px-4 py-2.5 rounded-xl transition group shadow-sm">
             <i data-lucide="refresh-cw" class="w-4 h-4 text-codAccent group-hover:rotate-180 transition duration-500"></i>
@@ -239,9 +239,9 @@
           <div class="w-full sm:w-auto flex items-center space-x-2 shrink-0">
             <label class="text-xs font-bold text-codTextMuted uppercase tracking-wider ml-1 sm:ml-0">Sort:</label>
             <select id="sort-select" class="bg-codDark border border-codBorder text-white text-sm rounded-xl py-2.5 px-4 focus:outline-none focus:border-codAccent appearance-none cursor-pointer pr-10" onchange="renderTable()" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238b949e%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1em;">
+              <option value="wp">Highest Wrath Points</option>
               <option value="merits">Highest Merits</option>
               <option value="power">Highest Power</option>
-              <option value="kills">Highest Kills</option>
               <option value="donation">Highest Donation</option>
               <option value="help">Highest Help</option>
             </select>
@@ -253,11 +253,12 @@
             <table class="w-full text-left border-collapse min-w-[1200px]">
               <thead>
                 <tr class="bg-codDark/30 border-b border-codBorder text-[10px] font-bold uppercase tracking-wider text-codTextMuted">
+                  <th class="py-4 px-4 w-12 text-center">Rank</th>
                   <th class="py-4 px-6">Player Identity</th>
                   <th class="py-4 px-6">ID Code</th>
+                  <th class="py-4 px-6 text-codAccent tracking-widest"><i data-lucide="crown" class="w-3 h-3 inline mr-1 mb-0.5"></i>Wrath Points</th>
                   <th class="py-4 px-6">Power</th>
-                  <th class="py-4 px-6 text-codAccent">Merit Count</th>
-                  <th class="py-4 px-6 text-green-400">Kill Points</th>
+                  <th class="py-4 px-6">Merits</th>
                   <th class="py-4 px-6 text-orange-400">Donation</th>
                   <th class="py-4 px-6 text-orange-400">Build</th>
                   <th class="py-4 px-6 text-orange-400">Destruct.</th>
@@ -266,8 +267,7 @@
                 </tr>
               </thead>
               <tbody id="roster-tbody" class="text-sm">
-                <!-- Javascript will populate rows here -->
-              </tbody>
+                </tbody>
             </table>
           </div>
           
@@ -281,7 +281,6 @@
         </div>
       </div>
 
-      <!-- ==================== ADMIN PORTAL VIEW ==================== -->
       <div id="admin-view" class="fade-in hidden relative">
         <div id="admin-auth" class="absolute inset-0 bg-codDark z-50 flex items-start justify-center pt-20">
           <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-8 shadow-2xl text-center">
@@ -309,7 +308,6 @@
           <button id="tab-manage-dir" onclick="toggleAdminSubTab('manage-dir')" class="px-5 py-2.5 rounded-lg text-sm font-bold transition text-codTextMuted hover:text-white">Manage Directory</button>
         </div>
 
-        <!-- Register Member Section -->
         <div id="admin-register-section" class="max-w-2xl">
           <div class="bg-codCard border border-codBorder rounded-2xl p-6 sm:p-8 shadow-sm">
             <h3 class="text-lg font-bold text-white mb-6 border-b border-codBorder pb-4 flex items-center space-x-2">
@@ -338,7 +336,7 @@
                 </div>
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Power</label>
                   <input type="number" id="form-power" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
@@ -347,21 +345,12 @@
                   <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Merits</label>
                   <input type="number" id="form-merits" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
                 </div>
-                <div>
-                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Kills</label>
-                  <input type="number" id="form-kills" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
-                </div>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-codBorder pt-4">
                 <div>
                   <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Donation</label>
                   <input type="number" id="form-donation" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Build (sec)</label>
-                  <input type="number" id="form-build" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Destruct (sec)</label>
-                  <input type="number" id="form-destruct" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
                 </div>
                 <div>
                   <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Help</label>
@@ -371,17 +360,24 @@
                   <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Resource Asst.</label>
                   <input type="number" id="form-asst" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
                 </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Build (sec)</label>
+                  <input type="number" id="form-build" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-codTextMuted uppercase tracking-wider mb-2">Destruct (sec)</label>
+                  <input type="number" id="form-destruct" class="w-full bg-codDark border border-codBorder rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-codAccent" placeholder="0">
+                </div>
               </div>
 
               <button onclick="saveAdminForm()" class="w-full py-4 mt-4 bg-codAccent hover:bg-codAccentHover text-black font-extrabold rounded-xl text-sm tracking-wider uppercase transition shadow-lg shadow-codAccent/15 flex items-center justify-center space-x-2">
                 <i data-lucide="save" class="w-5 h-5"></i>
-                <span>Register Alliance Member</span>
+                <span>Save Alliance Member</span>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Manage Directory Section -->
         <div id="admin-manage-section" class="hidden">
           <div class="bg-codCard border border-codBorder rounded-2xl p-4 mb-4 flex items-center">
             <i data-lucide="search" class="w-4 h-4 text-codTextMuted mr-3"></i>
@@ -390,21 +386,20 @@
 
           <div class="bg-codCard border border-codBorder rounded-2xl overflow-hidden relative shadow-xl">
             <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse min-w-[1200px]">
+              <table class="w-full text-left border-collapse min-w-[1000px]">
                 <thead>
                   <tr class="bg-codDark/30 border-b border-codBorder text-[10px] font-bold uppercase tracking-wider text-codTextMuted">
+                    <th class="py-4 px-4 w-12 text-center">Rank</th>
                     <th class="py-4 px-6">Player Identity</th>
-                    <th class="py-4 px-6">ID Code</th>
+                    <th class="py-4 px-6 text-codAccent">WP Grade</th>
                     <th class="py-4 px-6">Power</th>
-                    <th class="py-4 px-6 text-codAccent">Merit Count</th>
-                    <th class="py-4 px-6 text-green-400">Kill Points</th>
+                    <th class="py-4 px-6">Merit Count</th>
                     <th class="py-4 px-6 text-orange-400">Alliance Metrics</th>
                     <th class="py-4 px-6 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="admin-tbody" class="text-sm">
-                  <!-- Javascript populates this -->
-                </tbody>
+                  </tbody>
               </table>
             </div>
           </div>
@@ -413,7 +408,6 @@
     </main>
   </div>
 
-  <!-- Delete Confirmation Modal -->
   <div id="delete-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-codCard border border-codBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-95 transition-transform" id="delete-modal-content">
       <div class="w-12 h-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-4">
@@ -428,7 +422,6 @@
     </div>
   </div>
 
-  <!-- Toast Notification System -->
   <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3"></div>
 
   <script>
@@ -440,7 +433,7 @@
     let activeAllianceFilter = 'All'; 
     
     // Global Chart Objects
-    let charts = { powerChart: null, meritsChart: null, supportChart: null };
+    let charts = { wpChart: null, powerChart: null, meritsChart: null, supportChart: null };
 
     window.onload = function() {
       lucide.createIcons();
@@ -448,7 +441,6 @@
       loadDataFromDisk();
       updateUI();
       
-      // Smart Memory
       if (localStorage.getItem('wrath_hub_visited') === 'true') {
         document.getElementById('welcome-splash').classList.add('hidden');
         autoPullOnLoad(); 
@@ -517,7 +509,6 @@
     function switchView(viewId, event = null) {
       if (event) { event.preventDefault(); toggleSidebar(false); }
       
-      // Reset all views and nav links
       ['overview', 'roster', 'admin'].forEach(v => {
         const el = document.getElementById(v + '-view');
         if(el) {
@@ -531,7 +522,6 @@
         }
       });
       
-      // Set active view and nav link
       const targetView = document.getElementById(viewId + '-view');
       if (targetView) {
         targetView.classList.remove('hidden');
@@ -544,7 +534,6 @@
         targetNav.classList.add('bg-codAccent/10', 'text-codAccent', 'font-semibold');
       }
 
-      // If switching to Overview, ensure charts re-render visually
       if (viewId === 'overview') {
         setTimeout(renderCharts, 50); 
       }
@@ -655,12 +644,10 @@
     function filterAlliance(allianceName) {
       activeAllianceFilter = allianceName;
       
-      // Update ALL alliance badges on the screen
       document.querySelectorAll('.active-alliance-badge').forEach(badge => {
         badge.textContent = allianceName === 'All' ? 'ALL' : allianceName;
       });
       
-      // Update ALL alliance buttons
       document.querySelectorAll('.alliance-tab').forEach(btn => {
         if (btn.dataset.alliance === allianceName) {
           btn.className = "alliance-tab px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 bg-codAccent text-black shadow-lg shadow-codAccent/20";
@@ -673,16 +660,49 @@
       renderCharts();
     }
 
+    // ================== WRATH POINTS (WP) ENGINE ==================
+    // Calculates normalized 0-100 scores based on Family Maximums
+    function attachWP(dataArr) {
+      if(!dataArr || dataArr.length === 0) return [];
+      
+      // Find the absolute highest in the entire database (so scores are consistent)
+      const max = {
+        power: Math.max(1, ...dbData.map(p => p.power || 0)),
+        merits: Math.max(1, ...dbData.map(p => p.merits || 0)),
+        donation: Math.max(1, ...dbData.map(p => p.donation || 0)),
+        buildTime: Math.max(1, ...dbData.map(p => p.buildTime || 0)),
+        destructionTime: Math.max(1, ...dbData.map(p => p.destructionTime || 0)),
+        help: Math.max(1, ...dbData.map(p => p.help || 0)),
+        assistance: Math.max(1, ...dbData.map(p => p.assistance || 0))
+      };
+      
+      return dataArr.map(p => {
+        let wp = 0;
+        wp += ((p.power || 0) / max.power) * 5;           // 5% Weight
+        wp += ((p.merits || 0) / max.merits) * 20;        // 20% Weight
+        wp += ((p.donation || 0) / max.donation) * 25;    // 25% Weight
+        wp += ((p.buildTime || 0) / max.buildTime) * 10;  // 10% Weight
+        wp += ((p.destructionTime || 0) / max.destructionTime) * 10; // 10% Weight
+        wp += ((p.help || 0) / max.help) * 15;            // 15% Weight
+        wp += ((p.assistance || 0) / max.assistance) * 15;// 15% Weight
+        
+        p.wp = parseFloat(wp.toFixed(2)); 
+        return p;
+      });
+    }
+
     // ================== ANALYTICS CHARTS ENGINE ==================
     function renderCharts() {
       let filtered = dbData.filter(p => activeAllianceFilter === 'All' || p.alliance === activeAllianceFilter);
+      filtered = attachWP(filtered); // Ensure WP is attached
       
-      // Grab Top 10 Arrays
+      let topWP = [...filtered].sort((a,b) => (b.wp||0) - (a.wp||0)).slice(0, 10);
       let topPower = [...filtered].sort((a,b) => (b.power||0) - (a.power||0)).slice(0, 10);
       let topMerits = [...filtered].sort((a,b) => (b.merits||0) - (a.merits||0)).slice(0, 10);
       let topSupport = [...filtered].sort((a,b) => ((b.donation||0)+(b.help||0)) - ((a.donation||0)+(a.help||0))).slice(0, 10);
 
-      updateChart('powerChart', topPower, 'Power', 'power', '#dfa13b');
+      updateChart('wpChart', topWP, 'Wrath Points', 'wp', '#dfa13b');
+      updateChart('powerChart', topPower, 'Power', 'power', '#9ca3af');
       updateChart('meritsChart', topMerits, 'Merits', 'merits', '#f87171');
       updateChart('supportChart', topSupport, 'Support Points', p => (p.donation||0) + (p.help||0), '#4ade80');
     }
@@ -744,18 +764,23 @@
       let filtered = dbData.filter(p => {
         const matchesSearch = (p.name && p.name.toLowerCase().includes(searchStr)) || 
                               (p.id && String(p.id).includes(searchStr));
-        
         const matchesAlliance = activeAllianceFilter === 'All' || p.alliance === activeAllianceFilter;
-        
         return matchesSearch && matchesAlliance;
       });
 
+      // Inject WP grades before sorting
+      filtered = attachWP(filtered);
+
+      // Assign WP Rank based on the current filtered list
+      let wpSorted = [...filtered].sort((a,b) => (b.wp || 0) - (a.wp || 0));
+      wpSorted.forEach((p, index) => p.currentWpRank = index + 1);
+
       filtered.sort((a, b) => {
         if (sortVal === 'power') return (b.power || 0) - (a.power || 0);
-        if (sortVal === 'kills') return (b.kills || 0) - (a.kills || 0);
+        if (sortVal === 'merits') return (b.merits || 0) - (a.merits || 0);
         if (sortVal === 'donation') return (b.donation || 0) - (a.donation || 0);
         if (sortVal === 'help') return (b.help || 0) - (a.help || 0);
-        return (b.merits || 0) - (a.merits || 0); 
+        return (b.wp || 0) - (a.wp || 0); // Default to Highest Wrath Points
       });
 
       if (filtered.length === 0) {
@@ -768,16 +793,26 @@
       emptyState.classList.remove('flex');
 
       tbody.innerHTML = filtered.map(player => {
+        let rankDisplay = player.currentWpRank;
+        let rankColor = 'text-codTextMuted text-sm font-bold';
+        if(rankDisplay === 1) { rankDisplay = '🥇'; rankColor = 'text-2xl'; }
+        else if(rankDisplay === 2) { rankDisplay = '🥈'; rankColor = 'text-2xl'; }
+        else if(rankDisplay === 3) { rankDisplay = '🥉'; rankColor = 'text-2xl'; }
+        else { rankDisplay = '#' + rankDisplay; }
+
         return `
           <tr class="hover:bg-codCard/40 transition border-b border-codBorder/40 text-gray-300">
+            <td class="py-4 px-4 text-center font-black ${rankColor}">${rankDisplay}</td>
             <td class="py-4 px-6">
               <span class="block font-semibold text-white">${player.name}</span>
               <span class="block text-[9px] text-codAccent/80 font-bold tracking-wider mt-1">${player.alliance || 'Wrath of God'}</span>
             </td>
             <td class="py-4 px-6 text-codTextMuted font-mono text-xs">${player.id || "N/A"}</td>
-            <td class="py-4 px-6 font-mono">${formatNumber(player.power)}</td>
-            <td class="py-4 px-6 font-mono font-bold text-codAccent">${formatNumber(player.merits)}</td>
-            <td class="py-4 px-6 font-mono text-green-400">${formatNumber(player.kills)}</td>
+            
+            <td class="py-4 px-6 font-mono font-black text-codAccent text-base">${player.wp.toFixed(2)} WP</td>
+            
+            <td class="py-4 px-6 font-mono text-gray-400">${formatNumber(player.power)}</td>
+            <td class="py-4 px-6 font-mono text-gray-400">${formatNumber(player.merits)}</td>
             <td class="py-4 px-6 font-mono text-orange-200/70">${formatNumber(player.donation)}</td>
             <td class="py-4 px-6 font-mono text-orange-200/70">${formatNumber(player.buildTime)}</td>
             <td class="py-4 px-6 font-mono text-orange-200/70">${formatNumber(player.destructionTime)}</td>
@@ -786,6 +821,7 @@
           </tr>
         `;
       }).join('');
+      lucide.createIcons();
     }
 
     function renderAdminTable() {
@@ -797,21 +833,34 @@
                (p.id && String(p.id).includes(searchStr));
       });
 
+      filtered = attachWP(filtered);
+
+      // Assign WP Rank for the Admin table as well
+      let wpSorted = [...filtered].sort((a,b) => (b.wp || 0) - (a.wp || 0));
+      wpSorted.forEach((p, index) => p.currentWpRank = index + 1);
+
       tbody.innerHTML = filtered.map(player => {
         const safeIdOrName = escapeHtmlQuotes(player.id || player.name);
         const safeId = escapeHtmlQuotes(player.id || "");
         const safeName = escapeHtmlQuotes(player.name);
         
+        let rankDisplay = player.currentWpRank;
+        let rankColor = 'text-codTextMuted font-bold';
+        if(rankDisplay === 1) { rankDisplay = '🥇'; rankColor = 'text-xl'; }
+        else if(rankDisplay === 2) { rankDisplay = '🥈'; rankColor = 'text-xl'; }
+        else if(rankDisplay === 3) { rankDisplay = '🥉'; rankColor = 'text-xl'; }
+        else { rankDisplay = '#' + rankDisplay; }
+
         return `
           <tr class="hover:bg-codCard/40 transition border-b border-codBorder/40 text-gray-300">
+            <td class="py-3 px-4 text-center font-black ${rankColor}">${rankDisplay}</td>
             <td class="py-3 px-6">
               <span class="block font-semibold text-white">${player.name}</span>
               <span class="block text-[9px] text-codAccent/80 font-bold tracking-wider mt-1">${player.alliance || 'Wrath of God'}</span>
             </td>
-            <td class="py-3 px-6 text-codTextMuted font-mono text-xs">${player.id || "N/A"}</td>
+            <td class="py-3 px-6 font-mono font-black text-codAccent">${player.wp.toFixed(2)}</td>
             <td class="py-3 px-6 font-mono">${formatNumber(player.power)}</td>
-            <td class="py-3 px-6 font-mono text-codAccent">${formatNumber(player.merits)}</td>
-            <td class="py-3 px-6 font-mono text-green-400">${formatNumber(player.kills)}</td>
+            <td class="py-3 px-6 font-mono">${formatNumber(player.merits)}</td>
             <td class="py-3 px-6 font-mono text-[10px] text-orange-200/70">
               D:${formatNumber(player.donation)} | H:${formatNumber(player.help)}
             </td>
@@ -845,7 +894,7 @@
         alliance: document.getElementById('form-alliance').value,
         power: parseInt(document.getElementById('form-power').value) || 0,
         merits: parseInt(document.getElementById('form-merits').value) || 0,
-        kills: parseInt(document.getElementById('form-kills').value) || 0,
+        kills: 0, // Ignored stat, passed safely to not break DB columns
         donation: parseInt(document.getElementById('form-donation').value) || 0,
         buildTime: parseInt(document.getElementById('form-build').value) || 0,
         destructionTime: parseInt(document.getElementById('form-destruct').value) || 0,
@@ -865,13 +914,12 @@
       pushDataToCloud([playerObj]);
       updateUI();
       
-      showToast(`${name} registered successfully!`);
+      showToast(`${name} saved successfully!`);
       
       document.getElementById('form-name').value = '';
       document.getElementById('form-id').value = '';
       document.getElementById('form-power').value = '';
       document.getElementById('form-merits').value = '';
-      document.getElementById('form-kills').value = '';
       document.getElementById('form-donation').value = '';
       document.getElementById('form-build').value = '';
       document.getElementById('form-destruct').value = '';
@@ -888,7 +936,6 @@
       document.getElementById('form-alliance').value = player.alliance || 'Wrath of God';
       document.getElementById('form-power').value = player.power || '';
       document.getElementById('form-merits').value = player.merits || '';
-      document.getElementById('form-kills').value = player.kills || '';
       document.getElementById('form-donation').value = player.donation || '';
       document.getElementById('form-build').value = player.buildTime || '';
       document.getElementById('form-destruct').value = player.destructionTime || '';
